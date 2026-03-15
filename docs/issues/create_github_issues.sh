@@ -111,7 +111,7 @@ for file in "${FILES[@]}"; do
   fi
 
   if [[ "$EXECUTE" == "true" ]]; then
-    url="$(${cmd[@]})"
+    url="$("${cmd[@]}")"
     number="$(echo "$url" | sed -E 's#.*/issues/([0-9]+)#\1#')"
     base="$(basename "$file")"
     echo -e "${base}\t#${number}\t${url}" | tee -a "$STATE_FILE"
