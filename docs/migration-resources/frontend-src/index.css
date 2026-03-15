@@ -1,0 +1,142 @@
+/* import */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500&family=Noto+Serif:ital,wght@0,400;1,400;1,700&display=swap');
+
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* typography */
+@layer base {
+  html {
+    font-family: 'Noto Sans JP', sans-serif;
+    @apply text-gray-800 bg-gray-50;
+  }
+}
+.logo-font {
+  @apply font-notoserif italic;
+}
+.title-font {
+  @apply font-noto font-medium;
+}
+.e-font {
+  @apply font-notoserif;
+}
+
+/* Background-image */
+.top-background {
+  @apply fixed inset-0 bg-center bg-cover bg-no-repeat h-screen;
+  background-image: url('assets/images/top-image.jpg');
+}
+
+/* components */
+/* button, link */
+.btn {
+  @apply h-8 py-1 px-3 border rounded disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed inline-block text-center text-sm font-medium
+  shadow-sm hover:shadow-md active:shadow-sm;
+}
+
+/* want rate  */
+.radio-tile-group {
+  @apply flex justify-center;
+
+  .input-container {
+    width: 4.5rem;
+    height: 4.5rem;
+    @apply relative m-1 sm:m-2;
+
+    .radio-tile {
+      @apply flex flex-col items-center justify-center w-full h-full border-2 border-indigo-500 rounded p-1 transition transform duration-300 ease-in-out;
+    }
+    .icon i {
+      @apply fill-current text-indigo-500;
+    }
+    .radio-tile-label {
+      @apply text-center text-xs font-normal uppercase tracking-tight text-indigo-500 duration-300 ease-in-out;
+    }
+    .radio-button {
+      @apply opacity-0 absolute top-0 left-0 h-full w-full m-0 cursor-pointer z-50;
+    }
+    .radio-button:checked {
+      + .radio-tile {
+        @apply bg-indigo-500 border-2 border-indigo-500 text-white scale-110;
+        .icon i {
+          @apply fill-current text-white border-indigo-500;
+        }
+        .radio-tile-label {
+          @apply text-white;
+        }
+      }
+    }
+    .radio-button:disabled {
+      + .radio-tile,
+      + .radio-tile .icon i,
+      + .radio-tile .radio-tile-label {
+        @apply opacity-50;
+      }
+    }
+  }
+}
+
+/* library */
+
+/* react-paginate */
+.pagination {
+  @apply flex justify-center items-center text-gray-600 space-x-2 py-4;
+}
+
+.page-item {
+  @apply rounded-lg text-sm hover:bg-gray-200;
+}
+
+.previous-link,
+.next-link,
+.page-link {
+  @apply block px-3 py-1 rounded-lg;
+}
+
+.pagination .active {
+  @apply text-gray-900 cursor-default bg-gray-300 font-medium rounded-lg;
+}
+
+.pagination .disabled {
+  @apply text-gray-300 cursor-default bg-gray-50;
+}
+
+/* Swiper */
+.swiper-button-next,
+.swiper-button-prev {
+  @apply text-gray-200;
+}
+:root {
+  /* swiperのベースカラー設定 paginationの色 */
+  --swiper-theme-color: rgba(229, 231, 235); /* gray-520 */
+}
+
+/* react-tabs */
+.react-tabs__tab-list {
+  @apply flex;
+}
+.react-tabs__tab {
+  @apply flex-grow border-b-2 border-gray-200 list-none cursor-pointer pt-1 pb-2 px-1 text-lg e-font outline-none;
+}
+.react-tabs__tab--selected {
+  @apply border-l-2 text-indigo-500 border-indigo-500;
+}
+
+/* seact-relect input */
+.rs__control {
+  @apply appearance-none border pl-12 py-1 bg-white border-gray-100 shadow-sm focus:shadow-md focus:placeholder-gray-600 transition rounded-md w-full text-gray-600 leading-tight focus:outline-none relative box-border flex-wrap flex;
+}
+
+/* react-select search select form*/
+.search__form {
+  @apply relative bg-gray-100 rounded-full border border-gray-200 flex items-center;
+}
+
+.search__button {
+  @apply p-2 text-xs sm:text-base bg-white rounded-l-full text-gray-600 border-r border-gray-200 disabled:opacity-50 inline-flex items-center focus:outline-none cursor-default;
+}
+
+.search__control {
+  @apply appearance-none bg-transparent pl-2 mr-2 focus:outline-none w-40 sm:w-44 text-xs sm:text-sm flex-wrap flex cursor-pointer;
+}

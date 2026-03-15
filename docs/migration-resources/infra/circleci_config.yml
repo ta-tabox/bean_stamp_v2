@@ -1,0 +1,165 @@
+version: 2.1
+
+orbs:
+  ruby: circleci/ruby@1.8.0
+  node: circleci/node@5.1.0
+  aws-cli: circleci/aws-cli@3.1.4
+  aws-ecr: circleci/aws-ecr@8.1.3 # 8.2.xではjobでbuild contextを指定する際にエラーが出る2023/3/4
+  aws-ecs: circleci/aws-ecs@3.2.0
+  aws-s3: circleci/aws-s3@3.1.1
+
+jobs:
+  api-build:
+    docker:
+      - image: cimg/ruby:3.0.4-node # ruby3.0.4, nodeを含むイメージ
+    working_directory: ~/repo/api
+    steps:
+      - checkout:
+          path: "~/repo"
+      - ruby/install-deps # Ruby Orb を使って依存関係をインストール
+      - node/install-packages: # Node Orb を使ってパッケージをインストール
+          pkg-manager: yarn
+
+  api-checking:
+    docker:
+      - image: cimg/ruby:3.0.4-node
+    working_directory: ~/repo/api
+    steps:
+      - checkout:
+          path: "~/repo"
+      - ruby/install-deps
+      - ruby/rubocop-check:
+          format: progress
+          label: Inspecting with Rubocop
+
+  api-test:
+    # テストを高速化するために「並列ジョブコンテナ」を実行
+    parallelism: 3
+    docker:
+      - image: cimg/ruby:3.0.4-node
+        environment:
+          SELENIUM_DRIVER_URL: http://chrome:4444/wd/hub
+      - image: cimg/mysql:8.0.28 # mysqlイメージ, 開発環境のDocker環境と合わせる
+        command: --default-authentication-plugin=mysql_native_password
+        environment: # mysql用の環境変数
+          MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+          MYSQL_ROOT_HOST: "%"
+          MYSQL_HOST: db
+        name: db
+      - image: selenium/standalone-chrome-debug:latest # capybaraによるテストで使用する
+        name: chrome
+    working_directory: ~/repo/api
+    # Ruby/Rails 固有の環境変数をプライマリコンテナに適用
+    environment:
+      BUNDLE_JOBS: "3"
+      BUNDLE_RETRY: "3"
+      MYSQL_HOST: db
+      RAILS_ENV: test
+    steps:
+      - checkout:
+          path: "~/repo"
+      - ruby/install-deps
+      - node/install-packages:
+          pkg-manager: yarn
+      # データベース上で実行する前にセカンダリコンテナが起動することを確認
+      - run:
+          command: "dockerize -wait tcp://db:3306 -timeout 1m"
+          name: Wait for DB
+      - run:
+          command: "bundle exec rails db:create"
+          name: Database create
+      - run:
+          command: "bundle exec rails db:schema:load --trace"
+          name: Database setup
+      - ruby/rspec-test:
+          include: spec/**/*_spec.rb
+
+  # 正しく更新されたか検証する
+  # 環境変数としてデフォルトで以下を要求 AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY AWS_DEFAULT_REGION, AWS_ECR_REGISTRY_ID
+  verify-deployment:
+    executor: aws-cli/default
+    steps:
+      - aws-cli/install
+      - run:
+          name: Get last task definition
+          # タスク定義名を指定
+          command: >
+            TASK_DEFINITION_ARN=$(aws ecs describe-task-definition \
+                --task-definition ${MY_APP_PREFIX}-prod-task-api \
+                --output text \
+                --query 'taskDefinition.taskDefinitionArn')
+            echo "export TASK_DEFINITION_ARN='${TASK_DEFINITION_ARN}'" >>
+            $BASH_ENV
+      - aws-ecs/verify-revision-is-deployed:
+          family: "${MY_APP_PREFIX}-prod-service"
+          cluster: "${MY_APP_PREFIX}-prod-cluster"
+          task-definition-arn: "${TASK_DEFINITION_ARN}"
+
+  front-build:
+    docker:
+      - image: cimg/node:16.19.1 # yarn v1.22.19入り
+    working_directory: ~/repo/front
+    steps:
+      - checkout:
+          path: "~/repo"
+      - node/install-packages: # Node Orb を使ってパッケージをインストール
+          pkg-manager: yarn
+      - run: yarn build
+      - persist_to_workspace: # front-deployで使用できるようにビルドファイルをworkspaceに保存
+          root: .
+          paths:
+            - dist
+
+  front-deploy:
+    working_directory: ~/repo/front
+    docker:
+      - image: cimg/node:16.19.1
+    steps:
+      - checkout:
+          path: "~/repo"
+      - attach_workspace:
+          at: dist # workspaceからビルドファイルをアタッチ
+      - aws-s3/sync:
+          from: dist/*
+          to: "s3://${AWS_S3_WEB_BUCKET}"
+
+workflows:
+  build_test_and_deploy:
+    jobs:
+      - api-build
+      - api-checking
+      - api-test:
+          requires:
+            - api-build
+      # apiコンテナイメージをECRへbuild-> push
+      - aws-ecr/build-and-push-image:
+          requires:
+            - api-test
+            - front-build
+          filters:
+            branches:
+              only: main
+          path: ./api # apiをビルドコンテキストに指定
+          create-repo: true # ECRにリポジトリがなかったら作るか？
+          dockerfile: containers/app/Dockerfile # pathからの相対
+          repo: "${MY_APP_PREFIX}-prod-api" # ECRリポジトリ名
+          tag: "latest,${CIRCLE_SHA1}" # latestタグ＋ハッシュ
+          extra-build-args: "--build-arg RAILS_MASTER_KEY=${RAILS_MASTER_KEY} --build-arg RAILS_ENV=${RAILS_ENV}" # コンテナビルド時に使用する環境変数を渡す
+      - aws-ecs/deploy-service-update:
+          requires:
+            - aws-ecr/build-and-push-image
+          family: "${MY_APP_PREFIX}-prod-task-api" # タスク定義
+          service-name: "${MY_APP_PREFIX}-prod-service" # サービス名
+          cluster: "${MY_APP_PREFIX}-prod-cluster" # ECSクラスタ名 or ARNフルパス
+          container-image-name-updates: "container=${MY_APP_PREFIX}-prod-api,tag=${CIRCLE_SHA1}" # containerはタスク定義で設定したコンテナ名
+      - verify-deployment: # コンテナデプロイの検証
+          requires:
+            - aws-ecs/deploy-service-update
+      - front-build
+      - front-deploy:
+          requires:
+            - front-build
+            - aws-ecr/build-and-push-image
+          filters:
+            branches:
+              only: main

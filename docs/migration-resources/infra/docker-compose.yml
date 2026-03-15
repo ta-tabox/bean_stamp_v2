@@ -1,0 +1,85 @@
+version: "3"
+services:
+  db:
+    image: mysql:8.0.28
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+      - "3306:3306"
+    # mysqlの認証プラグインをmysql_native_passwordに変更
+    command: --default-authentication-plugin=mysql_native_password
+    # mysqlのデータ領域をホストにボリュームとしてマウントする
+    volumes:
+      - db-data:/var/lib/mysql
+
+  api: &api_base
+    build:
+      context: api
+      dockerfile: ./containers/app/Dockerfile.dev
+      args:
+        WORKDIR: app
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    volumes:
+      - ./api/:/app # ルートディレクトリをbindマウント
+      - bundle:/usr/local/bundle
+      - uploads:/app/public/uploads # carrierwaveによる画像保存先をボリュームとしてマウント
+    ports:
+      - "3000:3000" # localhost:3000でアクセス
+    depends_on:
+      - db
+      - selenium_chrome
+    stdin_open: true # -itオプションと同等の効果
+    tty: true
+    environment:
+      FRONT_ORIGIN: "localhost:5173" # corsで許可するorigin
+      API_ORIGIN: "http://localhost:3000" # FRONTから画像のURLを参照する
+      SELENIUM_DRIVER_URL: http://selenium_chrome:4444/wd/hub
+      WEBPACKER_DEV_SERVER_HOST: webpacker
+
+  selenium_chrome:
+    image: selenium/standalone-chrome-debug:latest
+    ports:
+      - "4444:4444"
+    logging:
+      driver: none
+    environment:
+      CONNECTION_TIMEOUT: 600000
+
+  webpacker:
+    <<: *api_base
+    command: bash -c "bundle exec bin/webpack-dev-server"
+    depends_on:
+      - api
+    ports:
+      - "3035:3035"
+    tty: false
+    stdin_open: false
+    environment:
+      NODE_ENV: development
+      RAILS_ENV: development
+      WEBPACKER_DEV_SERVER_HOST: 0.0.0.0
+
+  front:
+    build:
+      context: front
+      dockerfile: ./containers/Dockerfile
+      args:
+        WORKDIR: app
+        CONTAINER_PORT: 3000
+    volumes:
+      - ./front:/app
+    command: sh -c "yarn run dev"
+    depends_on:
+      - api
+    ports:
+      - "5173:3000" # ブラウザ用アクセス用 localhost:5173
+      - "4173:4173" # vite preview用
+    tty: true #コンテナが勝手に終了しないための設定
+    stdin_open: true #標準入出力とエラー出力をコンテナに結びつける設定
+    environment:
+      - CHOKIDAR_USEPOLLING=true #ホットリロードを行う設定
+
+volumes:
+  db-data: {}
+  uploads: {}
+  bundle: {}
