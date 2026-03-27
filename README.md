@@ -43,7 +43,7 @@ cp .env.example .env.local
 pnpm dev
 ```
 
-Node.js と pnpm は `.mise.toml` で固定しています。
+Node.js と pnpm は `.mise.toml` で固定しています。現在は Node.js `24` 系 LTS を前提にしています。
 
 ## 5. 環境変数
 
