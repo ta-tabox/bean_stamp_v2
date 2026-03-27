@@ -36,13 +36,14 @@ Issue 00 の時点では `app/` を中心に最小構成のみを用意してい
 ## 4. 初期セットアップ
 
 ```bash
-corepack enable
+mise trust
+mise install
 pnpm install
 cp .env.example .env.local
 pnpm dev
 ```
 
-Node.js は `.nvmrc` で `22` を固定しています。
+Node.js と pnpm は `.mise.toml` で固定しています。
 
 ## 5. 環境変数
 
