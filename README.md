@@ -72,6 +72,7 @@ pnpm build
 ## 7. 参照ドキュメント
 
 - 全体仕様: `docs/NEXTJS_REPLACE_SPEC.md`
+- 移行資材INDEX: `docs/migration-resources/INDEX.md`
 - Issue一覧: `docs/issues/ISSUE_INDEX.md`
 - Issue 00: `docs/issues/ISSUE_00.md`
 - READMEテンプレート: `docs/templates/README_TEMPLATE_NEW_REPO.md`
