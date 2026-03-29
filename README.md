@@ -65,6 +65,9 @@ GCS_BUCKET_UPLOADS=replace_me
 pnpm dev
 pnpm lint
 pnpm typecheck
+pnpm test
+pnpm test:unit
+pnpm test:e2e
 pnpm format
 pnpm format:check
 pnpm build
@@ -78,6 +81,7 @@ pnpm build
 - Issue 00: `docs/issues/ISSUE_00.md`
 - Issue 02: `docs/issues/ISSUE_02.md`
 - READMEテンプレート: `docs/templates/README_TEMPLATE_NEW_REPO.md`
+- エージェント運用: `AGENTS.md`
 
 ## 8. アーキテクチャ境界
 
@@ -103,3 +107,12 @@ import ルール:
 - `pnpm lint` が成功する
 - `pnpm typecheck` が成功する
 - README にサーバー層の import 境界が記載されている
+
+## 10. テスト方針
+
+- テスト駆動開発を基本とし、可能なら失敗するテストを先に追加してから実装する
+- `pnpm test` は単体テストの標準入口として扱う
+- 画面遷移やルーティング変更では `pnpm test:e2e` を更新し、主要ルートの到達性を維持する
+- バリデーション、DTO、サーバー utility、純粋関数には `pnpm test:unit` で単体テストを追加する
+- 変更を仕上げる前に、少なくとも `pnpm lint` と `pnpm typecheck` を実行する
+- UI 変更を含むコミット前の標準確認は `pnpm test` と `pnpm test:e2e` をセットで実行する
