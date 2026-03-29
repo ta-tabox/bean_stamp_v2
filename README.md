@@ -45,6 +45,40 @@ pnpm dev
 
 Node.js と pnpm は `.mise.toml` で固定しています。現在は Node.js `24` 系 LTS を前提にしています。
 
+Docker Compose を使う場合の標準手順は [docs/DEVELOPMENT_ENV.md](/Users/daiki/repos/github.com/ta-tabox/bean_stamp_v2/docs/DEVELOPMENT_ENV.md) を参照。
+
+最短の起動手順:
+
+```bash
+docker compose up -d db
+docker compose run --rm app pnpm install
+docker compose run --rm app pnpm prisma:migrate
+docker compose run --rm app pnpm prisma:seed
+docker compose up --build app
+```
+
+- `app`: Next.js 開発サーバーを `http://localhost:3000` で起動
+- `db`: PostgreSQL 16 を `localhost:5432` で起動
+
+初回セットアップ後に migration や seed を追加実行する場合:
+
+```bash
+docker compose exec app pnpm prisma:migrate
+docker compose exec app pnpm prisma:seed
+```
+
+停止:
+
+```bash
+docker compose down
+```
+
+DB データも削除する場合:
+
+```bash
+docker compose down -v
+```
+
 ## 5. 環境変数
 
 ```env
@@ -73,9 +107,23 @@ pnpm format:check
 pnpm build
 ```
 
+Docker Compose 経由の主要コマンド:
+
+```bash
+docker compose exec app pnpm lint
+docker compose exec app pnpm typecheck
+docker compose exec app pnpm test
+docker compose exec app pnpm test:unit
+docker compose exec app pnpm test:e2e
+docker compose exec app pnpm format:check
+docker compose exec app pnpm prisma:migrate
+docker compose exec app pnpm prisma:seed
+```
+
 ## 7. 参照ドキュメント
 
 - 全体仕様: `docs/NEXTJS_REPLACE_SPEC.md`
+- 開発環境ガイド: `docs/DEVELOPMENT_ENV.md`
 - 移行資材INDEX: `docs/migration-resources/INDEX.md`
 - Issue一覧: `docs/issues/ISSUE_INDEX.md`
 - Issue 00: `docs/issues/ISSUE_00.md`
