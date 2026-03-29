@@ -1,5 +1,5 @@
-import { PlaceholderPage } from "@/components/shared/placeholder-page";
-import { wantsRoutes } from "@/features/wants";
+import { PlaceholderPage } from "@/components/shared/placeholder-page"
+import { wantsRoutes } from "@/features/wants"
 
 export default function WantsPage() {
   return (
@@ -9,5 +9,5 @@ export default function WantsPage() {
       description="応募履歴と評価状態をまとめるルートです。"
       links={wantsRoutes}
     />
-  );
+  )
 }

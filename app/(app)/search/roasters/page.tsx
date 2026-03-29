@@ -1,5 +1,5 @@
-import { PlaceholderPage } from "@/components/shared/placeholder-page";
-import { searchRoutes } from "@/features/search";
+import { PlaceholderPage } from "@/components/shared/placeholder-page"
+import { searchRoutes } from "@/features/search"
 
 export default function SearchRoastersPage() {
   return (
@@ -9,5 +9,5 @@ export default function SearchRoastersPage() {
       description="ロースター一覧検索のルートです。"
       links={searchRoutes}
     />
-  );
+  )
 }

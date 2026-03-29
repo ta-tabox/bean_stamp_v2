@@ -1,7 +1,7 @@
-import { defineConfig, devices } from "@playwright/test";
+import { defineConfig, devices } from "@playwright/test"
 
-const port = 3100;
-const baseURL = `http://127.0.0.1:${port}`;
+const port = 3100
+const baseURL = `http://127.0.0.1:${port}`
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -28,4 +28,4 @@ export default defineConfig({
     stdout: "pipe",
     timeout: 240_000,
   },
-});
+})

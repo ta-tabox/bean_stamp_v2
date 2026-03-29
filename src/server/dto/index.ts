@@ -1,10 +1,10 @@
 export type PageInfoDto = {
-  page: number;
-  perPage: number;
-  totalCount: number;
-};
+  page: number
+  perPage: number
+  totalCount: number
+}
 
 export type ResourceMetaDto = {
-  id: string;
-  updatedAt?: string;
-};
+  id: string
+  updatedAt?: string
+}

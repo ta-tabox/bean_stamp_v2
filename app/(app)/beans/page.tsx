@@ -1,5 +1,5 @@
-import { PlaceholderPage } from "@/components/shared/placeholder-page";
-import { beansRoutes } from "@/features/beans";
+import { PlaceholderPage } from "@/components/shared/placeholder-page"
+import { beansRoutes } from "@/features/beans"
 
 export default function BeansPage() {
   return (
@@ -9,5 +9,5 @@ export default function BeansPage() {
       description="Bean 一覧ページのルートです。"
       links={beansRoutes}
     />
-  );
+  )
 }

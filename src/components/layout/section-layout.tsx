@@ -1,26 +1,20 @@
-import Link from "next/link";
-import type { ReactNode } from "react";
+import Link from "next/link"
+import type { ReactNode } from "react"
 
 type SectionLink = {
-  href: string;
-  label: string;
-};
+  href: string
+  label: string
+}
 
 type SectionLayoutProps = {
-  badge: string;
-  children: ReactNode;
-  description: string;
-  links: readonly SectionLink[];
-  title: string;
-};
+  badge: string
+  children: ReactNode
+  description: string
+  links: readonly SectionLink[]
+  title: string
+}
 
-export function SectionLayout({
-  badge,
-  children,
-  description,
-  links,
-  title,
-}: SectionLayoutProps) {
+export function SectionLayout({ badge, children, description, links, title }: SectionLayoutProps) {
   return (
     <div className="min-h-screen px-6 py-8 sm:px-10">
       <div className="mx-auto grid w-full max-w-6xl gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
@@ -29,9 +23,7 @@ export function SectionLayout({
             {badge}
           </p>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight">{title}</h1>
-          <p className="mt-3 text-sm leading-7 text-[var(--color-ink-soft)]">
-            {description}
-          </p>
+          <p className="mt-3 text-sm leading-7 text-[var(--color-ink-soft)]">{description}</p>
           <nav className="mt-6 flex flex-col gap-2">
             <Link
               href="/"
@@ -53,5 +45,5 @@ export function SectionLayout({
         {children}
       </div>
     </div>
-  );
+  )
 }

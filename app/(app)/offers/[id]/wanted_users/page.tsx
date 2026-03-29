@@ -1,14 +1,12 @@
-import { PlaceholderPage } from "@/components/shared/placeholder-page";
-import { offersRoutes } from "@/features/offers";
+import { PlaceholderPage } from "@/components/shared/placeholder-page"
+import { offersRoutes } from "@/features/offers"
 
 type WantedUsersPageProps = Readonly<{
-  params: Promise<{ id: string }>;
-}>;
+  params: Promise<{ id: string }>
+}>
 
-export default async function WantedUsersPage({
-  params,
-}: WantedUsersPageProps) {
-  const { id } = await params;
+export default async function WantedUsersPage({ params }: WantedUsersPageProps) {
+  const { id } = await params
 
   return (
     <PlaceholderPage
@@ -17,5 +15,5 @@ export default async function WantedUsersPage({
       description="Offer に対して Want 済みのユーザー一覧を表示するルートです。"
       links={offersRoutes}
     />
-  );
+  )
 }

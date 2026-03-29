@@ -1,5 +1,5 @@
-import { PlaceholderPage } from "@/components/shared/placeholder-page";
-import { roastersRoutes } from "@/features/roasters";
+import { PlaceholderPage } from "@/components/shared/placeholder-page"
+import { roastersRoutes } from "@/features/roasters"
 
 export default function RoastersHomePage() {
   return (
@@ -9,5 +9,5 @@ export default function RoastersHomePage() {
       description="所属ロースター向けのダッシュボード配置を想定したルートです。"
       links={roastersRoutes}
     />
-  );
+  )
 }

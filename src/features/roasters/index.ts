@@ -5,4 +5,4 @@ export const roastersRoutes = [
   { href: "/roasters/cancel", label: "Cancel" },
   { href: "/roasters/1", label: "Roaster detail" },
   { href: "/roasters/1/follower", label: "Follower" },
-] as const;
+] as const

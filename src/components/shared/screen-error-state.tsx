@@ -1,8 +1,8 @@
 type ScreenErrorStateProps = {
-  detail?: string;
-  retryLabel?: string;
-  title: string;
-};
+  detail?: string
+  retryLabel?: string
+  title: string
+}
 
 export function ScreenErrorState({
   detail,
@@ -16,13 +16,11 @@ export function ScreenErrorState({
       </p>
       <h2 className="mt-3 text-2xl font-semibold">{title}</h2>
       {detail ? (
-        <p className="mt-3 text-sm leading-7 text-[var(--color-ink-soft)]">
-          {detail}
-        </p>
+        <p className="mt-3 text-sm leading-7 text-[var(--color-ink-soft)]">{detail}</p>
       ) : null}
       <div className="mt-6 inline-flex rounded-full border border-[var(--color-border)] bg-white px-4 py-2 text-sm font-medium">
         {retryLabel}
       </div>
     </section>
-  );
+  )
 }

@@ -1,5 +1,5 @@
-import { PlaceholderPage } from "@/components/shared/placeholder-page";
-import { likesRoutes } from "@/features/likes";
+import { PlaceholderPage } from "@/components/shared/placeholder-page"
+import { likesRoutes } from "@/features/likes"
 
 export default function LikesPage() {
   return (
@@ -9,5 +9,5 @@ export default function LikesPage() {
       description="いいね一覧ページのルートです。"
       links={likesRoutes}
     />
-  );
+  )
 }

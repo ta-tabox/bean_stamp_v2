@@ -115,5 +115,6 @@ import ルール:
 - `pnpm test` は単体テストの標準入口として扱う
 - 画面遷移やルーティング変更では `pnpm test:e2e` を更新し、主要ルートの到達性を維持する
 - バリデーション、DTO、サーバー utility、純粋関数には `pnpm test:unit` で単体テストを追加する
+- コミット前に `pnpm format:check` を実行し、失敗した場合は `pnpm format` で整形する
 - 変更を仕上げる前に、少なくとも `pnpm lint` と `pnpm typecheck` を実行する
 - UI 変更を含むコミット前の標準確認は `pnpm test` と `pnpm test:e2e` をセットで実行する

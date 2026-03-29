@@ -1,5 +1,5 @@
-import { PlaceholderPage } from "@/components/shared/placeholder-page";
-import { beansRoutes } from "@/features/beans";
+import { PlaceholderPage } from "@/components/shared/placeholder-page"
+import { beansRoutes } from "@/features/beans"
 
 export default function BeanNewPage() {
   return (
@@ -9,5 +9,5 @@ export default function BeanNewPage() {
       description="豆登録フォームの実装先です。"
       links={beansRoutes}
     />
-  );
+  )
 }

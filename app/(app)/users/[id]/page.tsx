@@ -1,12 +1,12 @@
-import { PlaceholderPage } from "@/components/shared/placeholder-page";
-import { usersRoutes } from "@/features/users";
+import { PlaceholderPage } from "@/components/shared/placeholder-page"
+import { usersRoutes } from "@/features/users"
 
 type UserPageProps = Readonly<{
-  params: Promise<{ id: string }>;
-}>;
+  params: Promise<{ id: string }>
+}>
 
 export default async function UserPage({ params }: UserPageProps) {
-  const { id } = await params;
+  const { id } = await params
 
   return (
     <PlaceholderPage
@@ -15,5 +15,5 @@ export default async function UserPage({ params }: UserPageProps) {
       description="動的ユーザー詳細ページです。SSR でユーザー DTO を読み込む前提で用意しています。"
       links={usersRoutes}
     />
-  );
+  )
 }

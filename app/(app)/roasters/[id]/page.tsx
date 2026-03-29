@@ -1,12 +1,12 @@
-import { PlaceholderPage } from "@/components/shared/placeholder-page";
-import { roastersRoutes } from "@/features/roasters";
+import { PlaceholderPage } from "@/components/shared/placeholder-page"
+import { roastersRoutes } from "@/features/roasters"
 
 type RoasterPageProps = Readonly<{
-  params: Promise<{ id: string }>;
-}>;
+  params: Promise<{ id: string }>
+}>
 
 export default async function RoasterPage({ params }: RoasterPageProps) {
-  const { id } = await params;
+  const { id } = await params
 
   return (
     <PlaceholderPage
@@ -15,5 +15,5 @@ export default async function RoasterPage({ params }: RoasterPageProps) {
       description="ロースター詳細ページです。Bean と Offer への導線はこの画面から展開します。"
       links={roastersRoutes}
     />
-  );
+  )
 }

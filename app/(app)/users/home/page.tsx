@@ -1,5 +1,5 @@
-import { PlaceholderPage } from "@/components/shared/placeholder-page";
-import { usersRoutes } from "@/features/users";
+import { PlaceholderPage } from "@/components/shared/placeholder-page"
+import { usersRoutes } from "@/features/users"
 
 export default function UsersHomePage() {
   return (
@@ -9,5 +9,5 @@ export default function UsersHomePage() {
       description="旧 `/users/home` に対応するログイン後のホームです。"
       links={usersRoutes}
     />
-  );
+  )
 }

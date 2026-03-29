@@ -1,14 +1,12 @@
-import { PlaceholderPage } from "@/components/shared/placeholder-page";
-import { usersRoutes } from "@/features/users";
+import { PlaceholderPage } from "@/components/shared/placeholder-page"
+import { usersRoutes } from "@/features/users"
 
 type UserFollowingPageProps = Readonly<{
-  params: Promise<{ id: string }>;
-}>;
+  params: Promise<{ id: string }>
+}>
 
-export default async function UserFollowingPage({
-  params,
-}: UserFollowingPageProps) {
-  const { id } = await params;
+export default async function UserFollowingPage({ params }: UserFollowingPageProps) {
+  const { id } = await params
 
   return (
     <PlaceholderPage
@@ -17,5 +15,5 @@ export default async function UserFollowingPage({
       description="ユーザーがフォローしているロースター一覧のルートです。"
       links={usersRoutes}
     />
-  );
+  )
 }

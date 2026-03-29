@@ -1,5 +1,5 @@
-import { PlaceholderPage } from "@/components/shared/placeholder-page";
-import { roastersRoutes } from "@/features/roasters";
+import { PlaceholderPage } from "@/components/shared/placeholder-page"
+import { roastersRoutes } from "@/features/roasters"
 
 export default function RoasterCancelPage() {
   return (
@@ -9,5 +9,5 @@ export default function RoasterCancelPage() {
       description="ロースター停止・削除系の UI を置くルートです。"
       links={roastersRoutes}
     />
-  );
+  )
 }

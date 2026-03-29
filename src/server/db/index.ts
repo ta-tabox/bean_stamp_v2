@@ -1,9 +1,9 @@
 export type DatabaseConnection = {
-  kind: "prisma";
-};
+  kind: "prisma"
+}
 
 export function getDatabaseConnection(): DatabaseConnection {
   return {
     kind: "prisma",
-  };
+  }
 }

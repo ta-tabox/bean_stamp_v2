@@ -1,5 +1,5 @@
-import { PlaceholderPage } from "@/components/shared/placeholder-page";
-import { roastersRoutes } from "@/features/roasters";
+import { PlaceholderPage } from "@/components/shared/placeholder-page"
+import { roastersRoutes } from "@/features/roasters"
 
 export default function RoasterNewPage() {
   return (
@@ -9,5 +9,5 @@ export default function RoasterNewPage() {
       description="ロースター登録フォームの受け皿です。"
       links={roastersRoutes}
     />
-  );
+  )
 }

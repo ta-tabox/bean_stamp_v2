@@ -6,4 +6,4 @@ export const appRoutes = [
   { href: "/wants", label: "Wants" },
   { href: "/likes", label: "Likes" },
   { href: "/search", label: "Search" },
-] as const;
+] as const

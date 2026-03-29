@@ -1,1 +1,1 @@
-export const likesRoutes = [{ href: "/likes", label: "Likes" }] as const;
+export const likesRoutes = [{ href: "/likes", label: "Likes" }] as const

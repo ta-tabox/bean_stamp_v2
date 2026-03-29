@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "@playwright/test"
 
 const routes = [
   { path: "/", heading: "公開ルートの入口" },
@@ -32,17 +32,15 @@ const routes = [
   { path: "/search", heading: "検索トップ" },
   { path: "/search/roasters", heading: "ロースター検索" },
   { path: "/search/offers", heading: "オファー検索" },
-] as const;
+] as const
 
 for (const route of routes) {
   test(`${route.path} が表示できる`, async ({ page }) => {
-    const response = await page.goto(route.path);
+    const response = await page.goto(route.path)
 
-    expect(response?.status(), `${route.path} should return 200`).toBe(200);
-    await expect(page.locator("main")).toBeVisible();
-    await expect(
-      page.getByRole("heading", { name: route.heading, exact: true }),
-    ).toBeVisible();
-    await expect(page.getByText("This page could not be found")).toHaveCount(0);
-  });
+    expect(response?.status(), `${route.path} should return 200`).toBe(200)
+    await expect(page.locator("main")).toBeVisible()
+    await expect(page.getByRole("heading", { name: route.heading, exact: true })).toBeVisible()
+    await expect(page.getByText("This page could not be found")).toHaveCount(0)
+  })
 }

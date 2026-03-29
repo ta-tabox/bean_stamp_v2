@@ -1,11 +1,11 @@
-import Link from "next/link";
-import type { ReactNode } from "react";
+import Link from "next/link"
+import type { ReactNode } from "react"
 
-import { publicRoutes } from "@/features/public";
+import { publicRoutes } from "@/features/public"
 
 type PublicLayoutProps = Readonly<{
-  children: ReactNode;
-}>;
+  children: ReactNode
+}>
 
 export default function PublicLayout({ children }: PublicLayoutProps) {
   return (
@@ -22,8 +22,8 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                   Next.js アーキテクチャ骨組み
                 </h1>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--color-ink-soft)] sm:text-base">
-                  `app/(public)`・`app/(auth)`・`app/(app)` にルートを分離し、
-                  後続 issue で機能を載せる前提の土台を用意しています。
+                  `app/(public)`・`app/(auth)`・`app/(app)` にルートを分離し、 後続 issue
+                  で機能を載せる前提の土台を用意しています。
                 </p>
               </div>
             </div>
@@ -43,5 +43,5 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
         {children}
       </div>
     </div>
-  );
+  )
 }

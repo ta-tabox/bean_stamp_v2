@@ -1,11 +1,11 @@
-import type { ReactNode } from "react";
+import type { ReactNode } from "react"
 
-import { authRoutes } from "@/features/auth";
-import { SectionLayout } from "@/components/layout/section-layout";
+import { authRoutes } from "@/features/auth"
+import { SectionLayout } from "@/components/layout/section-layout"
 
 type AuthLayoutProps = Readonly<{
-  children: ReactNode;
-}>;
+  children: ReactNode
+}>
 
 export default function AuthLayout({ children }: AuthLayoutProps) {
   return (
@@ -17,5 +17,5 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
     >
       {children}
     </SectionLayout>
-  );
+  )
 }

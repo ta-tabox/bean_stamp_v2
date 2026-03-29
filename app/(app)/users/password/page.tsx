@@ -1,5 +1,5 @@
-import { PlaceholderPage } from "@/components/shared/placeholder-page";
-import { usersRoutes } from "@/features/users";
+import { PlaceholderPage } from "@/components/shared/placeholder-page"
+import { usersRoutes } from "@/features/users"
 
 export default function UserPasswordPage() {
   return (
@@ -9,5 +9,5 @@ export default function UserPasswordPage() {
       description="認証情報変更系の UI はこのルート配下に集約します。"
       links={usersRoutes}
     />
-  );
+  )
 }

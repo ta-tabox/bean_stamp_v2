@@ -1,14 +1,14 @@
-import type { Metadata } from "next";
-import "./globals.css";
+import type { Metadata } from "next"
+import "./globals.css"
 
 export const metadata: Metadata = {
   title: "Bean Stamp Next.js",
   description: "Bean Stamp の Next.js 置換版",
-};
+}
 
 type RootLayoutProps = Readonly<{
-  children: React.ReactNode;
-}>;
+  children: React.ReactNode
+}>
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
@@ -17,5 +17,5 @@ export default function RootLayout({ children }: RootLayoutProps) {
         {children}
       </body>
     </html>
-  );
+  )
 }

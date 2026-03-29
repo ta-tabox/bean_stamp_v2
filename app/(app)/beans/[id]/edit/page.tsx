@@ -1,12 +1,12 @@
-import { PlaceholderPage } from "@/components/shared/placeholder-page";
-import { beansRoutes } from "@/features/beans";
+import { PlaceholderPage } from "@/components/shared/placeholder-page"
+import { beansRoutes } from "@/features/beans"
 
 type BeanEditPageProps = Readonly<{
-  params: Promise<{ id: string }>;
-}>;
+  params: Promise<{ id: string }>
+}>
 
 export default async function BeanEditPage({ params }: BeanEditPageProps) {
-  const { id } = await params;
+  const { id } = await params
 
   return (
     <PlaceholderPage
@@ -15,5 +15,5 @@ export default async function BeanEditPage({ params }: BeanEditPageProps) {
       description="Bean 編集画面のルートです。"
       links={beansRoutes}
     />
-  );
+  )
 }

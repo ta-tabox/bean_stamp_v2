@@ -1,5 +1,5 @@
-import { PlaceholderPage } from "@/components/shared/placeholder-page";
-import { usersRoutes } from "@/features/users";
+import { PlaceholderPage } from "@/components/shared/placeholder-page"
+import { usersRoutes } from "@/features/users"
 
 export default function UserEditPage() {
   return (
@@ -9,5 +9,5 @@ export default function UserEditPage() {
       description="ユーザー編集画面の移行先です。"
       links={usersRoutes}
     />
-  );
+  )
 }

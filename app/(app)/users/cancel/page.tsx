@@ -1,5 +1,5 @@
-import { PlaceholderPage } from "@/components/shared/placeholder-page";
-import { usersRoutes } from "@/features/users";
+import { PlaceholderPage } from "@/components/shared/placeholder-page"
+import { usersRoutes } from "@/features/users"
 
 export default function UserCancelPage() {
   return (
@@ -9,5 +9,5 @@ export default function UserCancelPage() {
       description="危険操作の確認フローを載せるための退会ページです。"
       links={usersRoutes}
     />
-  );
+  )
 }

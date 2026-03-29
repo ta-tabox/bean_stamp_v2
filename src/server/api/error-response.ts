@@ -1,19 +1,19 @@
-import { asAppError } from "@/server/errors";
+import { asAppError } from "@/server/errors"
 
 export type ApiErrorPayload = {
   error: {
-    code: string;
-    message: string;
-  };
-};
+    code: string
+    message: string
+  }
+}
 
 export type ApiErrorResponse = {
-  payload: ApiErrorPayload;
-  status: number;
-};
+  payload: ApiErrorPayload
+  status: number
+}
 
 export function toApiErrorResponse(error: unknown): ApiErrorResponse {
-  const appError = asAppError(error);
+  const appError = asAppError(error)
 
   return {
     payload: {
@@ -23,5 +23,5 @@ export function toApiErrorResponse(error: unknown): ApiErrorResponse {
       },
     },
     status: appError.status,
-  };
+  }
 }

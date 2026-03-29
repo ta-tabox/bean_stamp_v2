@@ -1,5 +1,5 @@
-import { PlaceholderPage } from "@/components/shared/placeholder-page";
-import { authRoutes } from "@/features/auth";
+import { PlaceholderPage } from "@/components/shared/placeholder-page"
+import { authRoutes } from "@/features/auth"
 
 export default function PasswordResetPage() {
   return (
@@ -9,5 +9,5 @@ export default function PasswordResetPage() {
       description="パスワード再設定フローの受け皿です。メール送信やトークン検証は後続 issue で追加します。"
       links={authRoutes}
     />
-  );
+  )
 }

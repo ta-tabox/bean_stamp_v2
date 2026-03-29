@@ -5,4 +5,4 @@ export const usersRoutes = [
   { href: "/users/edit", label: "Edit" },
   { href: "/users/password", label: "Password" },
   { href: "/users/cancel", label: "Cancel" },
-] as const;
+] as const

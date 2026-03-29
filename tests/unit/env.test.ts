@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest"
 
-import { loadServerEnv } from "@/env";
+import { loadServerEnv } from "@/env"
 
 describe("loadServerEnv", () => {
   it("必要な環境変数を正規化して返す", () => {
@@ -11,12 +11,12 @@ describe("loadServerEnv", () => {
       NEXTAUTH_SECRET: "secret",
       NEXTAUTH_URL: "http://localhost:3000",
       NODE_ENV: "test",
-    });
+    })
 
-    expect(env.NODE_ENV).toBe("test");
-    expect(env.NEXTAUTH_URL).toBe("http://localhost:3000");
-    expect(env.GOOGLE_CLOUD_PROJECT).toBe("bean-stamp-dev");
-  });
+    expect(env.NODE_ENV).toBe("test")
+    expect(env.NEXTAUTH_URL).toBe("http://localhost:3000")
+    expect(env.GOOGLE_CLOUD_PROJECT).toBe("bean-stamp-dev")
+  })
 
   it("不足した環境変数がある場合は失敗する", () => {
     expect(() =>
@@ -24,6 +24,6 @@ describe("loadServerEnv", () => {
         NEXTAUTH_SECRET: "secret",
         NEXTAUTH_URL: "http://localhost:3000",
       }),
-    ).toThrow();
-  });
-});
+    ).toThrow()
+  })
+})

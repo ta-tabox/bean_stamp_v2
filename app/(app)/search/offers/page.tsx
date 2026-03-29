@@ -1,5 +1,5 @@
-import { PlaceholderPage } from "@/components/shared/placeholder-page";
-import { searchRoutes } from "@/features/search";
+import { PlaceholderPage } from "@/components/shared/placeholder-page"
+import { searchRoutes } from "@/features/search"
 
 export default function SearchOffersPage() {
   return (
@@ -9,5 +9,5 @@ export default function SearchOffersPage() {
       description="オファー検索結果一覧を表示するルートです。"
       links={searchRoutes}
     />
-  );
+  )
 }

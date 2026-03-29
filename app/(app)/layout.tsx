@@ -1,11 +1,11 @@
-import type { ReactNode } from "react";
+import type { ReactNode } from "react"
 
-import { appRoutes } from "@/features/app";
-import { SectionLayout } from "@/components/layout/section-layout";
+import { appRoutes } from "@/features/app"
+import { SectionLayout } from "@/components/layout/section-layout"
 
 type AppLayoutProps = Readonly<{
-  children: ReactNode;
-}>;
+  children: ReactNode
+}>
 
 export default function AppLayout({ children }: AppLayoutProps) {
   return (
@@ -17,5 +17,5 @@ export default function AppLayout({ children }: AppLayoutProps) {
     >
       {children}
     </SectionLayout>
-  );
+  )
 }

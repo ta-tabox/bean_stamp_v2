@@ -1,14 +1,12 @@
-import { PlaceholderPage } from "@/components/shared/placeholder-page";
-import { roastersRoutes } from "@/features/roasters";
+import { PlaceholderPage } from "@/components/shared/placeholder-page"
+import { roastersRoutes } from "@/features/roasters"
 
 type RoasterFollowerPageProps = Readonly<{
-  params: Promise<{ id: string }>;
-}>;
+  params: Promise<{ id: string }>
+}>
 
-export default async function RoasterFollowerPage({
-  params,
-}: RoasterFollowerPageProps) {
-  const { id } = await params;
+export default async function RoasterFollowerPage({ params }: RoasterFollowerPageProps) {
+  const { id } = await params
 
   return (
     <PlaceholderPage
@@ -17,5 +15,5 @@ export default async function RoasterFollowerPage({
       description="旧ルーティングの follower/followers 文脈を吸収する一覧ルートです。"
       links={roastersRoutes}
     />
-  );
+  )
 }

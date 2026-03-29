@@ -1,5 +1,5 @@
-import { PlaceholderPage } from "@/components/shared/placeholder-page";
-import { roastersRoutes } from "@/features/roasters";
+import { PlaceholderPage } from "@/components/shared/placeholder-page"
+import { roastersRoutes } from "@/features/roasters"
 
 export default function RoasterEditPage() {
   return (
@@ -9,5 +9,5 @@ export default function RoasterEditPage() {
       description="ロースター情報編集のルートです。"
       links={roastersRoutes}
     />
-  );
+  )
 }
