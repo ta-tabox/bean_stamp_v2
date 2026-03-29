@@ -25,4 +25,6 @@ pnpm-debug.log*
 # local
 /coverage
 .pnpm-store/
+.playwright-browsers/
+test-results/
 tsconfig.tsbuildinfo
