@@ -1,7 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
+  --color-bg: #f5efe3;
+  --color-surface: rgba(255, 252, 246, 0.86);
+  --color-surface-strong: #fffaf2;
+  --color-ink-soft: #6b6255;
+  --color-border: rgba(74, 56, 40, 0.14);
+  --color-fg: #2b2118;
+  --color-accent: #9d4f20;
+  --color-accent-strong: #6f2f12;
+  --color-accent-soft: rgba(157, 79, 32, 0.12);
 }
 
 * {
@@ -9,7 +18,10 @@
 }
 
 html {
-  font-family: Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(circle at top, rgba(217, 142, 71, 0.18), transparent 34%),
+    linear-gradient(180deg, #f7f1e4 0%, #f0e3cb 48%, #e6d3b2 100%);
+  font-family: "Avenir Next", "Hiragino Sans", sans-serif;
 }
 
 body {
@@ -19,4 +31,15 @@ body {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+::selection {
+  background: rgba(157, 79, 32, 0.2);
 }

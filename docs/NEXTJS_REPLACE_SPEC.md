@@ -398,18 +398,18 @@ erDiagram
 - メジャーアップデート追従はIssue化して段階適用する
 - 再現性確保のため `package-lock.json` / `pnpm-lock.yaml` / `yarn.lock` を必ずコミットする
 
-| 現行 | 用途 | 移行候補 |
-|---|---|---|
-| devise + devise_token_auth | 認証 | Auth.js + Prisma Adapter |
-| ActiveRecord | ORM | Prisma |
-| jbuilder | JSON整形 | TypeScript DTO Mapper + zod |
-| pagy | ページネーション | Prisma skip/take + 共通pagination util |
-| ransack | 検索 | Prisma where builder |
-| carrierwave + fog-aws | 画像アップロード | `@google-cloud/storage` |
-| seed-fu | シード投入 | Prisma seed script |
-| rspec | テスト | Vitest + Playwright |
-| rubocop | Lint | ESLint + Biome or Prettier |
-| rails_admin/cancancan | 管理画面/権限制御 | 今回移行対象外（記録のみ） |
+| 現行                       | 用途              | 移行候補                               |
+| -------------------------- | ----------------- | -------------------------------------- |
+| devise + devise_token_auth | 認証              | Auth.js + Prisma Adapter               |
+| ActiveRecord               | ORM               | Prisma                                 |
+| jbuilder                   | JSON整形          | TypeScript DTO Mapper + zod            |
+| pagy                       | ページネーション  | Prisma skip/take + 共通pagination util |
+| ransack                    | 検索              | Prisma where builder                   |
+| carrierwave + fog-aws      | 画像アップロード  | `@google-cloud/storage`                |
+| seed-fu                    | シード投入        | Prisma seed script                     |
+| rspec                      | テスト            | Vitest + Playwright                    |
+| rubocop                    | Lint              | ESLint + Biome or Prettier             |
+| rails_admin/cancancan      | 管理画面/権限制御 | 今回移行対象外（記録のみ）             |
 
 ## 10. パイプライン移行（CircleCI -> GitHub Actions）
 
