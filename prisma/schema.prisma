@@ -1,0 +1,235 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum OfferStatus {
+  on_offering
+  on_roasting
+  on_preparing
+  on_selling
+  end_of_sales
+}
+
+enum WantRate {
+  unrated
+  bad
+  so_so
+  good
+  excellent
+}
+
+model User {
+  id                    BigInt                  @id @default(autoincrement())
+  email                 String                  @default("")
+  encryptedPassword     String                  @default("") @map("encrypted_password")
+  resetPasswordToken    String?                 @unique @map("reset_password_token")
+  resetPasswordSentAt   DateTime?               @map("reset_password_sent_at") @db.Timestamp(6)
+  rememberCreatedAt     DateTime?               @map("remember_created_at") @db.Timestamp(6)
+  createdAt             DateTime                @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt             DateTime                @updatedAt @map("updated_at") @db.Timestamp(6)
+  name                  String                  @default("")
+  prefectureCode        String                  @default("") @map("prefecture_code")
+  describe              String?
+  image                 String?
+  roasterId             BigInt?                 @map("roaster_id")
+  guest                 Boolean                 @default(false)
+  admin                 Boolean                 @default(false)
+  provider              String                  @default("email")
+  uid                   String                  @default("")
+  tokens                String?
+  allowPasswordChange   Boolean                 @default(false) @map("allow_password_change")
+  roaster               Roaster?                @relation(fields: [roasterId], references: [id])
+  wants                 Want[]
+  likes                 Like[]
+  followingRelationships RoasterRelationship[]  @relation("FollowerRelationships")
+
+  @@unique([uid, provider])
+  @@map("users")
+}
+
+model Roaster {
+  id                    BigInt                  @id @default(autoincrement())
+  name                  String                  @default("")
+  phoneNumber           String                  @default("") @map("phone_number")
+  prefectureCode        String                  @default("") @map("prefecture_code")
+  describe              String?
+  createdAt             DateTime                @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt             DateTime                @updatedAt @map("updated_at") @db.Timestamp(6)
+  image                 String?
+  address               String                  @default("")
+  guest                 Boolean                 @default(false)
+  users                 User[]
+  beans                 Bean[]
+  followers             RoasterRelationship[]   @relation("RoasterFollowers")
+
+  @@index([prefectureCode])
+  @@map("roasters")
+}
+
+model Bean {
+  id            BigInt          @id @default(autoincrement())
+  name          String?
+  roasterId     BigInt          @map("roaster_id")
+  createdAt     DateTime        @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime        @updatedAt @map("updated_at") @db.Timestamp(6)
+  subregion     String          @default("")
+  farm          String          @default("")
+  variety       String          @default("")
+  elevation     Int?
+  process       String          @default("")
+  croppedAt     DateTime?       @map("cropped_at") @db.Date
+  describe      String?
+  acidity       Int?
+  flavor        Int?
+  body          Int?
+  bitterness    Int?
+  sweetness     Int?
+  roastLevelId  BigInt          @default(0) @map("roast_level_id")
+  countryId     BigInt          @default(0) @map("country_id")
+  roaster       Roaster         @relation(fields: [roasterId], references: [id])
+  roastLevel    RoastLevel      @relation(fields: [roastLevelId], references: [id])
+  country       Country         @relation(fields: [countryId], references: [id])
+  beanImages    BeanImage[]
+  beanTasteTags BeanTasteTag[]
+  offers        Offer[]
+
+  @@index([countryId])
+  @@index([roastLevelId])
+  @@index([roasterId])
+  @@index([roasterId, createdAt])
+  @@map("beans")
+}
+
+model BeanImage {
+  id        BigInt    @id @default(autoincrement())
+  image     String?
+  beanId    BigInt    @map("bean_id")
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  bean      Bean      @relation(fields: [beanId], references: [id])
+
+  @@index([beanId])
+  @@map("bean_images")
+}
+
+model RoastLevel {
+  id        BigInt    @id
+  name      String?
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  beans     Bean[]
+
+  @@map("mst_roast_levels")
+}
+
+model Country {
+  id        BigInt    @id
+  name      String?
+  area      String?
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  beans     Bean[]
+
+  @@map("mst_countries")
+}
+
+model TasteTag {
+  id           BigInt         @id
+  name         String?
+  createdAt    DateTime       @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt    DateTime       @updatedAt @map("updated_at") @db.Timestamp(6)
+  tasteGroupId BigInt         @map("taste_group_id")
+  beanTasteTags BeanTasteTag[]
+
+  @@index([tasteGroupId])
+  @@map("mst_taste_tags")
+}
+
+model BeanTasteTag {
+  id         BigInt    @id @default(autoincrement())
+  beanId     BigInt    @map("bean_id")
+  tasteTagId BigInt    @map("mst_taste_tag_id")
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  bean       Bean      @relation(fields: [beanId], references: [id])
+  tasteTag   TasteTag  @relation(fields: [tasteTagId], references: [id])
+
+  @@index([beanId])
+  @@index([tasteTagId])
+  @@unique([beanId, tasteTagId])
+  @@map("bean_taste_tags")
+}
+
+model Offer {
+  id               BigInt       @id @default(autoincrement())
+  beanId           BigInt       @map("bean_id")
+  endedAt          DateTime     @db.Date @map("ended_at")
+  roastedAt        DateTime     @db.Date @map("roasted_at")
+  receiptStartedAt DateTime     @db.Date @map("receipt_started_at")
+  receiptEndedAt   DateTime     @db.Date @map("receipt_ended_at")
+  price            Int
+  weight           Int
+  amount           Int
+  createdAt        DateTime     @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt        DateTime     @updatedAt @map("updated_at") @db.Timestamp(6)
+  status           OfferStatus  @default(on_offering)
+  bean             Bean         @relation(fields: [beanId], references: [id])
+  wants            Want[]
+  likes            Like[]
+
+  @@index([beanId])
+  @@index([beanId, createdAt, endedAt])
+  @@map("offers")
+}
+
+model Want {
+  id          BigInt     @id @default(autoincrement())
+  userId      BigInt     @map("user_id")
+  offerId     BigInt     @map("offer_id")
+  receiptedAt DateTime?  @map("receipted_at") @db.Timestamp(6)
+  createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime   @updatedAt @map("updated_at") @db.Timestamp(6)
+  rate        WantRate   @default(unrated)
+  user        User       @relation(fields: [userId], references: [id])
+  offer       Offer      @relation(fields: [offerId], references: [id])
+
+  @@index([userId])
+  @@index([offerId])
+  @@unique([userId, offerId])
+  @@map("wants")
+}
+
+model Like {
+  id        BigInt    @id @default(autoincrement())
+  userId    BigInt    @map("user_id")
+  offerId   BigInt    @map("offer_id")
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  user      User      @relation(fields: [userId], references: [id])
+  offer     Offer     @relation(fields: [offerId], references: [id])
+
+  @@index([userId])
+  @@index([offerId])
+  @@unique([userId, offerId])
+  @@map("likes")
+}
+
+model RoasterRelationship {
+  id         BigInt    @id @default(autoincrement())
+  followerId BigInt    @map("follower_id")
+  roasterId  BigInt    @map("roaster_id")
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  follower   User      @relation("FollowerRelationships", fields: [followerId], references: [id])
+  roaster    Roaster   @relation("RoasterFollowers", fields: [roasterId], references: [id])
+
+  @@index([followerId])
+  @@index([roasterId])
+  @@unique([followerId, roasterId])
+  @@map("roaster_relationships")
+}
