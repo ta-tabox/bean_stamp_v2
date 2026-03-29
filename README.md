@@ -31,7 +31,7 @@ Bean Stamp はコーヒー豆とコーヒー愛好家を繋ぐマッチングサ
 ```
 
 `src/` は Issue 02 以降で `server/` や `features/` を追加して拡張します。  
-Issue 00 の時点では `app/` を中心に最小構成のみを用意しています。
+Issue 02 時点でルーティング骨組みと import 境界を追加しています。
 
 ## 4. 初期セットアップ
 
@@ -56,7 +56,8 @@ GOOGLE_CLOUD_PROJECT=replace_me
 GCS_BUCKET_UPLOADS=replace_me
 ```
 
-Issue 00 では雛形のみ定義し、実際の利用は後続 Issue で追加します。
+`src/env.ts` で `zod` によるサーバー環境変数検証を定義しています。  
+本番コードでは server-side でのみ `loadServerEnv()` を呼び、client component から直接 `process.env` を触らない方針です。
 
 ## 6. 開発コマンド
 
@@ -75,11 +76,30 @@ pnpm build
 - 移行資材INDEX: `docs/migration-resources/INDEX.md`
 - Issue一覧: `docs/issues/ISSUE_INDEX.md`
 - Issue 00: `docs/issues/ISSUE_00.md`
+- Issue 02: `docs/issues/ISSUE_02.md`
 - READMEテンプレート: `docs/templates/README_TEMPLATE_NEW_REPO.md`
 
-## 8. Issue 00 の完了条件
+## 8. アーキテクチャ境界
 
-- `pnpm dev` で App Router の初期画面が起動する
+- `app/`: ルート定義とレイアウトのみ置く。UI 組み立てに必要な薄い責務に限定する
+- `src/features/*`: ドメインごとの route metadata や機能固有 UI を置く
+- `src/components/*`: 特定機能に依存しない shared component / layout を置く
+- `src/server/*`: DB / Auth / API / DTO / エラー変換などサーバー専用コードを置く
+- `src/env.ts`: 環境変数の読み込みとバリデーションを一元化する
+
+import ルール:
+
+- `app/*` は `src/features/*` と `src/components/*` と `src/server/*` を import してよい
+- `src/features/*` は `src/server/*` を直接 import しない
+- `src/features/*` は機能非依存の共通 UI を持たない
+- `src/components/*` は業務ロジックや DB / Auth を持たない
+- `src/server/*` は `src/features/*` を import しない
+- API エラーは `AppError` を `toApiErrorResponse()` で JSON 化する
+- 画面エラーは `ScreenErrorState` のような UI コンポーネントで吸収し、内部例外をそのまま表示しない
+
+## 9. Issue 02 の完了条件
+
+- `pnpm dev` で主要ルートが 404 にならず遷移できる
 - `pnpm lint` が成功する
 - `pnpm typecheck` が成功する
-- README にセットアップ手順が記載されている
+- README にサーバー層の import 境界が記載されている

@@ -24,3 +24,5 @@ pnpm-debug.log*
 
 # local
 /coverage
+.pnpm-store/
+tsconfig.tsbuildinfo
