@@ -94,6 +94,7 @@ pnpm build
 import ルール:
 
 - `app/*` は `src/features/*` と `src/components/*` と `src/server/*` を import してよい
+- `src/**` 配下の import は `@/` エイリアスを使い、相対 import を使わない
 - `src/features/*` は `src/server/*` を直接 import しない
 - `src/features/*` は機能非依存の共通 UI を持たない
 - `src/components/*` は業務ロジックや DB / Auth を持たない

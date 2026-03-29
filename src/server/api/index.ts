@@ -1,2 +1,2 @@
-export { toApiErrorResponse } from "./error-response";
-export type { ApiErrorPayload, ApiErrorResponse } from "./error-response";
+export { toApiErrorResponse } from "@/server/api/error-response";
+export type { ApiErrorPayload, ApiErrorResponse } from "@/server/api/error-response";

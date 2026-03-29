@@ -9,13 +9,13 @@
 - テストを書けない変更でも、最低限 `lint` / `typecheck` は必ず実行する
 - UI ルーティングやページ導線を触る変更では、E2E または同等の画面到達確認を追加・更新する
 - 純粋関数や DTO 変換、バリデーション、 server utility を触る変更では、単体テストを追加・更新する
+- `src/**` 配下の import は `@/` を使う。相対 import は使わない
 
 ## 期待する実行コマンド
 
 - 単体テスト: `pnpm test:unit`
 - 画面到達確認: `pnpm test:e2e`
 - 単体テストの標準入口: `pnpm test`
-- 画面到達確認: `pnpm test:e2e`
 - 静的検証: `pnpm lint && pnpm typecheck`
 
 ## 実装時のルール
