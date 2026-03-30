@@ -1,11 +1,13 @@
 import { PlaceholderPage } from "@/components/shared/placeholder-page"
 import { beansRoutes } from "@/features/beans"
+import { requireRoasterMembership } from "@/server/auth"
 
 type BeanEditPageProps = Readonly<{
   params: Promise<{ id: string }>
 }>
 
 export default async function BeanEditPage({ params }: BeanEditPageProps) {
+  await requireRoasterMembership()
   const { id } = await params
 
   return (

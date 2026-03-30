@@ -1,7 +1,10 @@
 import { PlaceholderPage } from "@/components/shared/placeholder-page"
 import { roastersRoutes } from "@/features/roasters"
+import { requireRoasterMembership } from "@/server/auth"
 
-export default function RoasterCancelPage() {
+export default async function RoasterCancelPage() {
+  await requireRoasterMembership()
+
   return (
     <PlaceholderPage
       eyebrow="Roasters"

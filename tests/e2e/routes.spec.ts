@@ -1,40 +1,15 @@
 import { expect, test } from "@playwright/test"
 
-const routes = [
+const publicRoutes = [
   { path: "/", heading: "公開ルートの入口" },
   { path: "/about", heading: "About" },
   { path: "/help", heading: "Help" },
   { path: "/auth/signin", heading: "Sign in" },
   { path: "/auth/signup", heading: "Sign up" },
   { path: "/auth/password_reset", heading: "Password reset" },
-  { path: "/users/home", heading: "ユーザーホーム" },
-  { path: "/users/1", heading: "ユーザー詳細 #1" },
-  { path: "/users/1/following", heading: "フォロー一覧 #1" },
-  { path: "/users/edit", heading: "プロフィール編集" },
-  { path: "/users/password", heading: "パスワード変更" },
-  { path: "/users/cancel", heading: "ユーザー退会" },
-  { path: "/roasters/home", heading: "ロースターホーム" },
-  { path: "/roasters/new", heading: "ロースター新規作成" },
-  { path: "/roasters/edit", heading: "ロースター編集" },
-  { path: "/roasters/cancel", heading: "ロースター終了" },
-  { path: "/roasters/1", heading: "ロースター詳細 #1" },
-  { path: "/roasters/1/follower", heading: "フォロワー一覧 #1" },
-  { path: "/beans", heading: "豆一覧" },
-  { path: "/beans/new", heading: "豆新規作成" },
-  { path: "/beans/1", heading: "豆詳細 #1" },
-  { path: "/beans/1/edit", heading: "豆編集 #1" },
-  { path: "/offers", heading: "オファー一覧" },
-  { path: "/offers/1", heading: "オファー詳細 #1" },
-  { path: "/offers/1/wanted_users", heading: "応募ユーザー一覧 #1" },
-  { path: "/wants", heading: "Want 一覧" },
-  { path: "/wants/1", heading: "Want 詳細 #1" },
-  { path: "/likes", heading: "Like 一覧" },
-  { path: "/search", heading: "検索トップ" },
-  { path: "/search/roasters", heading: "ロースター検索" },
-  { path: "/search/offers", heading: "オファー検索" },
 ] as const
 
-for (const route of routes) {
+for (const route of publicRoutes) {
   test(`${route.path} が表示できる`, async ({ page }) => {
     const response = await page.goto(route.path)
 
@@ -44,3 +19,80 @@ for (const route of routes) {
     await expect(page.getByText("This page could not be found")).toHaveCount(0)
   })
 }
+
+test("未認証ユーザーは保護ページからサインインへリダイレクトされる", async ({ page }) => {
+  await page.goto("/users/home")
+
+  await expect(page).toHaveURL(/\/auth\/signin$/)
+  await expect(page.getByRole("heading", { name: "Sign in", exact: true })).toBeVisible()
+})
+
+test("認証フローとセッション API が動作する", async ({ page }) => {
+  const uniqueSuffix = Date.now()
+  const email = `auth-${uniqueSuffix}@example.com`
+  const initialPassword = `Initial-${uniqueSuffix}`
+  const nextPassword = `Updated-${uniqueSuffix}`
+
+  await page.goto("/auth/signup")
+  await page.getByLabel("名前").fill("Auth Tester")
+  await page.getByLabel("メールアドレス").fill(email)
+  await page.getByLabel("都道府県コード").fill("13")
+  await page.getByLabel("パスワード", { exact: true }).fill(initialPassword)
+  await page.getByLabel("確認用パスワード").fill(initialPassword)
+  await page.getByRole("button", { name: "登録する" }).click()
+
+  await expect(page).toHaveURL(/\/auth\/signin\?registered=1/)
+  await expect(page.getByText("登録が完了しました。サインインしてください。")).toBeVisible()
+
+  await page.getByLabel("メールアドレス").fill(email)
+  await page.getByLabel("パスワード", { exact: true }).fill(initialPassword)
+  await page.getByRole("button", { name: "サインイン" }).click()
+
+  await expect(page).toHaveURL(/\/users\/home$/)
+  await expect(page.getByText("Auth Tester としてログイン中です。")).toBeVisible()
+  await expect(page.getByRole("button", { name: "サインアウト" })).toBeVisible()
+
+  const sessionResponse = await page.context().request.get("/api/v1/auth/sessions")
+  expect(sessionResponse.ok()).toBeTruthy()
+  await expect(await sessionResponse.json()).toMatchObject({
+    is_login: true,
+    user: {
+      email,
+      name: "Auth Tester",
+      prefecture_code: "13",
+      roaster_id: null,
+    },
+  })
+
+  await page.goto("/auth/signin")
+  await expect(page).toHaveURL(/\/users\/home$/)
+
+  await page.goto("/roasters/home")
+  await expect(page).toHaveURL(/\/users\/home$/)
+
+  await page.goto("/roasters/new")
+  await expect(page).toHaveURL(/\/roasters\/new$/)
+  await expect(page.getByRole("heading", { name: "ロースター新規作成", exact: true })).toBeVisible()
+
+  await page.getByRole("button", { name: "サインアウト" }).click()
+  await expect(page).toHaveURL(/\/auth\/signin$/)
+
+  await page.goto("/auth/password_reset")
+  await page.getByLabel("メールアドレス").fill(email)
+  await page.getByRole("button", { name: "再設定メールを送る" }).click()
+
+  await expect(page.getByText("パスワード再設定メールを送信しました。")).toBeVisible()
+  await page.getByRole("link", { name: "パスワードを再設定する" }).click()
+  await expect(page).toHaveURL(/\/auth\/password_reset\?token=/)
+
+  await page.getByLabel("新しいパスワード").fill(nextPassword)
+  await page.getByLabel("確認用パスワード").fill(nextPassword)
+  await page.getByRole("button", { name: "パスワードを更新する" }).click()
+
+  await expect(page).toHaveURL(/\/auth\/signin\?reset=1/)
+  await page.getByLabel("メールアドレス").fill(email)
+  await page.getByLabel("パスワード", { exact: true }).fill(nextPassword)
+  await page.getByRole("button", { name: "サインイン" }).click()
+
+  await expect(page).toHaveURL(/\/users\/home$/)
+})

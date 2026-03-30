@@ -2,19 +2,28 @@ import type { ReactNode } from "react"
 
 import { appRoutes } from "@/features/app"
 import { SectionLayout } from "@/components/layout/section-layout"
+import { SignOutButton } from "@/features/auth/components/sign-out-button"
+import { requireSession } from "@/server/auth"
 
 type AppLayoutProps = Readonly<{
   children: ReactNode
 }>
 
-export default function AppLayout({ children }: AppLayoutProps) {
+export const dynamic = "force-dynamic"
+
+export default async function AppLayout({ children }: AppLayoutProps) {
+  const session = await requireSession()
+
   return (
     <SectionLayout
       badge="App"
       title="認証後アプリ"
-      description="将来的にはセッション必須レイアウトに置き換え、`redirect()` ベースのサーバーサイドガードをここで適用します。"
+      description={`${session.name || session.email} としてログイン中です。未認証ユーザーはこのレイアウトへ到達できません。`}
       links={appRoutes}
     >
+      <div className="mb-4 flex justify-end">
+        <SignOutButton />
+      </div>
       {children}
     </SectionLayout>
   )

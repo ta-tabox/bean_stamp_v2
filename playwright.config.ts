@@ -21,7 +21,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: `pnpm exec next build && pnpm exec next start --hostname 127.0.0.1 --port ${port}`,
+    command: `BEAN_STAMP_E2E=1 NEXTAUTH_URL=${baseURL} NODE_ENV=production pnpm exec next build && BEAN_STAMP_E2E=1 NEXTAUTH_URL=${baseURL} NODE_ENV=production pnpm exec next start --hostname 127.0.0.1 --port ${port}`,
     port,
     reuseExistingServer: !process.env.CI,
     stderr: "pipe",
