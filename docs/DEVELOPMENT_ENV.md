@@ -8,6 +8,7 @@
 - `app` コンテナは Next.js 開発サーバー専用とし、依存導入は別コマンドで行う
 - PostgreSQL は `db` コンテナで管理する
 - Prisma の migration / seed も `app` コンテナから実行する
+- E2E は `e2e` コンテナに分離し、Playwright のブラウザ依存は `app` に持ち込まない
 
 ## サービス構成
 
@@ -17,6 +18,10 @@
 - `db`
   - PostgreSQL 16
   - 公開ポート: `5432`
+- `e2e`
+  - Playwright 公式イメージベースの `Dockerfile.e2e` を使う E2E 実行用コンテナ
+  - ブラウザ実体は `/ms-playwright` を使用
+  - `pnpm test:e2e` 実行時だけ entrypoint で `pnpm prisma:generate` を先行実行する
 
 ## 初回セットアップ
 
@@ -92,7 +97,8 @@ docker compose exec app pnpm test
 E2E:
 
 ```bash
-docker compose exec app pnpm test:e2e
+docker compose run --rm e2e pnpm install
+docker compose run --rm e2e pnpm test:e2e
 ```
 
 Lint:
@@ -162,10 +168,11 @@ docker compose exec db psql -U postgres -d bean_stamp -c "\\dt"
 ## Agent 作業向けの運用メモ
 
 - 作業開始時は `docker compose ps` で `app` と `db` の状態を確認する
+- E2E 実行前は `docker compose run --rm e2e pnpm install` で `e2e` 用の依存を同期する
 - `app` が未起動なら、まず `docker compose up -d db` を実行する
 - 依存が未導入なら `docker compose run --rm app pnpm install` を実行する
 - DB を作り直した場合は `docker compose run --rm app pnpm prisma:migrate` と `docker compose run --rm app pnpm prisma:seed` を実行する
-- UI やルーティング変更時は `docker compose exec app pnpm test:e2e` まで実行する
+- UI やルーティング変更時は `docker compose run --rm e2e pnpm test:e2e` まで実行する
 - 純粋関数や server utility の変更時は `docker compose exec app pnpm test:unit` を実行する
 - 最低限の静的検証は `docker compose exec app pnpm lint` と `docker compose exec app pnpm typecheck`
 
