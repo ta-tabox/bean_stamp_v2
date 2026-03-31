@@ -3,7 +3,7 @@ import type { ReactNode } from "react"
 import { appRoutes } from "@/features/app"
 import { SectionLayout } from "@/components/layout/SectionLayout"
 import { SignOutButton } from "@/features/auth/components/SignOutButton"
-import { requireSession } from "@/server/auth"
+import { requireSession } from "@/server/auth/guards"
 
 type AppLayoutProps = Readonly<{
   children: ReactNode

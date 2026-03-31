@@ -1,6 +1,6 @@
 import { PlaceholderPage } from "@/components/shared/PlaceholderPage"
 import { beansRoutes } from "@/features/beans"
-import { requireRoasterMembership } from "@/server/auth"
+import { requireRoasterMembership } from "@/server/auth/guards"
 
 type BeanEditPageProps = Readonly<{
   params: Promise<{ id: string }>

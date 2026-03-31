@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 
-import { getSessionPrincipal } from "@/server/auth"
+import { getSessionPrincipal } from "@/server/auth/guards"
 import { buildLegacySessionResponse } from "@/server/auth/session"
 import { prisma } from "@/server/db"
 

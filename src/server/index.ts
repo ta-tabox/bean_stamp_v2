@@ -1,5 +1,5 @@
 export * as api from "@/server/api"
-export * as auth from "@/server/auth"
+export * as auth from "@/server/auth/guards"
 export * as db from "@/server/db"
 export * as dto from "@/server/dto"
 export * from "@/server/errors"

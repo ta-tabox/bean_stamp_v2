@@ -1,6 +1,6 @@
 import { PlaceholderPage } from "@/components/shared/PlaceholderPage"
 import { roastersRoutes } from "@/features/roasters"
-import { requireRoasterMembership } from "@/server/auth"
+import { requireRoasterMembership } from "@/server/auth/guards"
 
 export default async function RoasterEditPage() {
   await requireRoasterMembership()

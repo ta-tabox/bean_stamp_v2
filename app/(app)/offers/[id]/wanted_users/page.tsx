@@ -1,6 +1,6 @@
 import { PlaceholderPage } from "@/components/shared/PlaceholderPage"
 import { offersRoutes } from "@/features/offers"
-import { requireRoasterMembership } from "@/server/auth"
+import { requireRoasterMembership } from "@/server/auth/guards"
 
 type WantedUsersPageProps = Readonly<{
   params: Promise<{ id: string }>

@@ -1,6 +1,6 @@
 import { PlaceholderPage } from "@/components/shared/PlaceholderPage"
 import { roastersRoutes } from "@/features/roasters"
-import { requireNoRoasterMembership } from "@/server/auth"
+import { requireNoRoasterMembership } from "@/server/auth/guards"
 
 export default async function RoasterNewPage() {
   await requireNoRoasterMembership()

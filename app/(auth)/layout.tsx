@@ -2,7 +2,7 @@ import type { ReactNode } from "react"
 
 import { authRoutes } from "@/features/auth"
 import { SectionLayout } from "@/components/layout/SectionLayout"
-import { requireSignedOut } from "@/server/auth"
+import { requireSignedOut } from "@/server/auth/guards"
 
 type AuthLayoutProps = Readonly<{
   children: ReactNode
