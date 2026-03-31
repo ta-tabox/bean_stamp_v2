@@ -1,4 +1,4 @@
-import { PlaceholderPage } from "@/components/shared/placeholder-page"
+import { PlaceholderPage } from "@/components/shared/PlaceholderPage"
 import { publicRoutes } from "@/features/public"
 
 export default function AboutPage() {

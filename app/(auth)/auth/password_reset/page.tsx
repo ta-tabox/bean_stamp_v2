@@ -1,7 +1,7 @@
 import Link from "next/link"
 
-import { AuthFormShell } from "@/features/auth/components/auth-form-shell"
-import { AuthStatusMessage } from "@/features/auth/components/auth-status-message"
+import { AuthFormShell } from "@/features/auth/components/AuthFormShell"
+import { AuthStatusMessage } from "@/features/auth/components/AuthStatusMessage"
 import { requestPasswordResetAction, resetPasswordAction } from "@/server/auth/actions"
 
 type PasswordResetPageProps = {

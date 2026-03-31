@@ -1,8 +1,8 @@
 import type { ReactNode } from "react"
 
 import { appRoutes } from "@/features/app"
-import { SectionLayout } from "@/components/layout/section-layout"
-import { SignOutButton } from "@/features/auth/components/sign-out-button"
+import { SectionLayout } from "@/components/layout/SectionLayout"
+import { SignOutButton } from "@/features/auth/components/SignOutButton"
 import { requireSession } from "@/server/auth"
 
 type AppLayoutProps = Readonly<{

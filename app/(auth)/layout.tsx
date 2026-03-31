@@ -1,7 +1,7 @@
 import type { ReactNode } from "react"
 
 import { authRoutes } from "@/features/auth"
-import { SectionLayout } from "@/components/layout/section-layout"
+import { SectionLayout } from "@/components/layout/SectionLayout"
 import { requireSignedOut } from "@/server/auth"
 
 type AuthLayoutProps = Readonly<{

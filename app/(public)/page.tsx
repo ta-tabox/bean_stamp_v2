@@ -1,4 +1,4 @@
-import { PlaceholderPage } from "@/components/shared/placeholder-page"
+import { PlaceholderPage } from "@/components/shared/PlaceholderPage"
 import { appRoutes } from "@/features/app"
 import { authRoutes } from "@/features/auth"
 import { publicRoutes } from "@/features/public"

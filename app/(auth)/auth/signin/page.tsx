@@ -1,8 +1,8 @@
 import Link from "next/link"
 
-import { AuthFormShell } from "@/features/auth/components/auth-form-shell"
-import { AuthStatusMessage } from "@/features/auth/components/auth-status-message"
-import { SignInForm } from "@/features/auth/components/sign-in-form"
+import { AuthFormShell } from "@/features/auth/components/AuthFormShell"
+import { AuthStatusMessage } from "@/features/auth/components/AuthStatusMessage"
+import { SignInForm } from "@/features/auth/components/SignInForm"
 
 type SignInPageProps = {
   searchParams?: Promise<{

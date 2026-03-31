@@ -1,4 +1,4 @@
-import { PlaceholderPage } from "@/components/shared/placeholder-page"
+import { PlaceholderPage } from "@/components/shared/PlaceholderPage"
 import { roastersRoutes } from "@/features/roasters"
 import { requireRoasterMembership } from "@/server/auth"
 
