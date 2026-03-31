@@ -59,6 +59,8 @@ docker compose up --build app
 
 - `app`: Next.js 開発サーバーを `http://localhost:3000` で起動
 - `db`: PostgreSQL 16 を `localhost:5432` で起動
+- `e2e`: Playwright 公式イメージを土台にした `Dockerfile.e2e` ベースの E2E 実行専用コンテナ
+  - `pnpm test:e2e` 実行時は entrypoint が `pnpm prisma:generate` を先行する
 
 初回セットアップ後に migration や seed を追加実行する場合:
 
@@ -114,7 +116,8 @@ docker compose exec app pnpm lint
 docker compose exec app pnpm typecheck
 docker compose exec app pnpm test
 docker compose exec app pnpm test:unit
-docker compose exec app pnpm test:e2e
+docker compose run --rm e2e pnpm install
+docker compose run --rm e2e pnpm test:e2e
 docker compose exec app pnpm format:check
 docker compose exec app pnpm prisma:migrate
 docker compose exec app pnpm prisma:seed

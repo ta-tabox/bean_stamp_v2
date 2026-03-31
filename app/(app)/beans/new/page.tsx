@@ -1,7 +1,10 @@
-import { PlaceholderPage } from "@/components/shared/placeholder-page"
+import { PlaceholderPage } from "@/components/shared/PlaceholderPage"
 import { beansRoutes } from "@/features/beans"
+import { requireRoasterMembership } from "@/server/auth/guards"
 
-export default function BeanNewPage() {
+export default async function BeanNewPage() {
+  await requireRoasterMembership()
+
   return (
     <PlaceholderPage
       eyebrow="Beans"

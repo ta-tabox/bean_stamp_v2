@@ -1,11 +1,13 @@
-import { PlaceholderPage } from "@/components/shared/placeholder-page"
+import { PlaceholderPage } from "@/components/shared/PlaceholderPage"
 import { offersRoutes } from "@/features/offers"
+import { requireRoasterMembership } from "@/server/auth/guards"
 
 type WantedUsersPageProps = Readonly<{
   params: Promise<{ id: string }>
 }>
 
 export default async function WantedUsersPage({ params }: WantedUsersPageProps) {
+  await requireRoasterMembership()
   const { id } = await params
 
   return (

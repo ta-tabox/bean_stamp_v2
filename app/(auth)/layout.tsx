@@ -1,18 +1,23 @@
 import type { ReactNode } from "react"
 
 import { authRoutes } from "@/features/auth"
-import { SectionLayout } from "@/components/layout/section-layout"
+import { SectionLayout } from "@/components/layout/SectionLayout"
+import { requireSignedOut } from "@/server/auth/guards"
 
 type AuthLayoutProps = Readonly<{
   children: ReactNode
 }>
 
-export default function AuthLayout({ children }: AuthLayoutProps) {
+export const dynamic = "force-dynamic"
+
+export default async function AuthLayout({ children }: AuthLayoutProps) {
+  await requireSignedOut()
+
   return (
     <SectionLayout
       badge="Auth"
       title="認証ルート"
-      description="将来的には `RequireSignedOutRoute` 相当の判定をレイアウトで行い、サインイン済みユーザーをアプリ本体へリダイレクトします。"
+      description="サインイン前ユーザー向けのルートです。認証済みの場合はアプリ本体へリダイレクトします。"
       links={authRoutes}
     >
       {children}
