@@ -6,7 +6,7 @@ export default function AboutPage() {
     <PlaceholderPage
       eyebrow="Public"
       title="About"
-      description="サービス紹介ページの差し替え先です。旧 `About` 画面の文言とビジュアルは後続 issue で移植します。"
+      description="旧 About 画面の差し替え先です。共通ヘッダーと公開ナビゲーションの下でサービス紹介を表示する構成にしています。"
       links={publicRoutes}
     />
   )

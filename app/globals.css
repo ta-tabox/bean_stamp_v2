@@ -5,8 +5,11 @@
   --color-bg: #f5efe3;
   --color-surface: rgba(255, 252, 246, 0.86);
   --color-surface-strong: #fffaf2;
+  --color-panel: rgba(247, 239, 226, 0.82);
+  --color-header: #f3eadb;
   --color-ink-soft: #6b6255;
   --color-border: rgba(74, 56, 40, 0.14);
+  --color-border-strong: rgba(74, 56, 40, 0.22);
   --color-fg: #2b2118;
   --color-accent: #9d4f20;
   --color-accent-strong: #6f2f12;
@@ -26,6 +29,8 @@ html {
 
 body {
   margin: 0;
+  color: var(--color-fg);
+  min-height: 100vh;
 }
 
 a {

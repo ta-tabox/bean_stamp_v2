@@ -20,6 +20,22 @@ for (const route of publicRoutes) {
   })
 }
 
+test("公開ヘッダーのナビゲーションで主要ページに遷移できる", async ({ page }) => {
+  await page.goto("/")
+
+  await page.getByRole("link", { name: "ABOUT", exact: true }).first().click()
+  await expect(page).toHaveURL(/\/about$/)
+  await expect(page.getByRole("heading", { name: "About", exact: true })).toBeVisible()
+
+  await page.getByRole("link", { name: "HELP", exact: true }).first().click()
+  await expect(page).toHaveURL(/\/help$/)
+  await expect(page.getByRole("heading", { name: "Help", exact: true })).toBeVisible()
+
+  await page.getByRole("link", { name: "HOME", exact: true }).first().click()
+  await expect(page).toHaveURL(/\/$/)
+  await expect(page.getByRole("heading", { name: "公開ルートの入口", exact: true })).toBeVisible()
+})
+
 test("未認証ユーザーは保護ページからサインインへリダイレクトされる", async ({ page }) => {
   await page.goto("/users/home")
 
@@ -49,7 +65,7 @@ test("認証フローとセッション API が動作する", async ({ page }) =
   await page.getByRole("button", { name: "サインイン" }).click()
 
   await expect(page).toHaveURL(/\/users\/home$/)
-  await expect(page.getByText("Auth Tester としてログイン中です。")).toBeVisible()
+  await expect(page.getByRole("heading", { name: "ユーザーホーム", exact: true })).toBeVisible()
   await expect(page.getByRole("button", { name: "サインアウト" })).toBeVisible()
 
   const sessionResponse = await page.context().request.get("/api/v1/auth/sessions")
@@ -73,6 +89,14 @@ test("認証フローとセッション API が動作する", async ({ page }) =
   await page.goto("/roasters/new")
   await expect(page).toHaveURL(/\/roasters\/new$/)
   await expect(page.getByRole("heading", { name: "ロースター新規作成", exact: true })).toBeVisible()
+
+  await page.getByRole("link", { name: "Offers" }).first().click()
+  await expect(page).toHaveURL(/\/offers$/)
+  await expect(page.getByRole("heading", { name: "オファー一覧", exact: true })).toBeVisible()
+
+  await page.getByRole("link", { name: "Search" }).first().click()
+  await expect(page).toHaveURL(/\/search$/)
+  await expect(page.getByRole("heading", { name: "検索トップ", exact: true })).toBeVisible()
 
   await page.getByRole("button", { name: "サインアウト" }).click()
   await expect(page).toHaveURL(/\/auth\/signin$/)

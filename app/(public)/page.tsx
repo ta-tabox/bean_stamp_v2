@@ -8,7 +8,7 @@ export default function PublicHomePage() {
     <PlaceholderPage
       eyebrow="Public"
       title="公開ルートの入口"
-      description="トップ・About・Help は未認証でも到達できる公開ページとして配置しています。下のリンクから認証ルートとアプリ内ルートにも遷移できます。"
+      description="トップ・About・Help の公開ページは共通ヘッダー配下で表示されます。下のリンクから認証ルートと主要アプリ導線にも移動できます。"
       links={[...publicRoutes, ...authRoutes, ...appRoutes.slice(0, 8)]}
     />
   )

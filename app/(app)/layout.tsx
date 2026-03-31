@@ -1,7 +1,6 @@
 import type { ReactNode } from "react"
 
-import { appRoutes } from "@/features/app"
-import { SectionLayout } from "@/components/layout/SectionLayout"
+import { AppChrome } from "@/components/layout/AppChrome"
 import { SignOutButton } from "@/features/auth/components/SignOutButton"
 import { requireSession } from "@/server/auth/guards"
 
@@ -13,18 +12,14 @@ export const dynamic = "force-dynamic"
 
 export default async function AppLayout({ children }: AppLayoutProps) {
   const session = await requireSession()
+  const currentUserLabel = `ログイン中: ${session.name || session.email}`
 
   return (
-    <SectionLayout
-      badge="App"
-      title="認証後アプリ"
-      description={`${session.name || session.email} としてログイン中です。未認証ユーザーはこのレイアウトへ到達できません。`}
-      links={appRoutes}
+    <AppChrome
+      currentUserLabel={currentUserLabel}
+      signOutSlot={<SignOutButton />}
     >
-      <div className="mb-4 flex justify-end">
-        <SignOutButton />
-      </div>
       {children}
-    </SectionLayout>
+    </AppChrome>
   )
 }
