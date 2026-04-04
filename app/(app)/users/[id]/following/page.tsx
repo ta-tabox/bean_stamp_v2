@@ -1,9 +1,13 @@
 import Link from "next/link"
 
-import { SectionLayout } from "@/components/layout/SectionLayout"
-import { buildUsersRoutes } from "@/features/users"
+import {
+  ProfileLinksRow,
+  ProfileListItemLink,
+  ProfileListSection,
+  ProfileSummaryCard,
+} from "@/components/profiles/ProfileUi"
 import { getSessionPrincipal } from "@/server/auth/guards"
-import { listRoastersFollowedByUser } from "@/server/profiles/service"
+import { getUserProfile, listRoastersFollowedByUser } from "@/server/profiles/service"
 
 type UserFollowingPageProps = Readonly<{
   params: Promise<{ id: string }>
@@ -12,43 +16,71 @@ type UserFollowingPageProps = Readonly<{
 export default async function UserFollowingPage({ params }: UserFollowingPageProps) {
   const { id } = await params
   const currentUser = await getSessionPrincipal()
-  const routes = buildUsersRoutes(currentUser?.id ?? id)
-  const roasters = await listRoastersFollowedByUser(id)
+  const [user, roasters] = await Promise.all([getUserProfile(id), listRoastersFollowedByUser(id)])
 
   return (
-    <SectionLayout
-      badge="Users"
-      title={`フォロー一覧 #${id}`}
-      description="ユーザーがフォローしているロースター一覧です。"
-      links={routes}
-    >
-      <main className="space-y-4">
-        {roasters.length === 0 ? (
-          <section className="rounded-[2rem] border border-dashed border-[var(--color-border)] bg-[var(--color-surface)] p-8 text-sm text-[var(--color-ink-soft)]">
-            フォロー中のロースターはまだありません。
-          </section>
-        ) : (
-          roasters.map((roaster) => (
+    <main className="space-y-6">
+      <section className="page-card">
+        <p className="panel-label">Users</p>
+        <h1 className="title-font mt-3 text-3xl text-[var(--color-fg)]">{`フォロー一覧 #${id}`}</h1>
+      </section>
+
+      <ProfileSummaryCard
+        kind="Users"
+        name={user.name}
+        handle={`@ user-${id}`}
+        imageUrl={user.thumbnail_url}
+        placeholder="user"
+        description={user.describe ?? "自己紹介はまだ設定されていません。"}
+        details={[
+          { label: "メールアドレス", value: user.email },
+          { label: "都道府県コード", value: user.prefecture_code },
+          {
+            label: "所属ロースター",
+            value: user.roaster_id === null ? "未所属" : `#${user.roaster_id}`,
+          },
+          { label: "フォロー件数", value: String(roasters.length) },
+        ]}
+        actions={
+          currentUser?.id === id ? (
             <Link
-              key={roaster.id}
-              href={`/roasters/${roaster.id}`}
-              className="block rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[0_20px_70px_rgba(82,53,22,0.08)]"
+              href="/users/edit"
+              className="btn btn-secondary"
             >
-              <div className="flex flex-wrap items-start justify-between gap-4">
-                <div>
-                  <h2 className="text-xl font-semibold">{roaster.name}</h2>
-                  <p className="mt-2 text-sm text-[var(--color-ink-soft)]">
-                    {roaster.address || "住所未設定"}
-                  </p>
-                </div>
-                <span className="rounded-full border border-[var(--color-border)] px-3 py-1 text-xs uppercase tracking-[0.2em] text-[var(--color-accent)]">
-                  {roaster.prefecture_code}
-                </span>
-              </div>
+              プロフィールを編集
             </Link>
-          ))
-        )}
-      </main>
-    </SectionLayout>
+          ) : null
+        }
+      >
+        <ProfileLinksRow
+          title="導線"
+          links={[
+            { href: `/users/${id}`, label: "プロフィールへ戻る", tone: "secondary" },
+            { href: "/search/roasters", label: "ロースターを探す", tone: "primary" },
+          ]}
+        />
+      </ProfileSummaryCard>
+
+      <ProfileListSection
+        title="フォロー中ロースター"
+        hasItems={roasters.length > 0}
+        emptyTitle="フォロー中のロースターはまだありません"
+        emptyDescription="検索ページからロースターを見つけてフォローすると、この一覧に反映されます。"
+        emptyAction={{ href: "/search/roasters", label: "ロースターを探す", tone: "primary" }}
+      >
+        {roasters.map((roaster) => (
+          <ProfileListItemLink
+            key={roaster.id}
+            href={`/roasters/${roaster.id}`}
+            title={roaster.name}
+            subtitle={roaster.address || "住所未設定"}
+            description={roaster.describe ?? "紹介文はまだ登録されていません。"}
+            imageUrl={roaster.thumbnail_url}
+            placeholder="roaster"
+            badge={roaster.prefecture_code}
+          />
+        ))}
+      </ProfileListSection>
+    </main>
   )
 }

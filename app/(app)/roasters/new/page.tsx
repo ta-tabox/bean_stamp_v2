@@ -11,7 +11,7 @@ export default async function RoasterNewPage() {
     <SectionLayout
       badge="Roasters"
       title="ロースター新規作成"
-      description="ロースター名、連絡先、住所を登録します。"
+      description="ロースター情報を登録します。"
       links={routes}
     >
       <main className="rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[0_20px_70px_rgba(82,53,22,0.08)]">
@@ -26,6 +26,7 @@ function RoasterForm(props: {
   defaultValues?: {
     address?: string
     describe?: string | null
+    imageUrl?: string | null
     name?: string
     phoneNumber?: string
     prefectureCode?: string
@@ -58,6 +59,13 @@ function RoasterForm(props: {
         name="address"
         defaultValue={defaults.address ?? ""}
       />
+      <FormField
+        label="ロゴ画像 URL"
+        name="imageUrl"
+        type="url"
+        required={false}
+        defaultValue={defaults.imageUrl ?? ""}
+      />
       <label className="block space-y-2 text-sm font-medium">
         <span>紹介文</span>
         <textarea
@@ -77,13 +85,19 @@ function RoasterForm(props: {
   )
 }
 
-function FormField(props: { defaultValue: string; label: string; name: string }) {
+function FormField(props: {
+  defaultValue: string
+  label: string
+  name: string
+  required?: boolean
+  type?: "text" | "url"
+}) {
   return (
     <label className="block space-y-2 text-sm font-medium">
       <span>{props.label}</span>
       <input
-        required
-        type="text"
+        required={props.required ?? true}
+        type={props.type ?? "text"}
         name={props.name}
         defaultValue={props.defaultValue}
         className="w-full rounded-2xl border border-[var(--color-border)] bg-white px-4 py-3 outline-none transition focus:border-[var(--color-accent)]"

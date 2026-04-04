@@ -18,16 +18,16 @@ export function SectionLayout({ badge, children, description, links, title }: Se
   return (
     <div className="min-h-screen px-6 py-8 sm:px-10">
       <div className="mx-auto grid w-full max-w-6xl gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
-        <aside className="rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[0_20px_70px_rgba(82,53,22,0.08)] backdrop-blur">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--color-accent)]">
-            {badge}
-          </p>
-          <h1 className="mt-3 text-3xl font-semibold tracking-tight">{title}</h1>
-          <p className="mt-3 text-sm leading-7 text-[var(--color-ink-soft)]">{description}</p>
+        <aside className="page-card">
+          <p className="panel-label">{badge}</p>
+          <h1 className="title-font mt-3 text-3xl tracking-tight text-[var(--color-fg)]">
+            {title}
+          </h1>
+          <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">{description}</p>
           <nav className="mt-6 flex flex-col gap-2">
             <Link
               href="/"
-              className="rounded-full border border-[var(--color-border)] bg-white/60 px-4 py-2 text-sm font-medium transition hover:border-[var(--color-accent)] hover:bg-[var(--color-accent-soft)]"
+              className="btn btn-secondary"
             >
               公開トップ
             </Link>
@@ -35,7 +35,7 @@ export function SectionLayout({ badge, children, description, links, title }: Se
               <Link
                 key={`${badge}-${link.label}-${link.href}`}
                 href={link.href}
-                className="rounded-full border border-[var(--color-border)] bg-white/60 px-4 py-2 text-sm font-medium transition hover:border-[var(--color-accent)] hover:bg-[var(--color-accent-soft)]"
+                className="btn btn-secondary"
               >
                 {link.label}
               </Link>

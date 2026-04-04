@@ -9,20 +9,18 @@ type AuthFormShellProps = {
 
 export function AuthFormShell({ children, description, footer, title }: AuthFormShellProps) {
   return (
-    <main className="rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[0_24px_90px_rgba(82,53,22,0.08)] backdrop-blur sm:p-8">
+    <main className="form-shell">
       <div className="mx-auto max-w-xl space-y-6">
         <div className="space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--color-accent)]">
-            Auth
-          </p>
-          <h2 className="text-3xl font-semibold tracking-tight">{title}</h2>
-          <p className="text-sm leading-7 text-[var(--color-ink-soft)] sm:text-base">
-            {description}
-          </p>
+          <p className="panel-label">Auth</p>
+          <h2 className="title-font text-3xl tracking-tight text-[var(--color-fg)]">{title}</h2>
+          <p className="text-sm leading-7 text-[var(--color-muted)] sm:text-base">{description}</p>
         </div>
         {children}
         {footer ? (
-          <div className="border-t border-[var(--color-border)] pt-4 text-sm">{footer}</div>
+          <div className="border-t border-[var(--color-border)] pt-4 text-sm text-[var(--color-muted)]">
+            {footer}
+          </div>
         ) : null}
       </div>
     </main>

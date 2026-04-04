@@ -1,9 +1,13 @@
 import Link from "next/link"
 
-import { SectionLayout } from "@/components/layout/SectionLayout"
-import { buildRoastersRoutes } from "@/features/roasters"
+import {
+  ProfileLinksRow,
+  ProfileListItemLink,
+  ProfileListSection,
+  ProfileSummaryCard,
+} from "@/components/profiles/ProfileUi"
 import { requireSession } from "@/server/auth/guards"
-import { listRoasterFollowers } from "@/server/profiles/service"
+import { getRoasterProfile, listRoasterFollowers } from "@/server/profiles/service"
 
 type RoasterFollowerPageProps = Readonly<{
   params: Promise<{ id: string }>
@@ -12,41 +16,70 @@ type RoasterFollowerPageProps = Readonly<{
 export default async function RoasterFollowerPage({ params }: RoasterFollowerPageProps) {
   const { id } = await params
   const session = await requireSession()
-  const routes = buildRoastersRoutes(session.roasterId ?? id)
-  const followers = await listRoasterFollowers(id)
+  const [roaster, followers] = await Promise.all([
+    getRoasterProfile(id, session.id),
+    listRoasterFollowers(id),
+  ])
 
   return (
-    <SectionLayout
-      badge="Roasters"
-      title={`フォロワー一覧 #${id}`}
-      description="このロースターをフォローしているユーザー一覧です。"
-      links={routes}
-    >
-      <main className="space-y-4">
-        {followers.length === 0 ? (
-          <section className="rounded-[2rem] border border-dashed border-[var(--color-border)] bg-[var(--color-surface)] p-8 text-sm text-[var(--color-ink-soft)]">
-            まだフォロワーはいません。
-          </section>
-        ) : (
-          followers.map((user) => (
+    <main className="space-y-6">
+      <section className="page-card">
+        <p className="panel-label">Roasters</p>
+        <h1 className="title-font mt-3 text-3xl text-[var(--color-fg)]">{`フォロワー一覧 #${id}`}</h1>
+      </section>
+
+      <ProfileSummaryCard
+        kind="Roasters"
+        name={roaster.name}
+        handle={`@ roaster-${id}`}
+        imageUrl={roaster.thumbnail_url}
+        placeholder="roaster"
+        description={roaster.describe ?? "ロースター紹介はまだありません。"}
+        details={[
+          { label: "電話番号", value: roaster.phone_number },
+          { label: "都道府県コード", value: roaster.prefecture_code },
+          { label: "住所", value: roaster.address },
+          { label: "フォロワー数", value: String(followers.length) },
+        ]}
+        actions={
+          session.roasterId === id ? (
             <Link
-              key={user.id}
-              href={`/users/${user.id}`}
-              className="block rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[0_20px_70px_rgba(82,53,22,0.08)]"
+              href="/roasters/edit"
+              className="btn btn-secondary"
             >
-              <div className="flex flex-wrap items-start justify-between gap-4">
-                <div>
-                  <h2 className="text-xl font-semibold">{user.name}</h2>
-                  <p className="mt-2 text-sm text-[var(--color-ink-soft)]">{user.email}</p>
-                </div>
-                <span className="rounded-full border border-[var(--color-border)] px-3 py-1 text-xs uppercase tracking-[0.2em] text-[var(--color-accent)]">
-                  {user.prefecture_code}
-                </span>
-              </div>
+              ロースターを編集
             </Link>
-          ))
-        )}
-      </main>
-    </SectionLayout>
+          ) : null
+        }
+      >
+        <ProfileLinksRow
+          title="導線"
+          links={[
+            { href: `/roasters/${id}`, label: "ロースター詳細へ戻る", tone: "secondary" },
+            { href: "/search/roasters", label: "ロースター検索へ", tone: "secondary" },
+          ]}
+        />
+      </ProfileSummaryCard>
+
+      <ProfileListSection
+        title="フォロワー一覧"
+        hasItems={followers.length > 0}
+        emptyTitle="まだフォロワーはいません"
+        emptyDescription="ユーザーがこのロースターをフォローすると、ここに順次表示されます。"
+      >
+        {followers.map((user) => (
+          <ProfileListItemLink
+            key={user.id}
+            href={`/users/${user.id}`}
+            title={user.name}
+            subtitle={user.email}
+            description={user.describe ?? "自己紹介はまだ設定されていません。"}
+            imageUrl={user.thumbnail_url}
+            placeholder="user"
+            badge={user.prefecture_code}
+          />
+        ))}
+      </ProfileListSection>
+    </main>
   )
 }

@@ -102,8 +102,12 @@ test("認証フローとセッション API が動作する", async ({ page }) =
   await expect(
     page.getByRole("heading", { name: `ユーザー詳細 #${userId}`, exact: true }),
   ).toBeVisible()
+  await expect(page.getByText(updatedEmail)).toHaveCount(0)
+  await expect(page.getByRole("link", { name: "フォロー中ロースターを見る" })).toBeVisible()
 
   await page.goto("/users/edit")
+  await expect(page.getByRole("main").getByRole("link", { name: "パスワード変更" })).toBeVisible()
+  await expect(page.getByRole("main").getByRole("link", { name: "退会する" })).toBeVisible()
   await page.getByLabel("名前").fill("Auth Tester Updated")
   await page.getByLabel("メールアドレス").fill(updatedEmail)
   await page.getByLabel("都道府県コード").fill("27")
@@ -112,7 +116,6 @@ test("認証フローとセッション API が動作する", async ({ page }) =
 
   await expect(page).toHaveURL(new RegExp(`/users/${userId}\\?updated=1`))
   await expect(page.getByText("プロフィールを更新しました。")).toBeVisible()
-  await expect(page.getByText(updatedEmail)).toBeVisible()
 
   await page.goto("/roasters/new")
   await expect(page).toHaveURL(/\/roasters\/new$/)
@@ -128,7 +131,7 @@ test("認証フローとセッション API が動作する", async ({ page }) =
   await expect(page.getByText("ロースターを作成しました。")).toBeVisible()
   const roasterId = page.url().match(/\/roasters\/(\d+)/)?.[1]
   expect(roasterId).toBeTruthy()
-  await expect(page.getByText("Auth Roaster")).toBeVisible()
+  await expect(page.getByRole("heading", { name: "Auth Roaster", exact: true })).toBeVisible()
   await expect(page.getByRole("link", { name: "ロースターを編集" })).toBeVisible()
 
   const roasterPayload = await page.evaluate(
@@ -160,10 +163,14 @@ test("認証フローとセッション API が動作する", async ({ page }) =
   })
 
   await page.goto("/roasters/edit")
+  await expect(
+    page.getByRole("main").getByRole("link", { name: "ロースターを削除する" }),
+  ).toBeVisible()
   await page.getByLabel("紹介文").fill("説明を更新しました")
   await page.getByRole("button", { name: "更新する" }).click()
   await expect(page).toHaveURL(new RegExp(`/roasters/${roasterId}\\?updated=1`))
   await expect(page.getByText("ロースターを更新しました。")).toBeVisible()
+  await expect(page.getByRole("link", { name: "フォロワー一覧を見る" })).toBeVisible()
 
   await page.getByRole("link", { name: "Offers" }).first().click()
   await expect(page).toHaveURL(/\/offers$/)
@@ -244,9 +251,15 @@ test("認証フローとセッション API が動作する", async ({ page }) =
   )
 
   await page.goto(`/users/${secondUserId}/following`)
-  await expect(page.getByText("Auth Roaster")).toBeVisible()
+  await expect(
+    page.getByRole("heading", { name: `フォロー一覧 #${secondUserId}`, exact: true }),
+  ).toBeVisible()
+  await expect(page.getByRole("link", { name: "ロースターを探す" })).toBeVisible()
 
   await page.goto(`/roasters/${roasterId}/follower`)
+  await expect(
+    page.getByRole("heading", { name: `フォロワー一覧 #${roasterId}`, exact: true }),
+  ).toBeVisible()
   await expect(page.getByRole("link", { name: /Follower User/ })).toBeVisible()
 
   await page.goto(`/roasters/${roasterId}`)

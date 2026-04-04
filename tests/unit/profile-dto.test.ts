@@ -15,6 +15,7 @@ describe("profile dto builders", () => {
         email: "user@example.com",
         guest: false,
         id: 10n,
+        image: "https://example.com/user.png",
         name: "Test User",
         prefectureCode: "13",
         roasterId: 20n,
@@ -24,11 +25,11 @@ describe("profile dto builders", () => {
       email: "user@example.com",
       guest: false,
       id: 10,
-      image_url: null,
+      image_url: "https://example.com/user.png",
       name: "Test User",
       prefecture_code: "13",
       roaster_id: 20,
-      thumbnail_url: null,
+      thumbnail_url: "https://example.com/user.png",
     })
   })
 
@@ -40,6 +41,7 @@ describe("profile dto builders", () => {
         followersCount: 3,
         guest: false,
         id: 5n,
+        image: "https://example.com/roaster.png",
         name: "Roaster",
         phoneNumber: "03-0000-0000",
         prefectureCode: "13",
@@ -51,12 +53,12 @@ describe("profile dto builders", () => {
       followers_count: 3,
       guest: false,
       id: 5,
-      image_url: null,
+      image_url: "https://example.com/roaster.png",
       name: "Roaster",
       phone_number: "03-0000-0000",
       prefecture_code: "13",
       roaster_relationship_id: 11,
-      thumbnail_url: null,
+      thumbnail_url: "https://example.com/roaster.png",
     })
   })
 

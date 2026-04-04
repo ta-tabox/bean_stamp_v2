@@ -14,6 +14,9 @@ import {
 const userProfileSchema = z.object({
   describe: z.string().trim().optional(),
   email: z.email("メールアドレスを確認してください"),
+  imageUrl: z
+    .union([z.url("画像URLを確認してください"), z.literal(""), z.null(), z.undefined()])
+    .optional(),
   name: z.string().trim().min(1, "名前を入力してください"),
   prefectureCode: z.string().trim().min(1, "都道府県コードを入力してください"),
 })
@@ -21,6 +24,9 @@ const userProfileSchema = z.object({
 const roasterProfileSchema = z.object({
   address: z.string().trim().min(1, "住所を入力してください"),
   describe: z.string().trim().optional(),
+  imageUrl: z
+    .union([z.url("画像URLを確認してください"), z.literal(""), z.null(), z.undefined()])
+    .optional(),
   name: z.string().trim().min(1, "ロースター名を入力してください"),
   phoneNumber: z.string().trim().min(1, "電話番号を入力してください"),
   prefectureCode: z.string().trim().min(1, "都道府県コードを入力してください"),
@@ -34,6 +40,7 @@ const userSelect = {
   email: true,
   guest: true,
   id: true,
+  image: true,
   name: true,
   prefectureCode: true,
   roasterId: true,
@@ -44,6 +51,7 @@ const roasterSelect = {
   describe: true,
   guest: true,
   id: true,
+  image: true,
   name: true,
   phoneNumber: true,
   prefectureCode: true,
@@ -113,6 +121,7 @@ export async function updateUserProfile(userId: string, input: UserProfileInput)
       data: {
         describe: normalizeOptionalText(input.describe),
         email: input.email.trim().toLowerCase(),
+        image: normalizeOptionalText(input.imageUrl),
         name: input.name.trim(),
         prefectureCode: input.prefectureCode.trim(),
         uid: input.email.trim().toLowerCase(),
@@ -501,6 +510,7 @@ function buildRoasterMutationData(input: RoasterProfileInput): Prisma.RoasterUnc
   return {
     address: input.address.trim(),
     describe: normalizeOptionalText(input.describe),
+    image: normalizeOptionalText(input.imageUrl),
     name: input.name.trim(),
     phoneNumber: input.phoneNumber.trim(),
     prefectureCode: input.prefectureCode.trim(),
