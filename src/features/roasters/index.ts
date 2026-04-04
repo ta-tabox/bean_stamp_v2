@@ -1,15 +1,23 @@
 export function buildRoastersRoutes(roasterId?: string | null) {
-  return [
+  const baseRoutes = [
     { href: "/roasters/home", label: "ロースターホーム" },
     { href: "/roasters/new", label: "新規作成" },
     { href: "/roasters/edit", label: "ロースター編集" },
     { href: "/roasters/cancel", label: "ロースター削除" },
+  ] as const
+
+  if (!roasterId) {
+    return baseRoutes
+  }
+
+  return [
+    ...baseRoutes,
     {
-      href: roasterId ? `/roasters/${roasterId}` : "/roasters/new",
+      href: `/roasters/${roasterId}`,
       label: "ロースター詳細",
     },
     {
-      href: roasterId ? `/roasters/${roasterId}/follower` : "/roasters/new",
+      href: `/roasters/${roasterId}/follower`,
       label: "フォロワー一覧",
     },
   ] as const

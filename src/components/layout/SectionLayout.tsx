@@ -33,7 +33,7 @@ export function SectionLayout({ badge, children, description, links, title }: Se
             </Link>
             {links.map((link) => (
               <Link
-                key={`${badge}-${link.href}`}
+                key={`${badge}-${link.label}-${link.href}`}
                 href={link.href}
                 className="rounded-full border border-[var(--color-border)] bg-white/60 px-4 py-2 text-sm font-medium transition hover:border-[var(--color-accent)] hover:bg-[var(--color-accent-soft)]"
               >
