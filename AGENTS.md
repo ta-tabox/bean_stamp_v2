@@ -4,28 +4,48 @@
 
 ## 基本方針
 
-- テスト駆動開発を基本とする
-- 不具合修正や新機能追加では、可能なら先に失敗するテストを書く
+- テスト駆動開発を基本とし、可能なら先に失敗するテストを書く
 - テストを書けない変更でも、最低限 `lint` / `typecheck` は必ず実行する
 - UI ルーティングやページ導線を触る変更では、E2E または同等の画面到達確認を追加・更新する
-- 純粋関数や DTO 変換、バリデーション、server utility を触る変更では、単体テストを追加・更新する
+- 純粋関数、DTO 変換、バリデーション、server utility を触る変更では、単体テストを追加・更新する
+- 開発環境や運用手順に関する修正を行った場合は、`AGENTS.md`、`README.md`、`docs/DEVELOPMENT_ENV.md` など関連ドキュメントの更新を完了条件に含める
 - `src/**` 配下の import は `@/` を使う。相対 import は使わない
 - GitHub の PR タイトル・本文・コメントは日本語で記載する
+- Issue 対応の PR 本文には、対象 Issue を閉じる `Closes #...` などのクローズ指定を必ず入れる
 
-## 検証コマンド
+## コマンド原則
 
-- 単体テスト: `pnpm test:unit`
-- 画面到達確認: `pnpm test:e2e`
-- 単体テストの標準入口: `pnpm test`
-- 整形確認: `pnpm format:check`
-- 静的検証: `pnpm lint && pnpm typecheck`
+- 検証、整形、ビルド、Prisma 操作は、ライブラリや CLI を直接叩かず、必ず `package.json` に定義された script を `pnpm <script>` で実行する
+- Docker Compose 経由で実行する場合も、`docker compose exec ... pnpm <script>` または `docker compose run --rm ... pnpm <script>` を使う
+- 開発・検証は Docker Compose を正とし、ローカル直実行の成功には依存しない
+- ローカルの `pnpm` 実行は、Compose が使えない場合または切り分けに必要な場合だけに限定する
+- 詳細な起動手順、復旧手順、エラー切り分けは `docs/DEVELOPMENT_ENV.md` を参照する
+
+## 標準コマンド
+
+- 単体テスト: `docker compose exec app pnpm test:unit`
+- 単体テスト標準入口: `docker compose exec app pnpm test`
+- E2E: `docker compose run --rm e2e pnpm test:e2e`
+- 静的検証: `docker compose exec app pnpm lint && docker compose exec app pnpm typecheck`
+- 整形確認: `docker compose exec app pnpm format:check`
+- 整形: `docker compose exec app pnpm format`
+- ビルド確認: `docker compose exec app pnpm build`
+- Prisma Client 再生成: `docker compose exec app pnpm prisma:generate`
+- Prisma migration: `docker compose exec app pnpm prisma:migrate`
+- Prisma migration deploy: `docker compose exec app pnpm prisma:migrate:deploy`
+- Prisma seed: `docker compose exec app pnpm prisma:seed`
 
 ## Docker / Compose 運用
 
-- `app` コンテナはアプリケーション実行に責務を絞り、E2E のブラウザ依存を持ち込まない
-- E2E は `e2e` コンテナで実行する
-- `pnpm test:e2e` は `e2e` コンテナから実行する
-- Playwright のブラウザパスや `prisma generate` など、E2E 実行環境に関する調整は Docker 側で管理する
+- `app` はアプリケーション実行用コンテナ、`db` は PostgreSQL、`e2e` は Playwright 実行用コンテナとして扱う
+- `app` コンテナは E2E のブラウザ依存を持ち込まない
+- E2E は `e2e` コンテナから実行する
+- `app` 起動時には entrypoint で `pnpm prisma:migrate:deploy` が走る前提で考える
+- Prisma の migration / seed / generate は `app` コンテナから実行する
+- Node.js 依存の導入は `docker compose run --rm app pnpm install` と `docker compose run --rm e2e pnpm install` を使う
+- Prisma schema を変更した場合、または依存ボリュームを作り直した場合は、検証前に Prisma Client の再生成状態を確認する
+- UI やルーティング変更時の E2E は `docker compose up -d app` の後に `docker compose run --rm e2e pnpm install` と `docker compose run --rm e2e pnpm test:e2e` を実行する
+- seed データが必要な検証では、事前に `docker compose run --rm app pnpm prisma:seed` を実行する
 
 ## テスト運用ルール
 
@@ -35,10 +55,12 @@
 - テスト失敗を残したままコミットしない
 - `pnpm format:check` が失敗した場合は、`pnpm format` で整形してから他の検証へ進む
 - 既存テストが落ちた場合は、仕様変更か回帰かを切り分けてから修正する
-- UI やルーティングを変更した場合、`pnpm test` に加えて `pnpm test:e2e` を必ず実行する
 - テストが失敗した場合は、まずテストコードの妥当性を確認する
 - テストコードが適切なら、ソースコードを修正してテストを通す
 - テストコードが古くなっている場合は、テストコードを修正してよい。ただし、何をどのような目的で直すかをユーザーに事前に伝える
+- テスト、整形、lint、typecheck、build、Prisma 操作は Docker Compose 経由で実行する
+- 純粋関数、DTO、バリデーション、server utility の変更では `docker compose exec app pnpm test:unit` を優先する
+- UI やルーティング変更では `docker compose exec app pnpm test` に加えて `docker compose run --rm e2e pnpm test:e2e` を実行する
 - 共通レイアウトや導線の骨格を移行している段階では、E2E はデスクトップ中心の到達確認を優先する
 - モバイル viewport 固有の E2E は、主要コンテンツと導線が固まった段階で追加する
 - モバイル E2E を後続へ送る場合は、将来追加する方針を関連ドキュメントまたは issue に明記する
