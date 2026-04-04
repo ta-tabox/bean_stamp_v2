@@ -1,8 +1,10 @@
-export const usersRoutes = [
-  { href: "/users/home", label: "Users home" },
-  { href: "/users/1", label: "User detail" },
-  { href: "/users/1/following", label: "Following" },
-  { href: "/users/edit", label: "Edit" },
-  { href: "/users/password", label: "Password" },
-  { href: "/users/cancel", label: "Cancel" },
-] as const
+export function buildUsersRoutes(userId: string) {
+  return [
+    { href: "/users/home", label: "ユーザーホーム" },
+    { href: `/users/${userId}`, label: "プロフィール" },
+    { href: `/users/${userId}/following`, label: "フォロー中ロースター" },
+    { href: "/users/edit", label: "プロフィール編集" },
+    { href: "/users/password", label: "パスワード変更" },
+    { href: "/users/cancel", label: "退会" },
+  ] as const
+}
