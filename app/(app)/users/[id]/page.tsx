@@ -17,15 +17,16 @@ export default async function UserPage({ params, searchParams }: UserPageProps) 
 
   return (
     <main className="space-y-6">
-      <section className="page-card">
-        <p className="panel-label">Users</p>
-        <h1 className="title-font mt-3 text-3xl text-[var(--color-fg)]">{`ユーザー詳細 #${id}`}</h1>
+      <section className="content-header-panel">
+        <div className="flex h-full items-end justify-start">
+          <h1 className="title-font text-3xl text-[var(--color-fg)]">ユーザー詳細</h1>
+        </div>
       </section>
       {search.updated === "1" ? <StatusBanner>プロフィールを更新しました。</StatusBanner> : null}
       <ProfileSummaryCard
-        kind="Profile"
+        kind="User"
         name={user.name}
-        handle={`@ user-${id}`}
+        handle={`@ ${user.prefecture_code}`}
         imageUrl={user.thumbnail_url}
         placeholder="user"
         description={user.describe ?? "自己紹介はまだ設定されていません。"}
@@ -42,9 +43,9 @@ export default async function UserPage({ params, searchParams }: UserPageProps) 
           currentUser?.id === id ? (
             <Link
               href="/users/edit"
-              className="btn btn-primary"
+              className="btn btn-secondary"
             >
-              プロフィールを編集
+              編集
             </Link>
           ) : null
         }
@@ -52,12 +53,12 @@ export default async function UserPage({ params, searchParams }: UserPageProps) 
         <ProfileLinksRow
           title="関連導線"
           links={[
-            { href: `/users/${id}/following`, label: "フォロー中ロースターを見る" },
+            { href: `/users/${id}/following`, label: "フォロー一覧" },
             ...(user.roaster_id !== null
               ? [
                   {
                     href: `/roasters/${user.roaster_id}`,
-                    label: "所属ロースターを見る",
+                    label: "所属ロースター",
                     tone: "secondary" as const,
                   },
                 ]

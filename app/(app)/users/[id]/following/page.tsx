@@ -20,9 +20,10 @@ export default async function UserFollowingPage({ params }: UserFollowingPagePro
 
   return (
     <main className="space-y-6">
-      <section className="page-card">
-        <p className="panel-label">Users</p>
-        <h1 className="title-font mt-3 text-3xl text-[var(--color-fg)]">{`フォロー一覧 #${id}`}</h1>
+      <section className="content-header-panel">
+        <div className="flex h-full items-end justify-start">
+          <h1 className="title-font text-3xl text-[var(--color-fg)]">フォロー</h1>
+        </div>
       </section>
 
       <ProfileSummaryCard
@@ -55,7 +56,7 @@ export default async function UserFollowingPage({ params }: UserFollowingPagePro
         <ProfileLinksRow
           title="導線"
           links={[
-            { href: `/users/${id}`, label: "プロフィールへ戻る", tone: "secondary" },
+            { href: `/users/${id}`, label: "ユーザー詳細へ戻る", tone: "secondary" },
             { href: "/search/roasters", label: "ロースターを探す", tone: "primary" },
           ]}
         />

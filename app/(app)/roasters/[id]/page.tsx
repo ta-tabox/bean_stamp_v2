@@ -24,9 +24,10 @@ export default async function RoasterPage({ params, searchParams }: RoasterPageP
 
   return (
     <main className="space-y-6">
-      <section className="page-card">
-        <p className="panel-label">Roasters</p>
-        <h1 className="title-font mt-3 text-3xl text-[var(--color-fg)]">{`ロースター詳細 #${id}`}</h1>
+      <section className="content-header-panel">
+        <div className="flex h-full items-end justify-start">
+          <h1 className="title-font text-3xl text-[var(--color-fg)]">ロースター</h1>
+        </div>
       </section>
       {currentParams.created === "1" ? (
         <StatusBanner>ロースターを作成しました。</StatusBanner>
@@ -43,7 +44,7 @@ export default async function RoasterPage({ params, searchParams }: RoasterPageP
       <ProfileSummaryCard
         kind="Roaster"
         name={roaster.name}
-        handle={`@ roaster-${id}`}
+        handle={roaster.address}
         imageUrl={roaster.thumbnail_url}
         placeholder="roaster"
         description={roaster.describe ?? "ロースター紹介はまだありません。"}
@@ -57,9 +58,9 @@ export default async function RoasterPage({ params, searchParams }: RoasterPageP
           ownRoaster ? (
             <Link
               href="/roasters/edit"
-              className="btn btn-primary"
+              className="btn btn-secondary"
             >
-              ロースターを編集
+              編集
             </Link>
           ) : roaster.roaster_relationship_id === null ? (
             <form action={followRoasterAction}>
@@ -102,7 +103,7 @@ export default async function RoasterPage({ params, searchParams }: RoasterPageP
           links={[
             {
               href: `/roasters/${roaster.id}/follower`,
-              label: "フォロワー一覧を見る",
+              label: "フォロワー一覧",
               tone: "secondary",
             },
             { href: "/search/roasters", label: "ロースター検索へ", tone: "secondary" },

@@ -93,53 +93,59 @@ export function ProfileSummaryCard({
   placeholder,
 }: ProfileSummaryCardProps) {
   return (
-    <section className="page-card overflow-hidden">
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-        <div className="flex flex-1 flex-col gap-5 sm:flex-row sm:items-start">
+    <section className="page-card">
+      <div className="flex flex-col gap-8 lg:flex-row">
+        <div className="min-w-0 flex-1 text-center lg:mx-4 lg:text-left">
+          <div className="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <p className="panel-label">{kind}</p>
+              <h2 className="title-font mt-2 text-3xl text-[var(--color-fg)]">{name}</h2>
+            </div>
+            {actions ? <div className="flex justify-center lg:justify-end">{actions}</div> : null}
+          </div>
+
+          <div className="mt-4 text-sm leading-7 text-gray-500">
+            <div>{handle}</div>
+            <p className="mt-4">{description}</p>
+          </div>
+
+          {children ? <div className="mt-4">{children}</div> : null}
+
+          <dl className="mt-5 space-y-2 text-sm text-gray-600">
+            {details.map((detail) => (
+              <div
+                key={`${detail.label}-${detail.value}`}
+                className="flex flex-col gap-1 sm:flex-row sm:gap-3"
+              >
+                <dt className="w-28 shrink-0 font-medium text-gray-800">{detail.label}</dt>
+                <dd className="min-w-0">{detail.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+
+        <div className="flex justify-center lg:w-[22rem] lg:justify-end">
           <ProfileAvatar
             name={name}
             imageUrl={imageUrl}
             placeholder={placeholder}
           />
-          <div className="min-w-0 flex-1">
-            <p className="panel-label">{kind}</p>
-            <h2 className="title-font mt-3 text-3xl text-[var(--color-fg)]">{name}</h2>
-            <p className="mt-2 text-sm text-[var(--color-muted)]">{handle}</p>
-            <p className="mt-5 max-w-2xl text-sm leading-7 text-[var(--color-fg)]">{description}</p>
-          </div>
         </div>
-        {actions ? <div className="flex shrink-0 flex-wrap gap-3">{actions}</div> : null}
       </div>
-
-      <dl className="mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        {details.map((detail) => (
-          <div
-            key={`${detail.label}-${detail.value}`}
-            className="detail-tile"
-          >
-            <dt className="panel-label">{detail.label}</dt>
-            <dd className="mt-2 text-base font-medium text-[var(--color-fg)]">{detail.value}</dd>
-          </div>
-        ))}
-      </dl>
-
-      {children ? (
-        <div className="mt-8 border-t border-[var(--color-border)] pt-6">{children}</div>
-      ) : null}
     </section>
   )
 }
 
 export function ProfileLinksRow({ links, title }: { links: readonly ActionLink[]; title: string }) {
   return (
-    <div className="space-y-3">
-      <h3 className="title-font text-lg text-[var(--color-fg)]">{title}</h3>
-      <div className="flex flex-wrap gap-3">
+    <div className="space-y-2">
+      <h3 className="text-sm font-medium text-gray-600">{title}</h3>
+      <div className="flex flex-col items-start gap-2">
         {links.map((link) => (
           <Link
             key={link.href}
             href={link.href}
-            className={link.tone === "primary" ? "btn btn-primary" : "btn btn-secondary"}
+            className="legacy-text-link"
           >
             {link.label}
           </Link>
@@ -159,14 +165,11 @@ export function ProfileListSection({
 }: ProfileListSectionProps) {
   return (
     <section className="page-card">
-      <div className="flex flex-col gap-2 border-b border-[var(--color-border)] pb-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="panel-label">List</p>
-          <h3 className="title-font mt-2 text-2xl text-[var(--color-fg)]">{title}</h3>
-        </div>
+      <div className="border-b border-[var(--color-border)] pb-4">
+        <h3 className="title-font text-2xl text-[var(--color-fg)]">{title}</h3>
       </div>
       {hasItems ? (
-        <div className="mt-4 overflow-hidden rounded-[1.5rem] border border-[var(--color-border)] bg-white/75">
+        <div className="mt-4 overflow-hidden rounded-xl border border-[var(--color-border)] bg-white">
           {children}
         </div>
       ) : (
@@ -201,7 +204,7 @@ export function ProfileListItemLink({
       href={href}
       className="list-item-link"
     >
-      <div className="flex min-w-0 flex-1 items-start gap-4">
+      <div className="flex min-w-0 flex-1 items-center gap-4">
         <ProfileAvatar
           name={title}
           compact
@@ -209,11 +212,9 @@ export function ProfileListItemLink({
           placeholder={placeholder}
         />
         <div className="min-w-0 flex-1">
-          <p className="title-font truncate text-lg text-[var(--color-fg)]">{title}</p>
-          <p className="mt-1 truncate text-sm text-[var(--color-muted)]">{subtitle}</p>
-          <p className="mt-3 line-clamp-2 text-sm leading-6 text-[var(--color-fg)]">
-            {description}
-          </p>
+          <p className="truncate font-medium text-gray-800">{title}</p>
+          <p className="truncate text-sm text-gray-600">{subtitle}</p>
+          <p className="truncate text-sm text-gray-500">{description}</p>
         </div>
       </div>
       <span className="metric-chip shrink-0">{badge}</span>
@@ -235,28 +236,26 @@ export function ProfileFormShell({
 }: ProfileFormShellProps) {
   return (
     <section className="form-shell">
-      <div className="flex flex-col gap-4 border-b border-[var(--color-border)] pb-6 sm:flex-row sm:items-start sm:justify-between">
-        <div className="min-w-0 flex-1">
+      <div className="flex justify-end">
+        <ProfileAvatar
+          compact
+          name={name}
+          imageUrl={imageUrl}
+          placeholder={placeholder}
+        />
+      </div>
+      <div className="-mt-10">
+        <div className="text-center">
           <p className="panel-label">{kind}</p>
-          <h2 className="title-font mt-3 text-2xl text-[var(--color-fg)]">{title}</h2>
-          <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--color-muted)]">
-            {description}
+          <h2 className="title-font mt-2 text-3xl text-[var(--color-fg)]">{title}</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">{description}</p>
+          <p className="mt-2 text-sm text-gray-500">
+            {name} / {handle}
           </p>
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="text-right">
-            <p className="title-font text-sm text-[var(--color-fg)]">{name}</p>
-            <p className="mt-1 text-xs text-[var(--color-muted)]">{handle}</p>
-          </div>
-          <ProfileAvatar
-            name={name}
-            imageUrl={imageUrl}
-            placeholder={placeholder}
-          />
         </div>
       </div>
       <div className="mt-6 space-y-5">{children}</div>
-      <div className="mt-8 flex flex-wrap items-center gap-3">
+      <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
         <button
           type="submit"
           className="btn btn-primary"
@@ -351,14 +350,14 @@ function ProfileAvatar({
         <>
           <img
             src={
-              placeholder === "user" ? "/images/default-user.svg" : "/images/default-roaster.svg"
+              placeholder === "user" ? "/images/default-user.png" : "/images/default-roaster.png"
             }
             alt=""
             aria-hidden="true"
-            className="h-full w-full rounded-full object-cover"
+            className="h-full w-full object-cover"
           />
           <span className="sr-only">{`${name}の画像`}</span>
-          <span className="logo-font absolute text-lg text-[var(--color-accent-strong)]/70">
+          <span className="logo-font absolute text-lg text-[var(--color-accent-strong)]/60">
             {initials}
           </span>
         </>

@@ -23,9 +23,10 @@ export default async function RoasterFollowerPage({ params }: RoasterFollowerPag
 
   return (
     <main className="space-y-6">
-      <section className="page-card">
-        <p className="panel-label">Roasters</p>
-        <h1 className="title-font mt-3 text-3xl text-[var(--color-fg)]">{`フォロワー一覧 #${id}`}</h1>
+      <section className="content-header-panel">
+        <div className="flex h-full items-end justify-start">
+          <h1 className="title-font text-3xl text-[var(--color-fg)]">フォロワー</h1>
+        </div>
       </section>
 
       <ProfileSummaryCard

@@ -1,49 +1,62 @@
+import Link from "next/link"
 import type { ReactNode } from "react"
 
 import { AppNavigation } from "@/components/layout/AppNavigation"
 import { NotificationPanel } from "@/components/layout/NotificationPanel"
-import { SiteHeader } from "@/components/layout/SiteHeader"
 
 type AppChromeProps = Readonly<{
   children: ReactNode
   currentUserLabel: string
   sidebarFooter: ReactNode
+  topHref: string
 }>
 
-export function AppChrome({ children, currentUserLabel, sidebarFooter }: AppChromeProps) {
+export function AppChrome({ children, currentUserLabel, sidebarFooter, topHref }: AppChromeProps) {
   return (
-    <div className="min-h-screen">
-      <SiteHeader
-        showSignInLink={false}
-        action={
-          <div className="flex items-center gap-3">
-            <p className="rounded-full border border-[var(--color-border)] bg-white/75 px-4 py-2 text-sm text-[var(--color-muted)]">
-              {currentUserLabel}
-            </p>
+    <div className="mx-auto min-h-screen max-w-screen-2xl">
+      <div className="flex flex-col lg:flex-row">
+        <div className="border-b border-gray-200 bg-gray-100 lg:hidden">
+          <div className="px-4 py-3">
+            <p className="logo-font text-2xl text-yellow-800">Bean Stamp</p>
+            <p className="mt-1 text-sm text-gray-500">{currentUserLabel}</p>
           </div>
-        }
-      />
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-6 sm:px-6 lg:px-8">
-        <div className="lg:hidden">
           <AppNavigation orientation="horizontal" />
         </div>
-        <div className="grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)_300px]">
-          <aside className="hidden lg:block">
-            <div className="page-card sticky top-28 space-y-4 p-5">
-              <div className="space-y-2">
-                <p className="panel-label">APP NAV</p>
-                <h2 className="title-font text-2xl text-[var(--color-fg)]">Main layout</h2>
-                <p className="text-sm leading-6 text-[var(--color-muted)]">{currentUserLabel}</p>
+        <aside className="hidden w-28 shrink-0 border-r border-gray-200 lg:block">
+          <div className="sticky top-0 flex min-h-screen flex-col items-center justify-between">
+            <div className="w-full">
+              <div className="mx-4 mt-12 pb-8 text-center">
+                <Link href={topHref}>
+                  <span className="logo-font px-2 text-xl tracking-tight text-teal-900 lg:text-2xl">
+                    Bean Stamp
+                  </span>
+                </Link>
               </div>
-              <AppNavigation orientation="vertical" />
+              <div className="mx-auto w-12">
+                <hr className="border-gray-200" />
+              </div>
+              <div className="flex justify-center">
+                <AppNavigation orientation="vertical" />
+              </div>
+            </div>
+
+            <div className="mb-8 w-full text-center">
+              <div className="mx-auto mb-8 w-12">
+                <hr className="border-gray-200" />
+              </div>
               <div>{sidebarFooter}</div>
             </div>
-          </aside>
-          <div className="min-w-0">{children}</div>
-          <div className="space-y-4">
-            <NotificationPanel />
-            <div className="lg:hidden">{sidebarFooter}</div>
           </div>
+        </aside>
+        <div className="min-w-0 flex-1">
+          <div className="container mx-auto my-6 px-4 lg:my-14">{children}</div>
+        </div>
+        <aside className="hidden w-full max-w-xs border-l border-gray-200 bg-gray-100 lg:block">
+          <NotificationPanel />
+        </aside>
+        <div className="border-t border-gray-200 bg-gray-100 p-4 lg:hidden">
+          <NotificationPanel compact />
+          <div className="mt-4">{sidebarFooter}</div>
         </div>
       </div>
     </div>

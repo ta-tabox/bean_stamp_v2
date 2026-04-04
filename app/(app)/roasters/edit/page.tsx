@@ -1,23 +1,20 @@
-import { SectionLayout } from "@/components/layout/SectionLayout"
 import { ProfileField, ProfileFormShell, ProfileTextarea } from "@/components/profiles/ProfileUi"
-import { buildRoastersRoutes } from "@/features/roasters"
 import { requireRoasterMembership } from "@/server/auth/guards"
 import { updateRoasterProfileAction } from "@/server/profiles/actions"
 import { getRoasterProfile } from "@/server/profiles/service"
 
 export default async function RoasterEditPage() {
   const session = await requireRoasterMembership()
-  const routes = buildRoastersRoutes(session.roasterId)
   const roaster = await getRoasterProfile(session.roasterId!, session.id)
 
   return (
-    <SectionLayout
-      badge="Roasters"
-      title="ロースター編集"
-      description="ロースター情報の編集"
-      links={routes}
-    >
-      <main>
+    <main className="space-y-6">
+      <section className="content-header-panel">
+        <div className="flex h-full items-end justify-start">
+          <h1 className="title-font text-3xl text-[var(--color-fg)]">ロースター編集</h1>
+        </div>
+      </section>
+      <section className="page-card">
         <form
           action={updateRoasterProfileAction}
           className="space-y-4"
@@ -67,7 +64,7 @@ export default async function RoasterEditPage() {
             />
           </ProfileFormShell>
         </form>
-      </main>
-    </SectionLayout>
+      </section>
+    </main>
   )
 }

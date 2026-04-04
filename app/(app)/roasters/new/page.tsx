@@ -1,23 +1,20 @@
-import { SectionLayout } from "@/components/layout/SectionLayout"
-import { buildRoastersRoutes } from "@/features/roasters"
 import { requireNoRoasterMembership } from "@/server/auth/guards"
 import { createRoasterProfileAction } from "@/server/profiles/actions"
 
 export default async function RoasterNewPage() {
-  const session = await requireNoRoasterMembership()
-  const routes = buildRoastersRoutes(session.roasterId)
+  await requireNoRoasterMembership()
 
   return (
-    <SectionLayout
-      badge="Roasters"
-      title="ロースター新規作成"
-      description="ロースター情報を登録します。"
-      links={routes}
-    >
-      <main className="rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[0_20px_70px_rgba(82,53,22,0.08)]">
+    <main className="space-y-6">
+      <section className="content-header-panel">
+        <div className="flex h-full items-end justify-start">
+          <h1 className="title-font text-3xl text-[var(--color-fg)]">ロースター新規作成</h1>
+        </div>
+      </section>
+      <section className="page-card">
         <RoasterForm action={createRoasterProfileAction} />
-      </main>
-    </SectionLayout>
+      </section>
+    </main>
   )
 }
 

@@ -1,6 +1,4 @@
-import { SectionLayout } from "@/components/layout/SectionLayout"
 import { ProfileField, ProfileFormShell, ProfileTextarea } from "@/components/profiles/ProfileUi"
-import { buildUsersRoutes } from "@/features/users"
 import { requireSession } from "@/server/auth/guards"
 import { updateUserProfileAction } from "@/server/profiles/actions"
 import { getUserProfile } from "@/server/profiles/service"
@@ -8,16 +6,15 @@ import { getUserProfile } from "@/server/profiles/service"
 export default async function UserEditPage() {
   const session = await requireSession()
   const user = await getUserProfile(session.id)
-  const routes = buildUsersRoutes(session.id)
 
   return (
-    <SectionLayout
-      badge="Users"
-      title="プロフィール編集"
-      description="ユーザー情報の編集"
-      links={routes}
-    >
-      <main>
+    <main className="space-y-6">
+      <section className="content-header-panel">
+        <div className="flex h-full items-end justify-start">
+          <h1 className="title-font text-3xl text-[var(--color-fg)]">ユーザー編集</h1>
+        </div>
+      </section>
+      <section className="page-card">
         <form
           action={updateUserProfileAction}
           className="space-y-4"
@@ -66,7 +63,7 @@ export default async function UserEditPage() {
             />
           </ProfileFormShell>
         </form>
-      </main>
-    </SectionLayout>
+      </section>
+    </main>
   )
 }
