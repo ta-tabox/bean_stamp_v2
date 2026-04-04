@@ -68,9 +68,17 @@ test("認証フローとセッション API が動作する", async ({ page }) =
   await expect(page.getByRole("heading", { name: "ユーザーホーム", exact: true })).toBeVisible()
   await expect(page.getByRole("button", { name: "サインアウト" })).toBeVisible()
 
-  const sessionResponse = await page.context().request.get("/api/v1/auth/sessions")
-  expect(sessionResponse.ok()).toBeTruthy()
-  await expect(await sessionResponse.json()).toMatchObject({
+  const sessionPayload = await page.evaluate(async () => {
+    const response = await fetch("/api/v1/auth/sessions")
+
+    return {
+      ok: response.ok,
+      payload: await response.json(),
+    }
+  })
+
+  expect(sessionPayload.ok).toBeTruthy()
+  await expect(sessionPayload.payload).toMatchObject({
     is_login: true,
     user: {
       email,
