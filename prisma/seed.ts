@@ -8,16 +8,16 @@ import {
 
 const prisma = new PrismaClient()
 
-async function main() {
-  await prisma.$transaction([
-    prisma.roastLevel.createMany({
+export async function seedMasterData(client: PrismaClient) {
+  await client.$transaction([
+    client.roastLevel.createMany({
       data: roastLevelsSeedData.map((roastLevel) => ({
         id: BigInt(roastLevel.id),
         name: roastLevel.name,
       })),
       skipDuplicates: true,
     }),
-    prisma.country.createMany({
+    client.country.createMany({
       data: countriesSeedData.map((country) => ({
         area: country.area,
         id: BigInt(country.id),
@@ -25,7 +25,7 @@ async function main() {
       })),
       skipDuplicates: true,
     }),
-    prisma.tasteTag.createMany({
+    client.tasteTag.createMany({
       data: tasteTagsSeedData.map((tasteTag) => ({
         id: BigInt(tasteTag.id),
         name: tasteTag.name,
@@ -34,6 +34,10 @@ async function main() {
       skipDuplicates: true,
     }),
   ])
+}
+
+async function main() {
+  await seedMasterData(prisma)
 }
 
 main()

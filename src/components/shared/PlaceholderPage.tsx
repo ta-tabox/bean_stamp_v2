@@ -29,7 +29,7 @@ export function PlaceholderPage({ description, eyebrow, links, title }: Placehol
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {links.map((link) => (
             <Link
-              key={`${title}-${link.href}`}
+              key={`${title}-${link.label}-${link.href}`}
               href={link.href}
               className="rounded-[1.5rem] border border-[var(--color-border)] bg-[var(--color-surface-strong)] px-4 py-4 transition hover:-translate-y-0.5 hover:border-[var(--color-accent)] hover:shadow-[0_12px_40px_rgba(82,53,22,0.08)]"
             >

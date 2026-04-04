@@ -21,6 +21,7 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:seed": "prisma db seed",
+    "prisma:seed:dev": "tsx prisma/seed-development.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
