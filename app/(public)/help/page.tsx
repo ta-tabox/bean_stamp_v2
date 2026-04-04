@@ -6,7 +6,7 @@ export default function HelpPage() {
     <PlaceholderPage
       eyebrow="Public"
       title="Help"
-      description="ヘルプページの移行先です。FAQ や問い合わせ導線はこのルートに集約します。"
+      description="ヘルプページの移行先です。FAQ や問い合わせ導線を共通ヘッダー配下へ集約する前提の画面です。"
       links={publicRoutes}
     />
   )
