@@ -1,17 +1,49 @@
+"use client"
+
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import type { ReactNode } from "react"
 
 import { AppNavigation } from "@/components/layout/AppNavigation"
+import { buildAppNavigationLinks, resolveAppNavigationMode } from "@/components/layout/navigation"
 import { NotificationPanel } from "@/components/layout/NotificationPanel"
+import { SidebarModeSwitcher } from "@/components/layout/SidebarModeSwitcher"
 
 type AppChromeProps = Readonly<{
   children: ReactNode
   currentUserLabel: string
-  sidebarFooter: ReactNode
-  topHref: string
+  roasterId?: string | null
+  roasterImageUrl?: string | null
+  roasterName?: string | null
+  signOutSlot: ReactNode
+  userId: string
+  userImageUrl?: string | null
+  userName: string
 }>
 
-export function AppChrome({ children, currentUserLabel, sidebarFooter, topHref }: AppChromeProps) {
+export function AppChrome({
+  children,
+  currentUserLabel,
+  roasterId,
+  roasterImageUrl,
+  roasterName,
+  signOutSlot,
+  userId,
+  userImageUrl,
+  userName,
+}: AppChromeProps) {
+  const pathname = usePathname()
+  const navigationMode = resolveAppNavigationMode({
+    currentPath: pathname,
+    hasRoasterMembership: Boolean(roasterId),
+  })
+  const navigationLinks = buildAppNavigationLinks({
+    mode: navigationMode,
+    roasterId,
+    userId,
+  })
+  const topHref = navigationMode === "roaster" ? "/roasters/home" : "/users/home"
+
   return (
     <div className="mx-auto min-h-screen max-w-screen-2xl">
       <div className="flex flex-col lg:flex-row">
@@ -20,7 +52,10 @@ export function AppChrome({ children, currentUserLabel, sidebarFooter, topHref }
             <p className="logo-font text-2xl text-yellow-800">Bean Stamp</p>
             <p className="mt-1 text-sm text-gray-500">{currentUserLabel}</p>
           </div>
-          <AppNavigation orientation="horizontal" />
+          <AppNavigation
+            links={navigationLinks}
+            orientation="horizontal"
+          />
         </div>
         <aside className="hidden w-28 shrink-0 border-r border-gray-200 lg:block">
           <div className="sticky top-0 flex min-h-screen flex-col items-center justify-between">
@@ -36,7 +71,10 @@ export function AppChrome({ children, currentUserLabel, sidebarFooter, topHref }
                 <hr className="border-gray-200" />
               </div>
               <div className="flex justify-center">
-                <AppNavigation orientation="vertical" />
+                <AppNavigation
+                  links={navigationLinks}
+                  orientation="vertical"
+                />
               </div>
             </div>
 
@@ -44,7 +82,17 @@ export function AppChrome({ children, currentUserLabel, sidebarFooter, topHref }
               <div className="mx-auto mb-8 w-12">
                 <hr className="border-gray-200" />
               </div>
-              <div>{sidebarFooter}</div>
+              <div>
+                <SidebarModeSwitcher
+                  isRoasterRoute={navigationMode === "roaster"}
+                  roasterId={roasterId}
+                  roasterImageUrl={roasterImageUrl}
+                  roasterName={roasterName}
+                  userImageUrl={userImageUrl}
+                  userName={userName}
+                />
+                <div className="mt-4">{signOutSlot}</div>
+              </div>
             </div>
           </div>
         </aside>
@@ -56,7 +104,17 @@ export function AppChrome({ children, currentUserLabel, sidebarFooter, topHref }
         </aside>
         <div className="border-t border-gray-200 bg-gray-100 p-4 lg:hidden">
           <NotificationPanel compact />
-          <div className="mt-4">{sidebarFooter}</div>
+          <div className="mt-4">
+            <SidebarModeSwitcher
+              isRoasterRoute={navigationMode === "roaster"}
+              roasterId={roasterId}
+              roasterImageUrl={roasterImageUrl}
+              roasterName={roasterName}
+              userImageUrl={userImageUrl}
+              userName={userName}
+            />
+            <div className="mt-4">{signOutSlot}</div>
+          </div>
         </div>
       </div>
     </div>

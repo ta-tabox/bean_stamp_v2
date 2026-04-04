@@ -1,13 +1,14 @@
 import Link from "next/link"
 
-import { appNavigationLinks } from "@/components/layout/navigation"
+import type { NavigationLink } from "@/components/layout/navigation"
 
 type AppNavigationProps = {
   className?: string
+  links: readonly NavigationLink[]
   orientation: "horizontal" | "vertical"
 }
 
-export function AppNavigation({ className, orientation }: AppNavigationProps) {
+export function AppNavigation({ className, links, orientation }: AppNavigationProps) {
   return (
     <nav
       aria-label="アプリナビゲーション"
@@ -20,7 +21,7 @@ export function AppNavigation({ className, orientation }: AppNavigationProps) {
             : "flex items-center gap-2 overflow-x-auto px-4 pb-3"
         }
       >
-        {appNavigationLinks.map((link) => {
+        {links.map((link) => {
           const iconClassName =
             link.icon === "coffee-bean" ? "h-8 w-8 -rotate-45 transform" : "h-8 w-8"
 

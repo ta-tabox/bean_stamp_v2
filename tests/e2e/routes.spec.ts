@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test"
+import type { Page } from "@playwright/test"
 
 const publicRoutes = [
   { path: "/", heading: "Bean Stamp" },
@@ -96,6 +97,9 @@ test("認証フローとセッション API が動作する", async ({ page }) =
     },
   })
   const userId = String(sessionPayload.payload.user.id)
+  await expect(visibleAppNavLink(page, `/users/${userId}`)).toBeVisible()
+  await expect(visibleAppNavLink(page, `/users/${userId}/following`)).toBeVisible()
+  await expect(visibleAppNavLink(page, "/wants")).toBeVisible()
 
   await page.goto("/auth/signin")
   await expect(page).toHaveURL(/\/users\/home$/)
@@ -143,6 +147,8 @@ test("認証フローとセッション API が動作する", async ({ page }) =
     page.getByRole("heading", { name: "Auth Roasterのホーム", exact: true }),
   ).toBeVisible()
   await expect(page.getByRole("link", { name: "オファーを作成する" })).toBeVisible()
+  await expect(visibleAppNavLink(page, `/roasters/${roasterId}`)).toBeVisible()
+  await expect(visibleAppNavLink(page, "/offers")).toBeVisible()
 
   const roasterPayload = await page.evaluate(
     async ({ currentRoasterId, currentUserId }) => {
@@ -297,3 +303,7 @@ test("認証フローとセッション API が動作する", async ({ page }) =
 
   await expect(page).toHaveURL(/\/users\/home$/)
 })
+
+function visibleAppNavLink(page: Page, href: string) {
+  return page.locator(`nav[aria-label="アプリナビゲーション"] a[href="${href}"]:visible`).first()
+}
