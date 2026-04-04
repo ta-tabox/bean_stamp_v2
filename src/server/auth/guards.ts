@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation"
 
 import { auth } from "@/server/auth/options"
+import { prisma } from "@/server/db"
 
 export type SessionPrincipal = {
   email: string
@@ -13,16 +14,31 @@ export type SessionPrincipal = {
 export async function getSessionPrincipal(): Promise<SessionPrincipal | null> {
   const session = await auth()
 
-  if (!session?.user?.id || !session.user.email) {
+  if (!session?.user?.id) {
+    return null
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: BigInt(session.user.id) },
+    select: {
+      email: true,
+      id: true,
+      name: true,
+      prefectureCode: true,
+      roasterId: true,
+    },
+  })
+
+  if (!user) {
     return null
   }
 
   return {
-    email: session.user.email,
-    id: session.user.id,
-    name: session.user.name ?? "",
-    prefectureCode: session.user.prefectureCode,
-    roasterId: session.user.roasterId ?? null,
+    email: user.email,
+    id: user.id.toString(),
+    name: user.name,
+    prefectureCode: user.prefectureCode,
+    roasterId: user.roasterId?.toString() ?? null,
   }
 }
 
