@@ -6,6 +6,7 @@ import { SidebarModeSwitcher } from "@/components/layout/SidebarModeSwitcher"
 import { SignOutButton } from "@/features/auth/components/SignOutButton"
 import { requireSession } from "@/server/auth/guards"
 import { getRoasterProfile, getUserProfile } from "@/server/profiles/service"
+import { readCurrentPath } from "@/server/request/read-current-path"
 
 type AppLayoutProps = Readonly<{
   children: ReactNode
@@ -44,20 +45,4 @@ export default async function AppLayout({ children }: AppLayoutProps) {
       {children}
     </AppChrome>
   )
-}
-
-function readCurrentPath(requestHeaders: Headers) {
-  const nextUrl = requestHeaders.get("next-url")
-
-  if (nextUrl) {
-    return nextUrl
-  }
-
-  const matchedPath = requestHeaders.get("x-matched-path")
-
-  if (matchedPath) {
-    return matchedPath
-  }
-
-  return ""
 }

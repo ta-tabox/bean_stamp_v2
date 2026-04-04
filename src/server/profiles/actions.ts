@@ -68,6 +68,7 @@ export async function updateRoasterProfileAction(formData: FormData) {
   const payload = parseRoasterProfileInput({
     address: formData.get("address"),
     describe: formData.get("describe"),
+    imageUrl: formData.get("imageUrl"),
     name: formData.get("name"),
     phoneNumber: formData.get("phoneNumber"),
     prefectureCode: formData.get("prefectureCode"),

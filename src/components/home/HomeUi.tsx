@@ -5,12 +5,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useTransition } from "react"
 
-type HomeOfferStatus =
-  | "end_of_sales"
-  | "on_offering"
-  | "on_preparing"
-  | "on_roasting"
-  | "on_selling"
+import type { HomeOfferStatus } from "@/features/home/types"
 
 type HomeOfferCardProps = {
   beanImageUrl: string | null

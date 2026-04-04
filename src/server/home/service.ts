@@ -1,22 +1,7 @@
 import { OfferStatus, Prisma } from "@prisma/client"
 
+import type { HomeOfferSummary } from "@/features/home/types"
 import { prisma } from "@/server/db"
-
-type HomeOfferCard = {
-  beanImageUrl: string | null
-  beanName: string
-  countryName: string
-  id: string
-  price: number
-  process: string
-  roastLevelName: string
-  roasterId: string
-  roasterImageUrl: string | null
-  roasterName: string
-  status: OfferStatus
-  wantsCount: number
-  weight: number
-}
 
 const homeOfferSelect = {
   _count: {
@@ -105,7 +90,7 @@ export async function listCurrentOffersForRoasterHome(roasterId: string) {
   return offers.map(buildHomeOfferCard)
 }
 
-export function buildHomeOfferCard(offer: HomeOfferRecord): HomeOfferCard {
+export function buildHomeOfferCard(offer: HomeOfferRecord): HomeOfferSummary {
   return {
     beanImageUrl: offer.bean.beanImages[0]?.image ?? null,
     beanName: offer.bean.name?.trim() || "名称未設定",

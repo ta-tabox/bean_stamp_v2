@@ -53,7 +53,7 @@ type ProfileFormShellProps = {
   children: ReactNode
   description: string
   footerLinks?: readonly FooterLink[]
-  handle: string
+  handle?: string
   imageUrl?: string | null
   kind: string
   name: string
@@ -234,6 +234,8 @@ export function ProfileFormShell({
   submitLabel,
   title,
 }: ProfileFormShellProps) {
+  const identity = [name, handle].filter(Boolean).join(" / ")
+
   return (
     <section className="form-shell">
       <div className="flex justify-end">
@@ -249,9 +251,7 @@ export function ProfileFormShell({
           <p className="panel-label">{kind}</p>
           <h2 className="title-font mt-2 text-3xl text-[var(--color-fg)]">{title}</h2>
           <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">{description}</p>
-          <p className="mt-2 text-sm text-gray-500">
-            {name} / {handle}
-          </p>
+          {identity ? <p className="mt-2 text-sm text-gray-500">{identity}</p> : null}
         </div>
       </div>
       <div className="mt-6 space-y-5">{children}</div>
