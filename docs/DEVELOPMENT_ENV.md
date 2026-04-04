@@ -196,6 +196,22 @@ seed 実行:
 docker compose exec app pnpm prisma:seed
 ```
 
+開発用のユーザー、ロースター、フォロー関係まで投入する場合:
+
+```bash
+docker compose exec app pnpm prisma:seed:dev
+```
+
+`pnpm prisma:seed` は本番でも必要なマスタデータのみを投入する。
+`pnpm prisma:seed:dev` はマスタデータに加えて、ブラウザ確認用のユーザー、ロースター、フォロー関係のサンプルデータを投入する。
+ログイン確認用の共通パスワードは `password123`。
+主なアカウント:
+
+- `user1@example.com`
+- `roaster1@example.com`
+- `roaster2@example.com`
+- `follower@example.com`
+
 Prisma Client 再生成:
 
 ```bash

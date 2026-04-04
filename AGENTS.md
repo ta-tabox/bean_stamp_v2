@@ -34,6 +34,7 @@
 - Prisma migration: `docker compose exec app pnpm prisma:migrate`
 - Prisma migration deploy: `docker compose exec app pnpm prisma:migrate:deploy`
 - Prisma seed: `docker compose exec app pnpm prisma:seed`
+- 開発用 seed: `docker compose exec app pnpm prisma:seed:dev`
 
 ## Docker / Compose 運用
 
@@ -42,6 +43,7 @@
 - E2E は `e2e` コンテナから実行する
 - `app` 起動時には entrypoint で `pnpm prisma:migrate:deploy` が走る前提で考える
 - Prisma の migration / seed / generate は `app` コンテナから実行する
+- `prisma:seed` はマスタデータ専用とし、開発用ダミーデータは `prisma:seed:dev` に分けて扱う
 - Node.js 依存の導入は `docker compose run --rm app pnpm install` と `docker compose run --rm e2e pnpm install` を使う
 - Prisma schema を変更した場合、または依存ボリュームを作り直した場合は、検証前に Prisma Client の再生成状態を確認する
 - UI やルーティング変更時の E2E は `docker compose up -d app` の後に `docker compose run --rm e2e pnpm install` と `docker compose run --rm e2e pnpm test:e2e` を実行する

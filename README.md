@@ -57,6 +57,12 @@ docker compose run --rm app pnpm prisma:seed
 docker compose up --build app
 ```
 
+ブラウザ確認用のユーザー、ロースター、フォロー関係まで投入したい場合は、追加で次を実行する。
+
+```bash
+docker compose run --rm app pnpm prisma:seed:dev
+```
+
 - `app`: Next.js 開発サーバーを `http://localhost:3000` で起動
 - `db`: PostgreSQL 16 を `localhost:5432` で起動
 - `e2e`: Playwright 公式イメージを土台にした `Dockerfile.e2e` ベースの E2E 実行専用コンテナ
@@ -68,6 +74,16 @@ docker compose up --build app
 docker compose exec app pnpm prisma:migrate
 docker compose exec app pnpm prisma:seed
 ```
+
+`pnpm prisma:seed` は本番でも必要なマスタデータのみを投入する。
+`pnpm prisma:seed:dev` はマスタデータに加えて、ブラウザ確認用のユーザー、ロースター、フォロー関係のサンプルデータを投入する。
+ログイン確認用の共通パスワードは `password123`。
+主なアカウント:
+
+- `user1@example.com`
+- `roaster1@example.com`
+- `roaster2@example.com`
+- `follower@example.com`
 
 停止:
 
