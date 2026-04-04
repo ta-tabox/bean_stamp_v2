@@ -17,22 +17,23 @@
 
 - 検証、整形、ビルド、Prisma 操作は、ライブラリや CLI を直接叩かず、必ず `package.json` に定義された script を `pnpm <script>` で実行する
 - Docker Compose 経由で実行する場合も、`docker compose exec ... pnpm <script>` または `docker compose run --rm ... pnpm <script>` を使う
-- 通常の開発・検証は Docker Compose を基準に行う
+- 開発・検証は Docker Compose を正とし、ローカル直実行の成功には依存しない
+- ローカルの `pnpm` 実行は、Compose が使えない場合または切り分けに必要な場合だけに限定する
 - 詳細な起動手順、復旧手順、エラー切り分けは `docs/DEVELOPMENT_ENV.md` を参照する
 
 ## 標準コマンド
 
-- 単体テスト: `pnpm test:unit`
-- 単体テスト標準入口: `pnpm test`
-- E2E: `pnpm test:e2e`
-- 静的検証: `pnpm lint && pnpm typecheck`
-- 整形確認: `pnpm format:check`
-- 整形: `pnpm format`
-- ビルド確認: `pnpm build`
-- Prisma Client 再生成: `pnpm prisma:generate`
-- Prisma migration: `pnpm prisma:migrate`
-- Prisma migration deploy: `pnpm prisma:migrate:deploy`
-- Prisma seed: `pnpm prisma:seed`
+- 単体テスト: `docker compose exec app pnpm test:unit`
+- 単体テスト標準入口: `docker compose exec app pnpm test`
+- E2E: `docker compose run --rm e2e pnpm test:e2e`
+- 静的検証: `docker compose exec app pnpm lint && docker compose exec app pnpm typecheck`
+- 整形確認: `docker compose exec app pnpm format:check`
+- 整形: `docker compose exec app pnpm format`
+- ビルド確認: `docker compose exec app pnpm build`
+- Prisma Client 再生成: `docker compose exec app pnpm prisma:generate`
+- Prisma migration: `docker compose exec app pnpm prisma:migrate`
+- Prisma migration deploy: `docker compose exec app pnpm prisma:migrate:deploy`
+- Prisma seed: `docker compose exec app pnpm prisma:seed`
 
 ## Docker / Compose 運用
 
@@ -57,7 +58,7 @@
 - テストが失敗した場合は、まずテストコードの妥当性を確認する
 - テストコードが適切なら、ソースコードを修正してテストを通す
 - テストコードが古くなっている場合は、テストコードを修正してよい。ただし、何をどのような目的で直すかをユーザーに事前に伝える
-- テストは可能な限り Docker Compose 経由で実行し、ローカル直実行は補助扱いにする
+- テスト、整形、lint、typecheck、build、Prisma 操作は Docker Compose 経由で実行する
 - 純粋関数、DTO、バリデーション、server utility の変更では `docker compose exec app pnpm test:unit` を優先する
 - UI やルーティング変更では `docker compose exec app pnpm test` に加えて `docker compose run --rm e2e pnpm test:e2e` を実行する
 - 共通レイアウトや導線の骨格を移行している段階では、E2E はデスクトップ中心の到達確認を優先する
