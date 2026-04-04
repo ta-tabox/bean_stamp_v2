@@ -17,7 +17,7 @@ export default async function AppLayout({ children }: AppLayoutProps) {
   return (
     <AppChrome
       currentUserLabel={currentUserLabel}
-      signOutSlot={<SignOutButton />}
+      sidebarFooter={<SignOutButton />}
     >
       {children}
     </AppChrome>

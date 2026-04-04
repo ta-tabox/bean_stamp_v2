@@ -7,10 +7,10 @@ import { SiteHeader } from "@/components/layout/SiteHeader"
 type AppChromeProps = Readonly<{
   children: ReactNode
   currentUserLabel: string
-  signOutSlot: ReactNode
+  sidebarFooter: ReactNode
 }>
 
-export function AppChrome({ children, currentUserLabel, signOutSlot }: AppChromeProps) {
+export function AppChrome({ children, currentUserLabel, sidebarFooter }: AppChromeProps) {
   return (
     <div className="min-h-screen">
       <SiteHeader
@@ -38,13 +38,13 @@ export function AppChrome({ children, currentUserLabel, signOutSlot }: AppChrome
                 <p className="text-sm leading-6 text-[var(--color-ink-soft)]">{currentUserLabel}</p>
               </div>
               <AppNavigation orientation="vertical" />
-              <div>{signOutSlot}</div>
+              <div>{sidebarFooter}</div>
             </div>
           </aside>
           <div className="min-w-0">{children}</div>
           <div className="space-y-4">
             <NotificationPanel />
-            <div className="lg:hidden">{signOutSlot}</div>
+            <div className="lg:hidden">{sidebarFooter}</div>
           </div>
         </div>
       </div>
