@@ -1,18 +1,14 @@
-"use client"
-
 import Link from "next/link"
-import { usePathname } from "next/navigation"
 
-import { appNavigationLinks } from "@/components/layout/navigation"
+import type { NavigationLink } from "@/components/layout/navigation"
 
 type AppNavigationProps = {
   className?: string
+  links: readonly NavigationLink[]
   orientation: "horizontal" | "vertical"
 }
 
-export function AppNavigation({ className, orientation }: AppNavigationProps) {
-  const pathname = usePathname()
-
+export function AppNavigation({ className, links, orientation }: AppNavigationProps) {
   return (
     <nav
       aria-label="アプリナビゲーション"
@@ -21,29 +17,37 @@ export function AppNavigation({ className, orientation }: AppNavigationProps) {
       <ul
         className={
           orientation === "vertical"
-            ? "flex flex-col gap-2"
-            : "flex items-center gap-2 overflow-x-auto"
+            ? "flex flex-col items-center gap-2"
+            : "flex items-center gap-2 overflow-x-auto px-4 pb-3"
         }
       >
-        {appNavigationLinks.map((link) => {
-          const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`)
+        {links.map((link) => {
+          const IconComponent = link.icon
+          const iconClassName = link.label === "Beans" ? "h-8 w-8 -rotate-45 transform" : "h-8 w-8"
 
           return (
             <li key={link.href}>
               <Link
                 href={link.href}
                 className={[
-                  "flex items-center justify-between rounded-[1.25rem] px-4 py-3 text-sm font-semibold transition",
-                  orientation === "vertical" ? "min-w-[220px]" : "whitespace-nowrap",
-                  isActive
-                    ? "bg-[var(--color-accent)] text-white shadow-[0_14px_30px_rgba(111,47,18,0.2)]"
-                    : "border border-[var(--color-border)] bg-white/70 text-[var(--color-fg)] hover:border-[var(--color-accent)] hover:bg-[var(--color-accent-soft)]",
+                  orientation === "vertical"
+                    ? "group relative inline-flex h-8 w-8 items-center justify-center text-gray-500 transition duration-200 hover:-translate-x-4 hover:text-gray-800"
+                    : "inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 text-sm text-gray-900 transition hover:bg-gray-800 hover:text-white",
                 ].join(" ")}
               >
-                <span>{link.label}</span>
-                <span className="text-[0.65rem] tracking-[0.24em] opacity-70">
-                  {link.href.replace("/", "").toUpperCase() || "ROOT"}
-                </span>
+                {orientation === "vertical" ? (
+                  <>
+                    <IconComponent className={iconClassName} />
+                    <span className="pointer-events-none absolute left-full top-1/2 ml-1 -translate-y-1/2 font-serif text-sm italic opacity-0 transition group-hover:opacity-100">
+                      {link.label}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <IconComponent className="h-5 w-5" />
+                    <span>{link.label}</span>
+                  </>
+                )}
               </Link>
             </li>
           )

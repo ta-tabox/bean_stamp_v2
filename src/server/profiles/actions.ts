@@ -26,6 +26,7 @@ export async function updateUserProfileAction(formData: FormData) {
   const payload = parseUserProfileInput({
     describe: formData.get("describe"),
     email: formData.get("email"),
+    imageUrl: formData.get("imageUrl"),
     name: formData.get("name"),
     prefectureCode: formData.get("prefectureCode"),
   })
@@ -51,6 +52,7 @@ export async function createRoasterProfileAction(formData: FormData) {
   const payload = parseRoasterProfileInput({
     address: formData.get("address"),
     describe: formData.get("describe"),
+    imageUrl: formData.get("imageUrl"),
     name: formData.get("name"),
     phoneNumber: formData.get("phoneNumber"),
     prefectureCode: formData.get("prefectureCode"),
@@ -66,6 +68,7 @@ export async function updateRoasterProfileAction(formData: FormData) {
   const payload = parseRoasterProfileInput({
     address: formData.get("address"),
     describe: formData.get("describe"),
+    imageUrl: formData.get("imageUrl"),
     name: formData.get("name"),
     phoneNumber: formData.get("phoneNumber"),
     prefectureCode: formData.get("prefectureCode"),

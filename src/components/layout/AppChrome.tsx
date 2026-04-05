@@ -1,50 +1,119 @@
+"use client"
+
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 import type { ReactNode } from "react"
 
 import { AppNavigation } from "@/components/layout/AppNavigation"
+import { buildAppNavigationLinks, resolveAppNavigationMode } from "@/components/layout/navigation"
 import { NotificationPanel } from "@/components/layout/NotificationPanel"
-import { SiteHeader } from "@/components/layout/SiteHeader"
+import { SidebarModeSwitcher } from "@/components/layout/SidebarModeSwitcher"
 
 type AppChromeProps = Readonly<{
   children: ReactNode
   currentUserLabel: string
-  sidebarFooter: ReactNode
+  roasterId?: string | null
+  roasterImageUrl?: string | null
+  roasterName?: string | null
+  signOutSlot: ReactNode
+  userId: string
+  userImageUrl?: string | null
+  userName: string
 }>
 
-export function AppChrome({ children, currentUserLabel, sidebarFooter }: AppChromeProps) {
+export function AppChrome({
+  children,
+  currentUserLabel,
+  roasterId,
+  roasterImageUrl,
+  roasterName,
+  signOutSlot,
+  userId,
+  userImageUrl,
+  userName,
+}: AppChromeProps) {
+  const pathname = usePathname()
+  const navigationMode = resolveAppNavigationMode({
+    currentPath: pathname,
+    hasRoasterMembership: Boolean(roasterId),
+  })
+  const navigationLinks = buildAppNavigationLinks({
+    mode: navigationMode,
+    roasterId,
+    userId,
+  })
+  const topHref = navigationMode === "roaster" ? "/roasters/home" : "/users/home"
+
   return (
-    <div className="min-h-screen">
-      <SiteHeader
-        showSignInLink={false}
-        action={
-          <div className="flex items-center gap-3">
-            <p className="rounded-full border border-[var(--color-border)] bg-white/60 px-4 py-2 text-sm text-[var(--color-ink-soft)]">
-              {currentUserLabel}
-            </p>
+    <div className="mx-auto min-h-screen max-w-screen-2xl">
+      <div className="flex flex-col lg:flex-row">
+        <div className="border-b border-gray-200 bg-gray-100 lg:hidden">
+          <div className="px-4 py-3">
+            <p className="logo-font text-2xl text-yellow-800">Bean Stamp</p>
+            <p className="mt-1 text-sm text-gray-500">{currentUserLabel}</p>
           </div>
-        }
-      />
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-6 sm:px-6 lg:px-8">
-        <div className="lg:hidden">
-          <AppNavigation orientation="horizontal" />
+          <AppNavigation
+            links={navigationLinks}
+            orientation="horizontal"
+          />
         </div>
-        <div className="grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)_300px]">
-          <aside className="hidden lg:block">
-            <div className="sticky top-28 space-y-4 rounded-[1.75rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[0_20px_60px_rgba(86,52,28,0.08)]">
-              <div className="space-y-2">
-                <p className="text-xs font-semibold tracking-[0.32em] text-[var(--color-accent)]">
-                  APP NAV
-                </p>
-                <h2 className="text-2xl font-semibold text-[var(--color-fg)]">Main layout</h2>
-                <p className="text-sm leading-6 text-[var(--color-ink-soft)]">{currentUserLabel}</p>
+        <aside className="hidden w-28 shrink-0 border-r border-gray-200 lg:block">
+          <div className="sticky top-0 flex min-h-screen flex-col items-center justify-between">
+            <div className="w-full">
+              <div className="mx-4 mt-12 pb-8 text-center">
+                <Link href={topHref}>
+                  <span className="logo-font px-2 text-xl tracking-tight text-teal-900 lg:text-2xl">
+                    Bean Stamp
+                  </span>
+                </Link>
               </div>
-              <AppNavigation orientation="vertical" />
-              <div>{sidebarFooter}</div>
+              <div className="mx-auto w-12">
+                <hr className="border-gray-200" />
+              </div>
+              <div className="flex justify-center">
+                <AppNavigation
+                  links={navigationLinks}
+                  orientation="vertical"
+                />
+              </div>
             </div>
-          </aside>
-          <div className="min-w-0">{children}</div>
-          <div className="space-y-4">
-            <NotificationPanel />
-            <div className="lg:hidden">{sidebarFooter}</div>
+
+            <div className="mb-8 w-full text-center">
+              <div className="mx-auto mb-8 w-12">
+                <hr className="border-gray-200" />
+              </div>
+              <div>
+                <SidebarModeSwitcher
+                  isRoasterRoute={navigationMode === "roaster"}
+                  roasterId={roasterId}
+                  roasterImageUrl={roasterImageUrl}
+                  roasterName={roasterName}
+                  userImageUrl={userImageUrl}
+                  userName={userName}
+                />
+                <div className="mt-4">{signOutSlot}</div>
+              </div>
+            </div>
+          </div>
+        </aside>
+        <div className="min-w-0 flex-1">
+          <div className="container mx-auto my-6 px-4 lg:my-14">{children}</div>
+        </div>
+        <aside className="hidden w-full max-w-xs border-l border-gray-200 bg-gray-100 lg:block">
+          <NotificationPanel />
+        </aside>
+        <div className="border-t border-gray-200 bg-gray-100 p-4 lg:hidden">
+          <NotificationPanel compact />
+          <div className="mt-4">
+            <SidebarModeSwitcher
+              isRoasterRoute={navigationMode === "roaster"}
+              roasterId={roasterId}
+              roasterImageUrl={roasterImageUrl}
+              roasterName={roasterName}
+              userImageUrl={userImageUrl}
+              userName={userName}
+            />
+            <div className="mt-4">{signOutSlot}</div>
           </div>
         </div>
       </div>

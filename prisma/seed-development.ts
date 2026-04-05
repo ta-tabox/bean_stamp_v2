@@ -11,6 +11,7 @@ const developmentRoasters = [
   {
     address: "東京都渋谷区神南 1-1-1",
     describe: "フルーティーな浅煎り中心のサンプルロースターです。",
+    image: "https://picsum.photos/seed/dev-roaster-light/512/512",
     name: "Light Roast Lab",
     phoneNumber: "03-1111-2222",
     prefectureCode: "13",
@@ -18,6 +19,7 @@ const developmentRoasters = [
   {
     address: "大阪府大阪市北区梅田 2-2-2",
     describe: "深煎りとブレンドを扱うサンプルロースターです。",
+    image: "https://picsum.photos/seed/dev-roaster-deep/512/512",
     name: "Deep Roast Works",
     phoneNumber: "06-3333-4444",
     prefectureCode: "27",
@@ -28,6 +30,7 @@ const developmentUsers = [
   {
     describe: "ロースター未所属の動作確認用ユーザーです。",
     email: "user1@example.com",
+    image: "https://picsum.photos/seed/dev-user-1/512/512",
     name: "Sample User 1",
     prefectureCode: "13",
     roasterName: null,
@@ -35,6 +38,7 @@ const developmentUsers = [
   {
     describe: "Light Roast Lab 所属の動作確認用アカウントです。",
     email: "roaster1@example.com",
+    image: "https://picsum.photos/seed/dev-user-roaster-1/512/512",
     name: "Sample Roaster Owner 1",
     prefectureCode: "13",
     roasterName: "Light Roast Lab",
@@ -42,6 +46,7 @@ const developmentUsers = [
   {
     describe: "Deep Roast Works 所属の動作確認用アカウントです。",
     email: "roaster2@example.com",
+    image: "https://picsum.photos/seed/dev-user-roaster-2/512/512",
     name: "Sample Roaster Owner 2",
     prefectureCode: "27",
     roasterName: "Deep Roast Works",
@@ -49,6 +54,7 @@ const developmentUsers = [
   {
     describe: "フォロー導線の確認用ユーザーです。",
     email: "follower@example.com",
+    image: "https://picsum.photos/seed/dev-user-follower/512/512",
     name: "Sample Follower",
     prefectureCode: "14",
     roasterName: null,
@@ -100,6 +106,7 @@ async function seedDevelopmentRoasters() {
           data: {
             address: roaster.address,
             describe: roaster.describe,
+            image: roaster.image,
             name: roaster.name,
             phoneNumber: roaster.phoneNumber,
             prefectureCode: roaster.prefectureCode,
@@ -110,6 +117,7 @@ async function seedDevelopmentRoasters() {
           data: {
             address: roaster.address,
             describe: roaster.describe,
+            image: roaster.image,
             name: roaster.name,
             phoneNumber: roaster.phoneNumber,
             prefectureCode: roaster.prefectureCode,
@@ -139,6 +147,7 @@ async function seedDevelopmentUsers(passwordHash: string, roasterIdByName: Map<s
           describe: user.describe,
           email: user.email,
           encryptedPassword: passwordHash,
+          image: user.image,
           name: user.name,
           prefectureCode: user.prefectureCode,
           provider: "credentials",
@@ -154,6 +163,7 @@ async function seedDevelopmentUsers(passwordHash: string, roasterIdByName: Map<s
         describe: user.describe,
         email: user.email,
         encryptedPassword: passwordHash,
+        image: user.image,
         name: user.name,
         prefectureCode: user.prefectureCode,
         provider: "credentials",

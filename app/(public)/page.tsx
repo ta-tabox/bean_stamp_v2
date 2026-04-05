@@ -1,15 +1,14 @@
-import { PlaceholderPage } from "@/components/shared/PlaceholderPage"
-import { appRoutes } from "@/features/app"
-import { authRoutes } from "@/features/auth"
-import { publicRoutes } from "@/features/public"
+import { redirect } from "next/navigation"
 
-export default function PublicHomePage() {
-  return (
-    <PlaceholderPage
-      eyebrow="Public"
-      title="公開ルートの入口"
-      description="トップ・About・Help の公開ページは共通ヘッダー配下で表示されます。下のリンクから認証ルートと主要アプリ導線にも移動できます。"
-      links={[...publicRoutes, ...authRoutes, ...appRoutes.slice(0, 8)]}
-    />
-  )
+import { PublicHomePageContent } from "@/features/public/components/PublicPageContents"
+import { getSessionPrincipal } from "@/server/auth/guards"
+
+export default async function PublicHomePage() {
+  const session = await getSessionPrincipal()
+
+  if (session) {
+    redirect("/users/home")
+  }
+
+  return <PublicHomePageContent />
 }

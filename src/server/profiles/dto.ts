@@ -3,6 +3,7 @@ type UserApiInput = {
   email: string
   guest: boolean
   id: bigint
+  image: string | null
   name: string
   prefectureCode: string
   roasterId: bigint | null
@@ -13,6 +14,7 @@ type RoasterApiInput = {
   describe: string | null
   guest: boolean
   id: bigint
+  image: string | null
   name: string
   phoneNumber: string
   prefectureCode: string
@@ -33,11 +35,11 @@ export type UserApiResponse = {
   email: string
   guest: boolean
   id: number
-  image_url: null
+  image_url: string | null
   name: string
   prefecture_code: string
   roaster_id: number | null
-  thumbnail_url: null
+  thumbnail_url: string | null
 }
 
 export type RoasterApiResponse = {
@@ -46,12 +48,12 @@ export type RoasterApiResponse = {
   followers_count?: number
   guest: boolean
   id: number
-  image_url: null
+  image_url: string | null
   name: string
   phone_number: string
   prefecture_code: string
   roaster_relationship_id?: number | null
-  thumbnail_url: null
+  thumbnail_url: string | null
 }
 
 export type RoasterRelationshipStatusApiResponse = {
@@ -81,11 +83,11 @@ export function buildUserApiResponse(input: UserApiInput): UserApiResponse {
     email: input.email,
     guest: input.guest,
     id: Number(input.id),
-    image_url: null,
+    image_url: input.image,
     name: input.name,
     prefecture_code: input.prefectureCode,
     roaster_id: input.roasterId === null ? null : Number(input.roasterId),
-    thumbnail_url: null,
+    thumbnail_url: input.image,
   }
 }
 
@@ -95,11 +97,11 @@ export function buildRoasterApiResponse(input: RoasterApiInput): RoasterApiRespo
     describe: input.describe,
     guest: input.guest,
     id: Number(input.id),
-    image_url: null,
+    image_url: input.image,
     name: input.name,
     phone_number: input.phoneNumber,
     prefecture_code: input.prefectureCode,
-    thumbnail_url: null,
+    thumbnail_url: input.image,
   }
 }
 

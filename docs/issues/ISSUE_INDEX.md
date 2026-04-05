@@ -11,12 +11,13 @@
 5. `ISSUE_04.md` 認証基盤
 6. `ISSUE_05.md` 共通UI基盤
 7. `ISSUE_06.md` Users / Roasters / Follow
-8. `ISSUE_07.md` Beans
-9. `ISSUE_08.md` Offers
-10. `ISSUE_09.md` Wants / Likes
-11. `ISSUE_10.md` Search / Recommend
-12. `ISSUE_11.md` ページネーション/通知/状態管理
-13. `ISSUE_12.md` テスト整備
-14. `ISSUE_13.md` Cloud Runデプロイ
-15. `ISSUE_14.md` GitHub Actions CI/CD
-16. `ISSUE_15.md` 受け入れ・切替
+8. `ISSUE_06A.md` Users / Roasters スタイル調整
+9. `ISSUE_07.md` Beans
+10. `ISSUE_08.md` Offers
+11. `ISSUE_09.md` Wants / Likes
+12. `ISSUE_10.md` Search / Recommend
+13. `ISSUE_11.md` ページネーション/通知/状態管理
+14. `ISSUE_12.md` テスト整備
+15. `ISSUE_13.md` Cloud Runデプロイ
+16. `ISSUE_14.md` GitHub Actions CI/CD
+17. `ISSUE_15.md` 受け入れ・切替
