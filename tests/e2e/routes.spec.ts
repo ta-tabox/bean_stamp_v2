@@ -300,10 +300,121 @@ test("認証フローとセッション API が動作する", async ({ page }) =
   await expect(page).toHaveURL(/\/users\/home$/)
 })
 
+test("ロースター所属ユーザーは Bean を作成・更新・削除でき、入力エラーが表示される", async ({
+  page,
+}) => {
+  const uniqueSuffix = Date.now()
+  const email = `beans-${uniqueSuffix}@example.com`
+  const password = `Beans-${uniqueSuffix}`
+
+  await signUpAndSignIn(page, {
+    email,
+    name: "Beans Tester",
+    password,
+    prefectureCode: "13",
+  })
+
+  await createRoaster(page, {
+    address: "Tokyo",
+    describe: "Bean 用のロースター",
+    name: "Bean Roaster",
+    phoneNumber: "03-1111-2222",
+    prefectureCode: "13",
+  })
+
+  await page.goto("/beans")
+  await expect(page.getByRole("heading", { name: "コーヒー豆一覧", exact: true })).toBeVisible()
+  await page.getByRole("link", { name: "コーヒー豆を登録する" }).click()
+
+  await expect(page).toHaveURL(/\/beans\/new$/)
+  await expect(page.getByRole("heading", { name: "コーヒー豆登録", exact: true })).toBeVisible()
+  await page.getByLabel("豆の名前").fill("House Blend")
+  await page.getByLabel("生産国").selectOption("44")
+  await page.getByLabel("焙煎度").selectOption("2")
+  await page.getByLabel("フレーバータグ").selectOption(["5"])
+  await page.getByLabel("画像").setInputFiles("tests/fixtures/bean-image.svg")
+  await page.getByRole("button", { name: "保存する" }).click()
+
+  await expect(page.getByText("フレーバーは2個以上登録してください")).toBeVisible()
+
+  await page.getByLabel("豆の名前").fill("House Blend")
+  await page.getByLabel("生産国").selectOption("44")
+  await page.getByLabel("焙煎度").selectOption("2")
+  await page.getByLabel("フレーバータグ").selectOption(["5", "24"])
+  await page.getByLabel("画像").setInputFiles("tests/fixtures/bean-image.svg")
+  await page.getByLabel("紹介文").fill("毎日飲めるハウスブレンドです。")
+  await page.getByRole("button", { name: "保存する" }).click()
+
+  await expect(page).toHaveURL(/\/beans\/\d+\?created=1$/)
+  await expect(page.getByText("コーヒー豆を登録しました。")).toBeVisible()
+  await expect(page.getByRole("heading", { name: "コーヒー豆詳細", exact: true })).toBeVisible()
+  await expect(page.getByRole("heading", { name: "House Blend", exact: true })).toBeVisible()
+  await expect(page.getByText("毎日飲めるハウスブレンドです。")).toBeVisible()
+
+  await page.getByRole("link", { name: "編集する" }).click()
+  await expect(page).toHaveURL(/\/beans\/\d+\/edit$/)
+  await page.getByLabel("紹介文").fill("説明を更新しました。")
+  await page.getByRole("button", { name: "更新する" }).click()
+
+  await expect(page).toHaveURL(/\/beans\/\d+\?updated=1$/)
+  await expect(page.getByText("コーヒー豆情報を変更しました。")).toBeVisible()
+  await expect(page.getByText("説明を更新しました。")).toBeVisible()
+
+  await page.getByRole("button", { name: "コーヒー豆を削除する" }).click()
+  await expect(page).toHaveURL(/\/beans\?deleted=1$/)
+  await expect(page.getByText("コーヒー豆を削除しました。")).toBeVisible()
+  await expect(page.getByText("コーヒー豆が登録されていません")).toBeVisible()
+})
+
 function visibleAppNavLink(page: Page, href: string) {
   return page.locator(`nav[aria-label="アプリナビゲーション"] a[href="${href}"]:visible`).first()
 }
 
 function visibleButton(page: Page, name: string) {
   return page.getByRole("button", { name, exact: true }).filter({ visible: true }).first()
+}
+
+async function signUpAndSignIn(
+  page: Page,
+  input: {
+    email: string
+    name: string
+    password: string
+    prefectureCode: string
+  },
+) {
+  await page.goto("/auth/signup")
+  await page.getByLabel("名前").fill(input.name)
+  await page.getByLabel("メールアドレス").fill(input.email)
+  await page.getByLabel("都道府県コード").fill(input.prefectureCode)
+  await page.getByLabel("パスワード", { exact: true }).fill(input.password)
+  await page.getByLabel("確認用パスワード").fill(input.password)
+  await page.getByRole("button", { name: "登録する" }).click()
+
+  await expect(page).toHaveURL(/\/auth\/signin\?registered=1/)
+  await page.getByLabel("メールアドレス").fill(input.email)
+  await page.getByLabel("パスワード", { exact: true }).fill(input.password)
+  await page.getByRole("button", { name: "サインイン" }).click()
+  await expect(page).toHaveURL(/\/users\/home$/)
+}
+
+async function createRoaster(
+  page: Page,
+  input: {
+    address: string
+    describe: string
+    name: string
+    phoneNumber: string
+    prefectureCode: string
+  },
+) {
+  await page.goto("/roasters/new")
+  await page.getByLabel("ロースター名").fill(input.name)
+  await page.getByLabel("電話番号").fill(input.phoneNumber)
+  await page.getByLabel("都道府県コード").fill(input.prefectureCode)
+  await page.getByLabel("住所").fill(input.address)
+  await page.getByLabel("紹介文").fill(input.describe)
+  await page.getByRole("button", { name: "保存する" }).click()
+
+  await expect(page).toHaveURL(/\/roasters\/\d+\?created=1$/)
 }

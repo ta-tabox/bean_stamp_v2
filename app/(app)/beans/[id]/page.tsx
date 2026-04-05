@@ -1,19 +1,34 @@
-import { PlaceholderPage } from "@/components/shared/PlaceholderPage"
-import { beansRoutes } from "@/features/beans"
+import { BeanDetailPageContent } from "@/features/beans/components/BeansPageContents"
+import { requireRoasterMembership } from "@/server/auth/guards"
+import { deleteBeanAction } from "@/server/beans/actions"
+import { getBeanForRoaster } from "@/server/beans"
 
-type BeanPageProps = Readonly<{
-  params: Promise<{ id: string }>
-}>
+type BeanPageProps = {
+  params: Promise<{
+    id: string
+  }>
+  searchParams?: Promise<{
+    created?: string
+    error?: string
+    updated?: string
+  }>
+}
 
-export default async function BeanPage({ params }: BeanPageProps) {
+export default async function BeanPage({ params, searchParams }: BeanPageProps) {
+  const session = await requireRoasterMembership()
   const { id } = await params
+  const currentParams = (await searchParams) ?? {}
+  const bean = await getBeanForRoaster(session.roasterId!, id)
 
   return (
-    <PlaceholderPage
-      eyebrow="Beans"
-      title={`豆詳細 #${id}`}
-      description="Bean 詳細画面です。画像やテイスト情報は後続 issue で追加します。"
-      links={beansRoutes}
+    <BeanDetailPageContent
+      bean={bean}
+      deleteAction={deleteBeanAction}
+      status={{
+        created: currentParams.created === "1",
+        error: currentParams.error,
+        updated: currentParams.updated === "1",
+      }}
     />
   )
 }

@@ -1,13 +1,22 @@
-import { PlaceholderPage } from "@/components/shared/PlaceholderPage"
-import { beansRoutes } from "@/features/beans"
+import { BeansListPageContent } from "@/features/beans/components/BeansPageContents"
+import { requireRoasterMembership } from "@/server/auth/guards"
+import { listBeansForRoaster } from "@/server/beans"
 
-export default function BeansPage() {
+type BeansPageProps = {
+  searchParams?: Promise<{
+    deleted?: string
+  }>
+}
+
+export default async function BeansPage({ searchParams }: BeansPageProps) {
+  const session = await requireRoasterMembership()
+  const params = (await searchParams) ?? {}
+  const beans = await listBeansForRoaster(session.roasterId!)
+
   return (
-    <PlaceholderPage
-      eyebrow="Beans"
-      title="豆一覧"
-      description="Bean 一覧ページのルートです。"
-      links={beansRoutes}
+    <BeansListPageContent
+      beans={beans}
+      deleted={params.deleted === "1"}
     />
   )
 }
