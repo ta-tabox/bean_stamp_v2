@@ -125,6 +125,8 @@ pnpm format:check
 pnpm build
 ```
 
+`pnpm dev` は `next dev --webpack` を実行する。Next.js 16 の Turbopack 開発モードで `Performance.measure` の負値エラーが出るケースを避けるため、開発時のみ webpack モードを標準にしている。
+
 Docker Compose 経由の主要コマンド:
 
 ```bash

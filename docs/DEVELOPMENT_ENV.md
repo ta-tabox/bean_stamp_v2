@@ -16,7 +16,7 @@
 - `app`
   - Next.js 開発サーバー
   - 公開ポート: `3000`
-  - `pnpm dev` 起動時に entrypoint で `pnpm prisma:migrate:deploy` を先行し、既存 migration を自動適用する
+  - `pnpm dev` は `next dev --webpack` を実行し、entrypoint で `pnpm prisma:migrate:deploy` を先行して既存 migration を自動適用する
 - `db`
   - PostgreSQL 16
   - 公開ポート: `5432`
@@ -60,6 +60,10 @@ docker compose up --build app
 ```
 
 ブラウザで `http://localhost:3000` を開く。
+
+補足:
+
+- Next.js 16 の Turbopack 開発モードでは、`Performance.measure` の負値エラーが出ることがあるため、このリポジトリでは開発時のみ webpack モードを標準にしている
 
 ## 日常的な起動手順
 
