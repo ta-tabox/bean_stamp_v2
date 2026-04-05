@@ -14,12 +14,7 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      use: {
-        ...devices["Desktop Chrome"],
-        launchOptions: {
-          args: ["--host-resolver-rules=MAP localhost host.docker.internal"],
-        },
-      },
+      use: devices["Desktop Chrome"],
     },
   ],
 })

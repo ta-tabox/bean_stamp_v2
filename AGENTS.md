@@ -26,7 +26,7 @@
 
 - 単体テスト: `docker compose exec app pnpm test:unit`
 - 単体テスト標準入口: `docker compose exec app pnpm test`
-- E2E: `docker compose run --rm e2e pnpm test:e2e`
+- E2E: `docker compose exec e2e pnpm test:e2e`
 - 静的検証: `docker compose exec app pnpm lint && docker compose exec app pnpm typecheck`
 - 整形確認: `docker compose exec app pnpm format:check`
 - 整形: `docker compose exec app pnpm format`
@@ -36,18 +36,22 @@
 - Prisma migration deploy: `docker compose exec app pnpm prisma:migrate:deploy`
 - Prisma seed: `docker compose exec app pnpm prisma:seed`
 - 開発用 seed: `docker compose exec app pnpm prisma:seed:dev`
+- E2E DB リセット: `docker compose exec e2e pnpm prisma:reset:e2e`
 
 ## Docker / Compose 運用
 
 - `app` はアプリケーション実行用コンテナ、`db` は PostgreSQL、`e2e` は Playwright 実行用コンテナとして扱う
 - `app` コンテナは E2E のブラウザ依存を持ち込まない
-- E2E は `e2e` コンテナから実行する
+- `db` コンテナは通常開発用 `bean_stamp` と E2E 用 `bean_stamp_e2e` を同一インスタンス内に持ち、データ分離は database 名で行う
+- E2E は `e2e` コンテナから実行し、Next.js 起動も `e2e` コンテナ内で完結させる
+- `e2e` コンテナは `docker compose up` に含めて常駐させ、待機状態から `docker compose exec e2e ...` で呼び出す
 - `app` 起動時には entrypoint で `pnpm prisma:migrate:deploy` が走る前提で考える
 - Prisma の migration / seed / generate は `app` コンテナから実行する
 - `prisma:seed` はマスタデータ専用とし、開発用ダミーデータは `prisma:seed:dev` に分けて扱う
 - Node.js 依存の導入は `docker compose run --rm app pnpm install` と `docker compose run --rm e2e pnpm install` を使う
 - Prisma schema を変更した場合、または依存ボリュームを作り直した場合は、検証前に Prisma Client の再生成状態を確認する
-- UI やルーティング変更時の E2E は `docker compose up -d app` の後に `docker compose run --rm e2e pnpm install` と `docker compose run --rm e2e pnpm test:e2e` を実行する
+- 通常の `docker compose up --build` では `app` / `db` / `e2e` をまとめて起動する
+- UI やルーティング変更時の E2E は `docker compose exec e2e pnpm test:e2e` を標準とし、クリーンな一発実行が必要な場合だけ `docker compose run --rm e2e pnpm test:e2e` を使う
 - seed データが必要な検証では、事前に `docker compose run --rm app pnpm prisma:seed` を実行する
 
 ## テスト運用ルール
@@ -63,7 +67,8 @@
 - テストコードが古くなっている場合は、テストコードを修正してよい。ただし、何をどのような目的で直すかをユーザーに事前に伝える
 - テスト、整形、lint、typecheck、build、Prisma 操作は Docker Compose 経由で実行する
 - 純粋関数、DTO、バリデーション、server utility の変更では `docker compose exec app pnpm test:unit` を優先する
-- UI やルーティング変更では `docker compose exec app pnpm test` に加えて `docker compose run --rm e2e pnpm test:e2e` を実行する
+- UI やルーティング変更では `docker compose exec app pnpm test` に加えて `docker compose exec e2e pnpm test:e2e` を実行する
+- `docker compose exec e2e pnpm test:e2e` は `bean_stamp_e2e` を毎回リセットしてからアプリ再起動と Playwright 実行を行う
 - 共通レイアウトや導線の骨格を移行している段階では、E2E はデスクトップ中心の到達確認を優先する
 - モバイル viewport 固有の E2E は、主要コンテンツと導線が固まった段階で追加する
 - モバイル E2E を後続へ送る場合は、将来追加する方針を関連ドキュメントまたは issue に明記する

@@ -47,14 +47,21 @@ services:
       dockerfile: Dockerfile.e2e
     container_name: bean_stamp_e2e
     depends_on:
-      app:
-        condition: service_started
+      db:
+        condition: service_healthy
     working_dir: /app
     environment:
-      PLAYWRIGHT_BASE_URL: http://localhost:3000
+      NODE_ENV: development
+      NEXTAUTH_URL: http://127.0.0.1:3000
+      NEXTAUTH_SECRET: replace_me
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/bean_stamp_e2e
+      GOOGLE_CLOUD_PROJECT: replace_me
+      GCS_BUCKET_UPLOADS: replace_me
+      PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
       PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      E2E_DATABASE_NAME: bean_stamp_e2e
+      E2E_DB_ADMIN_URL: postgresql://postgres:postgres@db:5432/postgres
+      WATCHPACK_POLLING: "true"
     stdin_open: true
     tty: true
     volumes:

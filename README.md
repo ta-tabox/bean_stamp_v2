@@ -64,9 +64,10 @@ docker compose run --rm app pnpm prisma:seed:dev
 ```
 
 - `app`: Next.js 開発サーバーを `http://localhost:3000` で起動
-- `db`: PostgreSQL 16 を `localhost:5432` で起動
+- `db`: PostgreSQL 16 を `localhost:5432` で起動し、通常開発用 `bean_stamp` と E2E 用 `bean_stamp_e2e` を同一インスタンス内で分離
 - `e2e`: Playwright 公式イメージを土台にした `Dockerfile.e2e` ベースの E2E 実行専用コンテナ
-  - `pnpm test:e2e` 実行時は entrypoint が `pnpm prisma:generate` を先行する
+  - `pnpm test:e2e` はラッパースクリプト経由で `bean_stamp_e2e` を作成または再利用し、DB をリセットしてから Next.js 起動、待機、Playwright 実行までを担う
+  - 通常の `docker compose up --build` に含まれ、待機状態から `docker compose exec e2e ...` で呼び出せる
 
 初回セットアップ後に migration や seed を追加実行する場合:
 
@@ -111,6 +112,8 @@ GCS_BUCKET_UPLOADS=replace_me
 `src/env.ts` で `zod` によるサーバー環境変数検証を定義しています。  
 本番コードでは server-side でのみ `loadServerEnv()` を呼び、client component から直接 `process.env` を触らない方針です。
 
+ローカルで E2E を Docker なしに実行する場合は、通常開発用 DB とは別の database を `DATABASE_URL` に設定する。例: `postgresql://postgres:postgres@localhost:5432/bean_stamp_e2e`
+
 ## 6. 開発コマンド
 
 ```bash
@@ -120,6 +123,7 @@ pnpm typecheck
 pnpm test
 pnpm test:unit
 pnpm test:e2e
+pnpm prisma:reset:e2e
 pnpm format
 pnpm format:check
 pnpm build
@@ -135,11 +139,14 @@ docker compose exec app pnpm typecheck
 docker compose exec app pnpm test
 docker compose exec app pnpm test:unit
 docker compose run --rm e2e pnpm install
-docker compose run --rm e2e pnpm test:e2e
+docker compose exec e2e pnpm test:e2e
+docker compose exec e2e pnpm prisma:reset:e2e
 docker compose exec app pnpm format:check
 docker compose exec app pnpm prisma:migrate
 docker compose exec app pnpm prisma:seed
 ```
+
+`docker compose exec e2e pnpm test:e2e` は `app` コンテナ起動を前提にしない。E2E 実行に必要な Next.js サーバーは `e2e` コンテナ内で起動され、通常開発用 DB は書き換えない。クリーンな一発実行が必要な場合だけ `docker compose run --rm e2e pnpm test:e2e` を使う。
 
 ## 7. 参照ドキュメント
 
@@ -187,3 +194,4 @@ import ルール:
 - コミット前に `pnpm format:check` を実行し、失敗した場合は `pnpm format` で整形する
 - 変更を仕上げる前に、少なくとも `pnpm lint` と `pnpm typecheck` を実行する
 - UI 変更を含むコミット前の標準確認は `pnpm test` と `pnpm test:e2e` をセットで実行する
+- E2E は通常開発 DB と別 database で実行し、開発データを汚染しないことを前提とする
