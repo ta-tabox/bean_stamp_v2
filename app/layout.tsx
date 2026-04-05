@@ -2,7 +2,6 @@ import type { Metadata } from "next"
 import { Noto_Sans_JP, Noto_Serif } from "next/font/google"
 
 import favicon from "@/assets/images/favicon.png"
-import { IconsSprite } from "@/components/icon/IconsSprite"
 
 import "./globals.css"
 
@@ -40,7 +39,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
       className={`${notoSans.variable} ${notoSerif.variable}`}
     >
       <body className="min-h-screen bg-[var(--color-bg)] text-[var(--color-fg)] antialiased">
-        <IconsSprite />
         {children}
       </body>
     </html>

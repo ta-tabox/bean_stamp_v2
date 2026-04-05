@@ -1,20 +1,34 @@
+import type { IconComponent } from "@/components/icon/Icon"
+import {
+  ClipboardIcon,
+  CoffeeBeanIcon,
+  CoffeeCupIcon,
+  HeartIcon,
+  HomeIcon,
+  QuestionMarkCircleIcon,
+  SearchIcon,
+  ShoppingBagIcon,
+  StarIcon,
+  UserIcon,
+} from "@/components/icon/Icon"
+
 export type NavigationLink = {
   href: string
-  icon: string
+  icon: IconComponent
   label: string
 }
 
 export type AppNavigationMode = "roaster" | "user"
 
 export const publicNavigationLinks = [
-  { href: "/", icon: "home", label: "HOME" },
-  { href: "/about", icon: "coffee-cup", label: "ABOUT" },
-  { href: "/help", icon: "question-mark-circle", label: "HELP" },
+  { href: "/", icon: HomeIcon, label: "HOME" },
+  { href: "/about", icon: CoffeeCupIcon, label: "ABOUT" },
+  { href: "/help", icon: QuestionMarkCircleIcon, label: "HELP" },
 ] as const satisfies readonly NavigationLink[]
 
 const commonAppNavigationLinks = [
-  { href: "/search", icon: "search", label: "Search" },
-  { href: "/help", icon: "question-mark-circle", label: "Help" },
+  { href: "/search", icon: SearchIcon, label: "Search" },
+  { href: "/help", icon: QuestionMarkCircleIcon, label: "Help" },
 ] as const satisfies readonly NavigationLink[]
 
 export function buildAppNavigationLinks({
@@ -28,20 +42,20 @@ export function buildAppNavigationLinks({
 }): readonly NavigationLink[] {
   if (mode === "roaster" && roasterId) {
     return [
-      { href: "/roasters/home", icon: "home", label: "Home" },
-      { href: `/roasters/${roasterId}`, icon: "coffee-cup", label: "Roaster" },
-      { href: "/beans", icon: "coffee-bean", label: "Beans" },
-      { href: "/offers", icon: "clipboard", label: "Offers" },
+      { href: "/roasters/home", icon: HomeIcon, label: "Home" },
+      { href: `/roasters/${roasterId}`, icon: CoffeeCupIcon, label: "Roaster" },
+      { href: "/beans", icon: CoffeeBeanIcon, label: "Beans" },
+      { href: "/offers", icon: ClipboardIcon, label: "Offers" },
       ...commonAppNavigationLinks,
     ]
   }
 
   return [
-    { href: "/users/home", icon: "home", label: "Home" },
-    { href: `/users/${userId}`, icon: "user", label: "User" },
-    { href: `/users/${userId}/following`, icon: "star", label: "Follow" },
-    { href: "/wants", icon: "shopping-bag", label: "Wants" },
-    { href: "/likes", icon: "heart", label: "Likes" },
+    { href: "/users/home", icon: HomeIcon, label: "Home" },
+    { href: `/users/${userId}`, icon: UserIcon, label: "User" },
+    { href: `/users/${userId}/following`, icon: StarIcon, label: "Follow" },
+    { href: "/wants", icon: ShoppingBagIcon, label: "Wants" },
+    { href: "/likes", icon: HeartIcon, label: "Likes" },
     ...commonAppNavigationLinks,
   ]
 }

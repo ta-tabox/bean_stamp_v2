@@ -22,8 +22,8 @@ export function AppNavigation({ className, links, orientation }: AppNavigationPr
         }
       >
         {links.map((link) => {
-          const iconClassName =
-            link.icon === "coffee-bean" ? "h-8 w-8 -rotate-45 transform" : "h-8 w-8"
+          const IconComponent = link.icon
+          const iconClassName = link.label === "Beans" ? "h-8 w-8 -rotate-45 transform" : "h-8 w-8"
 
           return (
             <li key={link.href}>
@@ -37,18 +37,14 @@ export function AppNavigation({ className, links, orientation }: AppNavigationPr
               >
                 {orientation === "vertical" ? (
                   <>
-                    <svg className={iconClassName}>
-                      <use href={`#${link.icon}`} />
-                    </svg>
+                    <IconComponent className={iconClassName} />
                     <span className="pointer-events-none absolute left-full top-1/2 ml-1 -translate-y-1/2 font-serif text-sm italic opacity-0 transition group-hover:opacity-100">
                       {link.label}
                     </span>
                   </>
                 ) : (
                   <>
-                    <svg className="h-5 w-5">
-                      <use href={`#${link.icon}`} />
-                    </svg>
+                    <IconComponent className="h-5 w-5" />
                     <span>{link.label}</span>
                   </>
                 )}

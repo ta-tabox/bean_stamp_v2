@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useTransition } from "react"
 
+import { ArrowPathIcon } from "@/components/icon/Icon"
 import type { HomeOfferStatus } from "@/features/home/types"
 
 type HomeOfferCardProps = {
@@ -145,9 +146,7 @@ export function HomeReloadButton({ label = "更新" }: HomeReloadButtonProps) {
           })
         }}
       >
-        <svg className={`h-6 w-6 ${isPending ? "animate-spin" : ""}`}>
-          <use href="#arrow-path" />
-        </svg>
+        <ArrowPathIcon className={`h-6 w-6 ${isPending ? "animate-spin" : ""}`} />
       </button>
     </div>
   )

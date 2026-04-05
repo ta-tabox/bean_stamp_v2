@@ -1,5 +1,17 @@
 import { describe, expect, it } from "vitest"
 
+import {
+  ClipboardIcon,
+  CoffeeBeanIcon,
+  CoffeeCupIcon,
+  HeartIcon,
+  HomeIcon,
+  QuestionMarkCircleIcon,
+  SearchIcon,
+  ShoppingBagIcon,
+  StarIcon,
+  UserIcon,
+} from "@/components/icon/Icon"
 import { buildAppNavigationLinks, resolveAppNavigationMode } from "@/components/layout/navigation"
 
 describe("navigation", () => {
@@ -10,13 +22,13 @@ describe("navigation", () => {
         userId: "12",
       }),
     ).toEqual([
-      { href: "/users/home", icon: "home", label: "Home" },
-      { href: "/users/12", icon: "user", label: "User" },
-      { href: "/users/12/following", icon: "star", label: "Follow" },
-      { href: "/wants", icon: "shopping-bag", label: "Wants" },
-      { href: "/likes", icon: "heart", label: "Likes" },
-      { href: "/search", icon: "search", label: "Search" },
-      { href: "/help", icon: "question-mark-circle", label: "Help" },
+      { href: "/users/home", icon: HomeIcon, label: "Home" },
+      { href: "/users/12", icon: UserIcon, label: "User" },
+      { href: "/users/12/following", icon: StarIcon, label: "Follow" },
+      { href: "/wants", icon: ShoppingBagIcon, label: "Wants" },
+      { href: "/likes", icon: HeartIcon, label: "Likes" },
+      { href: "/search", icon: SearchIcon, label: "Search" },
+      { href: "/help", icon: QuestionMarkCircleIcon, label: "Help" },
     ])
   })
 
@@ -28,12 +40,12 @@ describe("navigation", () => {
         userId: "12",
       }),
     ).toEqual([
-      { href: "/roasters/home", icon: "home", label: "Home" },
-      { href: "/roasters/5", icon: "coffee-cup", label: "Roaster" },
-      { href: "/beans", icon: "coffee-bean", label: "Beans" },
-      { href: "/offers", icon: "clipboard", label: "Offers" },
-      { href: "/search", icon: "search", label: "Search" },
-      { href: "/help", icon: "question-mark-circle", label: "Help" },
+      { href: "/roasters/home", icon: HomeIcon, label: "Home" },
+      { href: "/roasters/5", icon: CoffeeCupIcon, label: "Roaster" },
+      { href: "/beans", icon: CoffeeBeanIcon, label: "Beans" },
+      { href: "/offers", icon: ClipboardIcon, label: "Offers" },
+      { href: "/search", icon: SearchIcon, label: "Search" },
+      { href: "/help", icon: QuestionMarkCircleIcon, label: "Help" },
     ])
   })
 
