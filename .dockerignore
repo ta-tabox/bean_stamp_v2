@@ -2,6 +2,16 @@
 .gitignore
 .next
 node_modules
+.pnpm-store
 .playwright-browsers
 coverage
 tmp
+test-results
+playwright-report
+tsconfig.tsbuildinfo
+.env.local
+.env
+.DS_Store
+.idea
+.vscode
+*.log
