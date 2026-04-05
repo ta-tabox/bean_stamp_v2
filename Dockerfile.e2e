@@ -7,11 +7,16 @@ ENV PATH=$PNPM_HOME:$PATH
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends postgresql-client \
+  && rm -rf /var/lib/apt/lists/*
+
 RUN corepack enable && corepack prepare pnpm@10.29.3 --activate
 
 COPY scripts/e2e-entrypoint.sh /usr/local/bin/e2e-entrypoint.sh
+COPY scripts/run-e2e.sh /usr/local/bin/run-e2e.sh
 
-RUN chmod +x /usr/local/bin/e2e-entrypoint.sh
+RUN chmod +x /usr/local/bin/e2e-entrypoint.sh /usr/local/bin/run-e2e.sh
 
 ENTRYPOINT ["e2e-entrypoint.sh"]
-CMD ["pnpm", "test:e2e"]
+CMD ["sleep", "infinity"]

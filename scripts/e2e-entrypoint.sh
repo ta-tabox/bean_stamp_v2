@@ -2,7 +2,7 @@
 set -eu
 
 if [ "$#" -eq 0 ]; then
-  set -- pnpm test:e2e
+  set -- sleep infinity
 fi
 
 exec "$@"

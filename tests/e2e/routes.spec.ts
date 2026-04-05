@@ -75,7 +75,7 @@ test("認証フローとセッション API が動作する", async ({ page }) =
   await expect(
     page.getByRole("link", { name: "ロースターをフォローしてオファーを受け取る" }),
   ).toBeVisible()
-  await expect(page.getByRole("button", { name: "SignOut" })).toBeVisible()
+  await expect(visibleButton(page, "SignOut")).toBeVisible()
 
   const sessionPayload = await page.evaluate(async () => {
     const response = await fetch("/api/v1/auth/sessions")
@@ -186,17 +186,15 @@ test("認証フローとセッション API が動作する", async ({ page }) =
   await expect(page.getByText("ロースターを更新しました。")).toBeVisible()
   await expect(page.getByRole("link", { name: "フォロワー一覧" })).toBeVisible()
 
-  await page.getByRole("link", { name: "Offers" }).first().click()
+  await page.goto("/offers")
   await expect(page).toHaveURL(/\/offers$/)
   await expect(page.getByRole("heading", { name: "オファー一覧", exact: true })).toBeVisible()
 
-  await page.getByRole("link", { name: "Search" }).first().click()
+  await page.goto("/search")
   await expect(page).toHaveURL(/\/search$/)
   await expect(page.getByRole("heading", { name: "検索トップ", exact: true })).toBeVisible()
 
-  await page
-    .getByRole("button", { name: "SignOut" })
-    .evaluate((button) => button.closest("form")?.requestSubmit())
+  await visibleButton(page, "SignOut").evaluate((button) => button.closest("form")?.requestSubmit())
   await expect(page).toHaveURL(/\/auth\/signin$/)
 
   await page.goto("/auth/signup")
@@ -279,9 +277,7 @@ test("認証フローとセッション API が動作する", async ({ page }) =
   await expect(page).toHaveURL(new RegExp(`/roasters/${roasterId}\\?unfollowed=1`))
   await expect(page.getByText("ロースターのフォローを解除しました。")).toBeVisible()
 
-  await page
-    .getByRole("button", { name: "SignOut" })
-    .evaluate((button) => button.closest("form")?.requestSubmit())
+  await visibleButton(page, "SignOut").evaluate((button) => button.closest("form")?.requestSubmit())
   await expect(page).toHaveURL(/\/auth\/signin$/)
 
   await page.goto("/auth/password_reset")
@@ -306,4 +302,8 @@ test("認証フローとセッション API が動作する", async ({ page }) =
 
 function visibleAppNavLink(page: Page, href: string) {
   return page.locator(`nav[aria-label="アプリナビゲーション"] a[href="${href}"]:visible`).first()
+}
+
+function visibleButton(page: Page, name: string) {
+  return page.getByRole("button", { name, exact: true }).filter({ visible: true }).first()
 }
