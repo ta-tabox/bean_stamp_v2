@@ -12,6 +12,7 @@
 - Compose では共有 volume `global_pnpm_store` を `/pnpm/store` として使い、`compose.yml` の `npm_config_store_dir` で固定する
 - E2E は `e2e` コンテナに分離し、Playwright のブラウザ依存は `app` に持ち込まない
 - E2E のテスト対象アプリは `e2e` コンテナ内で起動し、通常開発用 DB を書き換えない
+- `e2e` の `/app/.next` は専用 volume に分離し、`app` コンテナの Next.js 開発生成物と干渉させない
 
 ## サービス構成
 
@@ -29,6 +30,7 @@
   - 通常の `docker compose up` に含めて起動し、既定コマンドで待機する
   - 既定コマンドは `sleep infinity` で、常駐させた状態に対して `docker compose exec e2e ...` を実行できる
   - `pnpm test:e2e` はラッパースクリプト経由で `bean_stamp_e2e` を作成または再利用し、DB リセット、Next.js 再起動、待機、Playwright 実行を同一コンテナで完結する
+  - `.next` は `e2e_next` volume を `/app/.next` へ mount し、通常開発用の `app` と分離する
 
 ## 初回セットアップ
 
@@ -89,6 +91,7 @@ docker compose up -d --build
 ただし、次のケースでは `up --build` の前に Prisma Client 再生成が必要:
 
 - `docker compose down -v` で `app_node_modules` / `e2e_node_modules` を削除した
+- `docker compose down -v` で `e2e_next` を含む依存 volume を削除した
 - `docker volume rm` で Node.js 依存のボリュームを削除した
 - `prisma/schema.prisma` を変更した
 

@@ -23,6 +23,13 @@ describe("E2E compose configuration", () => {
     expect(compose).toContain("    depends_on:\n      db:\n        condition: service_healthy")
     expect(compose).not.toContain("    depends_on:\n      app:\n        condition: service_started")
   })
+
+  it("e2e コンテナは .next を専用 volume に分離する", () => {
+    const compose = readFileSync(composePath, "utf8")
+
+    expect(compose).toContain("- e2e_next:/app/.next")
+    expect(compose).toContain("e2e_next:")
+  })
 })
 
 describe("E2E runtime files", () => {
