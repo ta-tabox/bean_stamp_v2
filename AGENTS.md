@@ -45,6 +45,8 @@
 - `db` コンテナは通常開発用 `bean_stamp` と E2E 用 `bean_stamp_e2e` を同一インスタンス内に持ち、データ分離は database 名で行う
 - E2E は `e2e` コンテナから実行し、Next.js 起動も `e2e` コンテナ内で完結させる
 - `e2e` コンテナは `docker compose up` に含めて常駐させ、待機状態から `docker compose exec e2e ...` で呼び出す
+- ホスト側の pnpm store 設定はリポジトリではなく各ローカル環境の pnpm user config で管理する
+- Compose の pnpm store は共有 volume `global_pnpm_store` を `/pnpm/store` として使い、`compose.yml` の `npm_config_store_dir` で固定する
 - `app` 起動時には entrypoint で `pnpm prisma:migrate:deploy` が走る前提で考える
 - Prisma の migration / seed / generate は `app` コンテナから実行する
 - `prisma:seed` はマスタデータ専用とし、開発用ダミーデータは `prisma:seed:dev` に分けて扱う
@@ -85,6 +87,9 @@
 - 失敗の表現方法は層ごとに揃える
 - 共通化は変更理由が一致する場合に限る
 - `app/**` は Next.js の route・layout・metadata・redirect など最上位のつなぎにとどめ、細かい UI と業務ロジックは `src/**` へ切り出す
+- 今後の新規実装・改修では、Next.js 固有の Server Action に閉じた設計よりも、HTTP 境界が明示された API 設計を優先する
+- UI は入力と表示に責務を寄せ、認証、バリデーション、永続化、レスポンス整形などの実処理は API / server 層へ分離する
+- 将来のフレームワーク変更可能性を踏まえ、フレームワーク固有機能への依存は境界に閉じ込め、業務ロジックは再利用しやすい構造を保つ
 
 ## 命名とコメント
 

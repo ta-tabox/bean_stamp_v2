@@ -1,21 +1,28 @@
-import { PlaceholderPage } from "@/components/shared/PlaceholderPage"
-import { beansRoutes } from "@/features/beans"
+import { BeanFormPageContent } from "@/features/beans/components/BeansPageContents"
 import { requireRoasterMembership } from "@/server/auth/guards"
+import { getBeanForRoaster } from "@/server/beans"
 
-type BeanEditPageProps = Readonly<{
-  params: Promise<{ id: string }>
-}>
+type BeanEditPageProps = {
+  params: Promise<{
+    id: string
+  }>
+  searchParams?: Promise<{
+    error?: string
+  }>
+}
 
-export default async function BeanEditPage({ params }: BeanEditPageProps) {
-  await requireRoasterMembership()
+export default async function BeanEditPage({ params, searchParams }: BeanEditPageProps) {
+  const session = await requireRoasterMembership()
   const { id } = await params
+  const currentParams = (await searchParams) ?? {}
+  const bean = await getBeanForRoaster(session.roasterId!, id)
 
   return (
-    <PlaceholderPage
-      eyebrow="Beans"
-      title={`豆編集 #${id}`}
-      description="Bean 編集画面のルートです。"
-      links={beansRoutes}
+    <BeanFormPageContent
+      bean={bean}
+      error={currentParams.error}
+      submitLabel="更新する"
+      title="コーヒー豆編集"
     />
   )
 }

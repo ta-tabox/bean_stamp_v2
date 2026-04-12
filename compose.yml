@@ -31,6 +31,7 @@ services:
       DATABASE_URL: postgresql://postgres:postgres@db:5432/bean_stamp
       GOOGLE_CLOUD_PROJECT: replace_me
       GCS_BUCKET_UPLOADS: replace_me
+      npm_config_store_dir: /pnpm/store
       WATCHPACK_POLLING: "true"
     ports:
       - "3000:3000"
@@ -39,7 +40,7 @@ services:
     volumes:
       - .:/app
       - app_node_modules:/app/node_modules
-      - app_pnpm_store:/pnpm
+      - pnpm_store:/pnpm
 
   e2e:
     build:
@@ -61,16 +62,20 @@ services:
       PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
       E2E_DATABASE_NAME: bean_stamp_e2e
       E2E_DB_ADMIN_URL: postgresql://postgres:postgres@db:5432/postgres
+      npm_config_store_dir: /pnpm/store
       WATCHPACK_POLLING: "true"
     stdin_open: true
     tty: true
     volumes:
       - .:/app
       - e2e_node_modules:/app/node_modules
-      - app_pnpm_store:/pnpm
+      - e2e_next:/app/.next
+      - pnpm_store:/pnpm
 
 volumes:
   postgres_data:
   app_node_modules:
-  app_pnpm_store:
+  pnpm_store:
+    name: global_pnpm_store
   e2e_node_modules:
+  e2e_next:

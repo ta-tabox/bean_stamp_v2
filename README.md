@@ -68,6 +68,9 @@ docker compose run --rm app pnpm prisma:seed:dev
 - `e2e`: Playwright 公式イメージを土台にした `Dockerfile.e2e` ベースの E2E 実行専用コンテナ
   - `pnpm test:e2e` はラッパースクリプト経由で `bean_stamp_e2e` を作成または再利用し、DB をリセットしてから Next.js 起動、待機、Playwright 実行までを担う
   - 通常の `docker compose up --build` に含まれ、待機状態から `docker compose exec e2e ...` で呼び出せる
+  - `e2e` の `/app/.next` は専用 volume に分離し、通常開発用 `app` コンテナの Next.js 生成物と干渉しないようにする
+- ホスト側の pnpm store 設定はリポジトリではなく各ローカル環境の pnpm user config で管理する
+- Compose の pnpm store は named volume `global_pnpm_store` を `/pnpm/store` として共有し、`compose.yml` の `npm_config_store_dir` で固定する
 
 初回セットアップ後に migration や seed を追加実行する場合:
 
