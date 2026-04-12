@@ -45,6 +45,8 @@
 - `db` コンテナは通常開発用 `bean_stamp` と E2E 用 `bean_stamp_e2e` を同一インスタンス内に持ち、データ分離は database 名で行う
 - E2E は `e2e` コンテナから実行し、Next.js 起動も `e2e` コンテナ内で完結させる
 - `e2e` コンテナは `docker compose up` に含めて常駐させ、待機状態から `docker compose exec e2e ...` で呼び出す
+- ホスト側の pnpm store 設定はリポジトリではなく各ローカル環境の pnpm user config で管理する
+- Compose の pnpm store は共有 volume `global_pnpm_store` を `/pnpm/store` として使い、`compose.yml` の `npm_config_store_dir` で固定する
 - `app` 起動時には entrypoint で `pnpm prisma:migrate:deploy` が走る前提で考える
 - Prisma の migration / seed / generate は `app` コンテナから実行する
 - `prisma:seed` はマスタデータ専用とし、開発用ダミーデータは `prisma:seed:dev` に分けて扱う

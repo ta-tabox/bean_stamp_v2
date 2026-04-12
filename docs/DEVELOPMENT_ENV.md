@@ -8,6 +8,8 @@
 - `app` コンテナは Next.js 開発サーバー専用とし、依存導入は別コマンドで行う
 - PostgreSQL は `db` コンテナ 1 つで管理し、通常開発用 `bean_stamp` と E2E 用 `bean_stamp_e2e` を database 名で分離する
 - Prisma の migration / seed も `app` コンテナから実行する
+- ホスト側の pnpm store 設定はリポジトリではなく各ローカル環境の pnpm user config で管理する
+- Compose では共有 volume `global_pnpm_store` を `/pnpm/store` として使い、`compose.yml` の `npm_config_store_dir` で固定する
 - E2E は `e2e` コンテナに分離し、Playwright のブラウザ依存は `app` に持ち込まない
 - E2E のテスト対象アプリは `e2e` コンテナ内で起動し、通常開発用 DB を書き換えない
 
