@@ -1,6 +1,5 @@
 import { BeanFormPageContent } from "@/features/beans/components/BeansPageContents"
 import { requireRoasterMembership } from "@/server/auth/guards"
-import { createBeanAction } from "@/server/beans/actions"
 
 type BeanNewPageProps = {
   searchParams?: Promise<{
@@ -14,7 +13,6 @@ export default async function BeanNewPage({ searchParams }: BeanNewPageProps) {
 
   return (
     <BeanFormPageContent
-      action={createBeanAction}
       error={params.error}
       submitLabel="保存する"
       title="コーヒー豆登録"

@@ -1,10 +1,11 @@
 "use server"
 
-import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 
-import { createBean, deleteBean, parseBeanMutationInput, updateBean } from "@/server/beans/service"
 import { requireRoasterMembership } from "@/server/auth/guards"
+import { parseBeanMutationFormData } from "@/server/beans/form-data"
+import { revalidateBeanPaths } from "@/server/beans/revalidation"
+import { createBean, deleteBean, updateBean } from "@/server/beans/service"
 import { asAppError } from "@/server/errors"
 
 export async function createBeanAction(formData: FormData) {
@@ -13,28 +14,7 @@ export async function createBeanAction(formData: FormData) {
   let beanId: string
 
   try {
-    const bean = await createBean(
-      session.roasterId!,
-      parseBeanMutationInput({
-        acidity: formData.get("acidity"),
-        bitterness: formData.get("bitterness"),
-        body: formData.get("body"),
-        countryId: formData.get("countryId"),
-        croppedAt: formData.get("croppedAt"),
-        describe: formData.get("describe"),
-        elevation: formData.get("elevation"),
-        farm: formData.get("farm"),
-        flavor: formData.get("flavor"),
-        images: formData.getAll("images"),
-        name: formData.get("name"),
-        process: formData.get("process"),
-        roastLevelId: formData.get("roastLevelId"),
-        subregion: formData.get("subregion"),
-        sweetness: formData.get("sweetness"),
-        tasteTagIds: formData.getAll("tasteTagIds"),
-        variety: formData.get("variety"),
-      }),
-    )
+    const bean = await createBean(session.roasterId!, parseBeanMutationFormData(formData))
 
     beanId = String(bean.id)
   } catch (error) {
@@ -50,29 +30,7 @@ export async function updateBeanAction(formData: FormData) {
   const beanId = String(formData.get("beanId") ?? "")
 
   try {
-    await updateBean(
-      session.roasterId!,
-      beanId,
-      parseBeanMutationInput({
-        acidity: formData.get("acidity"),
-        bitterness: formData.get("bitterness"),
-        body: formData.get("body"),
-        countryId: formData.get("countryId"),
-        croppedAt: formData.get("croppedAt"),
-        describe: formData.get("describe"),
-        elevation: formData.get("elevation"),
-        farm: formData.get("farm"),
-        flavor: formData.get("flavor"),
-        images: formData.getAll("images"),
-        name: formData.get("name"),
-        process: formData.get("process"),
-        roastLevelId: formData.get("roastLevelId"),
-        subregion: formData.get("subregion"),
-        sweetness: formData.get("sweetness"),
-        tasteTagIds: formData.getAll("tasteTagIds"),
-        variety: formData.get("variety"),
-      }),
-    )
+    await updateBean(session.roasterId!, beanId, parseBeanMutationFormData(formData))
   } catch (error) {
     redirect(`/beans/${beanId}/edit?error=${encodeURIComponent(asAppError(error).userMessage)}`)
   }
@@ -93,12 +51,4 @@ export async function deleteBeanAction(formData: FormData) {
 
   revalidateBeanPaths(beanId)
   redirect("/beans?deleted=1")
-}
-
-function revalidateBeanPaths(beanId: string) {
-  revalidatePath("/beans")
-  revalidatePath("/beans/new")
-  revalidatePath(`/beans/${beanId}`)
-  revalidatePath(`/beans/${beanId}/edit`)
-  revalidatePath("/roasters/home")
 }

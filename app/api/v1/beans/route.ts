@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 
 import { getSessionPrincipal } from "@/server/auth/guards"
 import { toApiErrorResponse } from "@/server/api/error-response"
+import { revalidateBeanPaths } from "@/server/beans/revalidation"
 import { createBean, listBeansForRoaster, parseBeanMutationInput } from "@/server/beans"
 import { AppError } from "@/server/errors"
 
@@ -19,12 +20,25 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const isHtmlFormRequest = isFormNavigationRequest(request)
+
   try {
     const session = await requireApiRoasterSession()
     const bean = await createBean(session.roasterId, parseBeanMutationInput(await readBeanPayload(request)))
 
+    if (isHtmlFormRequest) {
+      const beanId = String(bean.id)
+      revalidateBeanPaths(beanId)
+
+      return redirectFromRequest(request, `/beans/${beanId}?created=1`)
+    }
+
     return NextResponse.json(bean)
   } catch (error) {
+    if (isHtmlFormRequest) {
+      return redirectForFormError(request, error, "/beans/new")
+    }
+
     const response = toApiErrorResponse(error)
 
     return NextResponse.json(response.payload, { status: response.status })
@@ -123,4 +137,32 @@ function readRecord(value: unknown) {
 
 function getFirstNonEmptyArray(...values: unknown[][]) {
   return values.find((value) => value.length > 0) ?? []
+}
+
+function isFormNavigationRequest(request: Request) {
+  const accept = request.headers.get("accept") ?? ""
+  const contentType = request.headers.get("content-type") ?? ""
+
+  return accept.includes("text/html") && !contentType.includes("application/json")
+}
+
+function redirectForFormError(request: Request, error: unknown, fallbackPath: string) {
+  const response = toApiErrorResponse(error)
+
+  if (response.status === 401) {
+    return redirectFromRequest(request, "/auth/signin")
+  }
+
+  if (response.status === 403) {
+    return redirectFromRequest(request, "/users/home")
+  }
+
+  return redirectFromRequest(
+    request,
+    `${fallbackPath}?error=${encodeURIComponent(response.payload.error.message)}`,
+  )
+}
+
+function redirectFromRequest(request: Request, path: string) {
+  return NextResponse.redirect(new URL(path, request.url), { status: 303 })
 }

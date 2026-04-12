@@ -1,6 +1,5 @@
 import { BeanDetailPageContent } from "@/features/beans/components/BeansPageContents"
 import { requireRoasterMembership } from "@/server/auth/guards"
-import { deleteBeanAction } from "@/server/beans/actions"
 import { getBeanForRoaster } from "@/server/beans"
 
 type BeanPageProps = {
@@ -23,7 +22,6 @@ export default async function BeanPage({ params, searchParams }: BeanPageProps) 
   return (
     <BeanDetailPageContent
       bean={bean}
-      deleteAction={deleteBeanAction}
       status={{
         created: currentParams.created === "1",
         error: currentParams.error,

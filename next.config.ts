@@ -1,7 +1,7 @@
 import type { NextConfig } from "next"
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ["app"],
+  allowedDevOrigins: ["127.0.0.1", "app", "localhost"],
   reactStrictMode: true,
 }
 

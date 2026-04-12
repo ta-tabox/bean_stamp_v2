@@ -2,6 +2,8 @@ import { NextResponse } from "next/server"
 
 import { getSessionPrincipal } from "@/server/auth/guards"
 import { toApiErrorResponse } from "@/server/api/error-response"
+import { parseBeanMutationFormData } from "@/server/beans/form-data"
+import { revalidateBeanPaths } from "@/server/beans/revalidation"
 import { deleteBean, getBeanForRoaster, parseBeanMutationInput, updateBean } from "@/server/beans"
 import { AppError } from "@/server/errors"
 
@@ -40,6 +42,31 @@ export async function PATCH(request: Request, context: RouteContext) {
     const response = toApiErrorResponse(error)
 
     return NextResponse.json(response.payload, { status: response.status })
+  }
+}
+
+export async function POST(request: Request, context: RouteContext) {
+  try {
+    const session = await requireApiRoasterSession()
+    const { id } = await context.params
+    const formData = await request.formData()
+    const intent = String(formData.get("_intent") ?? "update")
+
+    if (intent === "delete") {
+      await deleteBean(session.roasterId, id)
+      revalidateBeanPaths(id)
+
+      return redirectFromRequest(request, "/beans?deleted=1")
+    }
+
+    await updateBean(session.roasterId, id, parseBeanMutationFormData(formData))
+    revalidateBeanPaths(id)
+
+    return redirectFromRequest(request, `/beans/${id}?updated=1`)
+  } catch (error) {
+    const { id } = await context.params
+
+    return redirectForFormError(request, error, `/beans/${id}/edit`, `/beans/${id}`)
   }
 }
 
@@ -149,4 +176,36 @@ function readRecord(value: unknown) {
 
 function getFirstNonEmptyArray(...values: unknown[][]) {
   return values.find((value) => value.length > 0) ?? []
+}
+
+function redirectForFormError(
+  request: Request,
+  error: unknown,
+  updateFallbackPath: string,
+  deleteFallbackPath: string,
+) {
+  const response = toApiErrorResponse(error)
+
+  if (response.status === 401) {
+    return redirectFromRequest(request, "/auth/signin")
+  }
+
+  if (response.status === 403) {
+    return redirectFromRequest(request, "/users/home")
+  }
+
+  const destination =
+    request.headers.get("content-type")?.includes("multipart/form-data") &&
+    !(request.headers.get("content-length") === "0")
+      ? updateFallbackPath
+      : deleteFallbackPath
+
+  return redirectFromRequest(
+    request,
+    `${destination}?error=${encodeURIComponent(response.payload.error.message)}`,
+  )
+}
+
+function redirectFromRequest(request: Request, path: string) {
+  return NextResponse.redirect(new URL(path, request.url), { status: 303 })
 }

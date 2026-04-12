@@ -1,6 +1,5 @@
 import { BeanFormPageContent } from "@/features/beans/components/BeansPageContents"
 import { requireRoasterMembership } from "@/server/auth/guards"
-import { updateBeanAction } from "@/server/beans/actions"
 import { getBeanForRoaster } from "@/server/beans"
 
 type BeanEditPageProps = {
@@ -20,7 +19,6 @@ export default async function BeanEditPage({ params, searchParams }: BeanEditPag
 
   return (
     <BeanFormPageContent
-      action={updateBeanAction}
       bean={bean}
       error={currentParams.error}
       submitLabel="更新する"
