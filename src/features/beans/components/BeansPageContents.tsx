@@ -76,6 +76,12 @@ export function BeansListPageContent({ beans, deleted = false }: BeansListPageCo
                   </h2>
                   <div className="mt-2 ml-4 flex justify-end gap-3">
                     <Link
+                      href={`/offers/new?beanId=${bean.id}`}
+                      className="btn btn-primary"
+                    >
+                      オファー
+                    </Link>
+                    <Link
                       href={`/beans/${bean.id}`}
                       className="btn btn-secondary"
                     >
@@ -219,6 +225,12 @@ export function BeanDetailPageContent({
               className="btn btn-secondary"
             >
               一覧へ戻る
+            </Link>
+            <Link
+              href={`/offers/new?beanId=${bean.id}`}
+              className="btn btn-primary"
+            >
+              この豆をオファーする
             </Link>
             <Link
               href={`/beans/${bean.id}/edit`}
