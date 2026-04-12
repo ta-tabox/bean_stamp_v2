@@ -13,7 +13,7 @@ import {
   type OfferFormField,
   type OfferFormValues,
 } from "@/features/offers/components/offer-form-validation"
-import type { OfferApiResponse, OffersStatsApiResponse } from "@/server/offers"
+import type { OfferApiResponse } from "@/server/offers"
 import type { UserApiResponse } from "@/server/profiles/dto"
 
 type WritableBeanOption = {
@@ -24,7 +24,6 @@ type WritableBeanOption = {
 type OffersListPageContentProps = {
   deleted?: boolean
   offers: readonly OfferApiResponse[]
-  stats: OffersStatsApiResponse
   statusFilter?: string
 }
 
@@ -71,50 +70,25 @@ const offerStatusClassName: Record<OfferApiResponse["status"], string> = {
 export function OffersListPageContent({
   deleted = false,
   offers,
-  stats,
   statusFilter,
 }: OffersListPageContentProps) {
   return (
     <main className="space-y-6">
       {deleted ? <StatusBanner>オファーを削除しました。</StatusBanner> : null}
-      <ContentHeader title="オファー一覧" />
-
-      <section className="grid gap-3 md:grid-cols-5">
-        <StatsTile
-          label="オファー中"
-          value={stats.on_offering}
-        />
-        <StatsTile
-          label="ロースト期間"
-          value={stats.on_roasting}
-        />
-        <StatsTile
-          label="準備中"
-          value={stats.on_preparing}
-        />
-        <StatsTile
-          label="受け取り期間"
-          value={stats.on_selling}
-        />
-        <StatsTile
-          label="受け取り終了"
-          value={stats.end_of_sales}
-        />
-      </section>
-
-      <section className="page-card space-y-4">
-        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+      <section className="content-header-panel">
+        <div className="flex h-full flex-col justify-between gap-4 sm:flex-row sm:items-end">
+          <h1 className="title-font text-3xl text-[var(--color-fg)]">オファー 一覧</h1>
           <form
             action="/offers"
             method="get"
-            className="flex flex-col gap-2 sm:flex-row sm:items-end"
+            className="ml-auto flex flex-col gap-2 text-left"
           >
-            <label className="flex flex-col gap-2 text-sm text-[var(--color-muted)]">
-              ステータス
+            <label className="text-sm font-medium text-[var(--color-muted)]">ステータス</label>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
               <select
                 name="status"
                 defaultValue={statusFilter ?? ""}
-                className="bean-select-input rounded-lg border border-[var(--color-border)] bg-white px-3 py-2 text-sm text-[var(--color-fg)]"
+                className="bean-select-input min-w-56 rounded-md border border-gray-100 bg-white px-4 py-3 text-sm text-gray-600 shadow-sm focus:outline-none"
               >
                 <option value="">有効なオファーを表示</option>
                 <option value="on_offering">オファー中</option>
@@ -123,110 +97,33 @@ export function OffersListPageContent({
                 <option value="on_selling">受け取り期間</option>
                 <option value="end_of_sales">受け取り終了</option>
               </select>
-            </label>
-            <button
-              type="submit"
-              className="btn btn-secondary"
-            >
-              絞り込む
-            </button>
+              <button
+                type="submit"
+                className="btn btn-secondary"
+              >
+                絞り込む
+              </button>
+            </div>
           </form>
-
-          <Link
-            href="/offers/new"
-            className="btn btn-primary"
-          >
-            新規オファー
-          </Link>
         </div>
       </section>
 
+      <div className="pt-4 pb-8 text-center">
+        <Link
+          href="/beans"
+          className="btn btn-primary"
+        >
+          コーヒー豆をオファーする
+        </Link>
+      </div>
+
       {offers.length ? (
-        <section className="space-y-6">
+        <section className="space-y-16">
           {offers.map((offer) => (
-            <article
+            <OfferIndexCard
               key={offer.id}
-              className="page-card overflow-hidden"
-            >
-              <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
-                <div className="space-y-4">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <OfferStatusBadge status={offer.status} />
-                    <span className="rounded-full border border-[var(--color-border)] px-3 py-1 text-xs text-[var(--color-muted)]">
-                      Wants {offer.want.count} / {offer.amount}
-                    </span>
-                    <Link
-                      href={`/roasters/${offer.roaster.id}`}
-                      className="legacy-text-link text-sm"
-                    >
-                      {offer.roaster.name}
-                    </Link>
-                  </div>
-
-                  <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                    <div>
-                      <h2 className="title-font text-2xl text-[var(--color-fg)]">
-                        {offer.bean.name}
-                      </h2>
-                      <p className="mt-2 text-sm text-[var(--color-muted)]">
-                        {offer.bean.describe ?? "説明はまだ登録されていません。"}
-                      </p>
-                    </div>
-
-                    <div className="flex gap-3">
-                      <Link
-                        href={`/offers/${offer.id}`}
-                        className="btn btn-secondary"
-                      >
-                        詳細
-                      </Link>
-                      <Link
-                        href={`/offers/${offer.id}/edit`}
-                        className="btn btn-primary"
-                      >
-                        編集
-                      </Link>
-                    </div>
-                  </div>
-
-                  <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                    <DetailTile
-                      label="オファー終了日"
-                      value={formatJaDate(offer.ended_at)}
-                    />
-                    <DetailTile
-                      label="焙煎日"
-                      value={formatJaDate(offer.roasted_at)}
-                    />
-                    <DetailTile
-                      label="受け取り開始日"
-                      value={formatJaDate(offer.receipt_started_at)}
-                    />
-                    <DetailTile
-                      label="受け取り終了日"
-                      value={formatJaDate(offer.receipt_ended_at)}
-                    />
-                  </div>
-
-                  <div className="grid gap-3 sm:grid-cols-3">
-                    <DetailTile
-                      label="内容量"
-                      value={`${offer.weight}g`}
-                    />
-                    <DetailTile
-                      label="価格"
-                      value={`¥${offer.price.toLocaleString("ja-JP")}`}
-                    />
-                    <DetailTile
-                      label="フレーバー"
-                      value={offer.bean.taste.names.join(", ") || "未設定"}
-                    />
-                  </div>
-                </div>
-
-                <OfferImagePanel offer={offer} />
-              </div>
-            </article>
+              offer={offer}
+            />
           ))}
         </section>
       ) : (
@@ -237,7 +134,7 @@ export function OffersListPageContent({
               豆を選んでオファーを登録すると、一覧と詳細ページに表示されます。
             </p>
             <Link
-              href="/offers/new"
+              href="/beans"
               className="btn btn-primary mt-5"
             >
               オファーを登録する
@@ -305,139 +202,57 @@ export function OfferDetailPageContent({
       />
       <ContentHeader title="オファー詳細" />
 
-      <section className="page-card space-y-6">
-        <div className="flex flex-col gap-4 border-b border-[var(--color-border)] pb-6">
-          <div className="flex flex-wrap items-center gap-3">
-            <OfferStatusBadge status={offer.status} />
-            <span className="rounded-full border border-[var(--color-border)] px-3 py-1 text-xs text-[var(--color-muted)]">
-              Wants {offer.want.count} / {offer.amount}
-            </span>
-          </div>
-
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="bean-section-title text-left">〜 Offer 〜</p>
-              <h2 className="title-font mt-2 text-3xl text-[var(--color-fg)]">{offer.bean.name}</h2>
-            </div>
-
-            <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap justify-end gap-3">
+        <Link
+          href="/offers"
+          className="btn btn-secondary"
+        >
+          一覧へ戻る
+        </Link>
+        {canManage ? (
+          <>
+            <Link
+              href={`/offers/${offer.id}/wanted_users`}
+              className="btn btn-secondary"
+            >
+              ウォントしたユーザー
+            </Link>
+            {canEdit ? (
               <Link
-                href="/offers"
-                className="btn btn-secondary"
+                href={`/offers/${offer.id}/edit`}
+                className="btn btn-primary"
               >
-                一覧へ戻る
+                編集
               </Link>
-              {canManage ? (
-                <>
-                  <Link
-                    href={`/offers/${offer.id}/wanted_users`}
-                    className="btn btn-secondary"
-                  >
-                    Wanted users
-                  </Link>
-                  {canEdit ? (
-                    <Link
-                      href={`/offers/${offer.id}/edit`}
-                      className="btn btn-primary"
-                    >
-                      編集する
-                    </Link>
-                  ) : null}
-                  <div
-                    ref={deleteMarkerRef}
-                    data-form-ready="0"
-                    data-testid="offer-delete-form"
-                    hidden
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      void handleDelete()
-                    }}
-                    disabled={isDeleting}
-                    className="btn border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100"
-                  >
-                    オファーを削除する
-                  </button>
-                </>
-              ) : null}
-            </div>
-          </div>
-        </div>
+            ) : null}
+            <div
+              ref={deleteMarkerRef}
+              data-form-ready="0"
+              data-testid="offer-delete-form"
+              hidden
+            />
+            <button
+              type="button"
+              onClick={() => {
+                void handleDelete()
+              }}
+              disabled={isDeleting}
+              className="btn border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100"
+            >
+              削除
+            </button>
+          </>
+        ) : null}
+      </div>
 
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
-          <div className="space-y-6">
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              <DetailTile
-                label="オファー終了日"
-                value={formatJaDate(offer.ended_at)}
-              />
-              <DetailTile
-                label="焙煎日"
-                value={formatJaDate(offer.roasted_at)}
-              />
-              <DetailTile
-                label="受け取り開始日"
-                value={formatJaDate(offer.receipt_started_at)}
-              />
-              <DetailTile
-                label="受け取り終了日"
-                value={formatJaDate(offer.receipt_ended_at)}
-              />
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-3">
-              <DetailTile
-                label="内容量"
-                value={`${offer.weight}g`}
-              />
-              <DetailTile
-                label="価格"
-                value={`¥${offer.price.toLocaleString("ja-JP")}`}
-              />
-              <DetailTile
-                label="登録日"
-                value={formatJaDate(offer.created_at)}
-              />
-            </div>
-
-            <section className="space-y-4">
-              <div className="flex flex-wrap items-center gap-3">
-                <Link
-                  href={`/roasters/${offer.roaster.id}`}
-                  className="legacy-text-link"
-                >
-                  {offer.roaster.name}
-                </Link>
-                <span className="metric-chip">Roaster</span>
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                <DetailTile
-                  label="生産国"
-                  value={offer.bean.country.name}
-                />
-                <DetailTile
-                  label="焙煎度"
-                  value={offer.bean.roast_level.name}
-                />
-                <DetailTile
-                  label="フレーバー"
-                  value={offer.bean.taste.names.join(", ") || "未設定"}
-                />
-              </div>
-
-              <div className="detail-tile">
-                <p className="text-xs uppercase tracking-[0.24em] text-gray-400">Bean note</p>
-                <p className="mt-3 text-sm leading-7 text-[var(--color-fg)]">
-                  {offer.bean.describe ?? "豆の紹介文はまだ登録されていません。"}
-                </p>
-              </div>
-            </section>
-          </div>
-
-          <OfferImagePanel offer={offer} />
-        </div>
+      <section className="mt-16">
+        <OfferDetailSummaryCard
+          offer={offer}
+          showWantedUsersLink={canManage}
+        />
+      </section>
+      <section className="mt-8">
+        <OfferBeanInfoCard offer={offer} />
       </section>
     </main>
   )
@@ -572,7 +387,7 @@ export function OfferFormPageContent({
 
       {beans.length ? (
         <form
-          className="form-shell space-y-8"
+          className="mx-auto max-w-3xl space-y-4"
         >
           <div
             ref={submitMarkerRef}
@@ -580,13 +395,13 @@ export function OfferFormPageContent({
             data-testid="offer-mutation-form"
             hidden
           />
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="space-y-4">
             {offer ? (
-              <div className="detail-tile">
-                <p className="text-xs uppercase tracking-[0.24em] text-gray-400">Bean</p>
-                <p className="mt-3 text-lg text-[var(--color-fg)]">
+              <div>
+                <label className="text-sm font-medium text-gray-500">コーヒー豆</label>
+                <div className="mt-3 rounded-md border border-gray-100 bg-white px-4 py-3 text-gray-600 shadow-sm">
                   {selectedBean?.name ?? offer.bean.name}
-                </p>
+                </div>
                 <input
                   type="hidden"
                   name="beanId"
@@ -594,10 +409,10 @@ export function OfferFormPageContent({
                 />
               </div>
             ) : (
-              <Field>
+              <OfferFormField>
                 <label
                   htmlFor="beanId"
-                  className="text-sm font-medium text-[var(--color-fg)]"
+                  className="text-sm font-medium text-gray-500"
                 >
                   コーヒー豆
                 </label>
@@ -622,79 +437,13 @@ export function OfferFormPageContent({
                   ))}
                 </select>
                 <FieldErrorMessage message={fieldErrors.beanId} />
-              </Field>
+              </OfferFormField>
             )}
 
-            <Field>
-              <label
-                htmlFor="price"
-                className="text-sm font-medium text-[var(--color-fg)]"
-              >
-                価格
-              </label>
-              <input
-                id="price"
-                name="price"
-                type="number"
-                min="1"
-                value={formValues.price}
-                onChange={(event) => {
-                  handleFieldChange("price", event.target.value)
-                }}
-                aria-invalid={fieldErrors.price ? "true" : "false"}
-                className={buildFieldClassName(fieldErrors.price)}
-              />
-              <FieldErrorMessage message={fieldErrors.price} />
-            </Field>
-
-            <Field>
-              <label
-                htmlFor="weight"
-                className="text-sm font-medium text-[var(--color-fg)]"
-              >
-                内容量(g)
-              </label>
-              <input
-                id="weight"
-                name="weight"
-                type="number"
-                min="1"
-                value={formValues.weight}
-                onChange={(event) => {
-                  handleFieldChange("weight", event.target.value)
-                }}
-                aria-invalid={fieldErrors.weight ? "true" : "false"}
-                className={buildFieldClassName(fieldErrors.weight)}
-              />
-              <FieldErrorMessage message={fieldErrors.weight} />
-            </Field>
-
-            <Field>
-              <label
-                htmlFor="amount"
-                className="text-sm font-medium text-[var(--color-fg)]"
-              >
-                数量
-              </label>
-              <input
-                id="amount"
-                name="amount"
-                type="number"
-                min="1"
-                value={formValues.amount}
-                onChange={(event) => {
-                  handleFieldChange("amount", event.target.value)
-                }}
-                aria-invalid={fieldErrors.amount ? "true" : "false"}
-                className={buildFieldClassName(fieldErrors.amount)}
-              />
-              <FieldErrorMessage message={fieldErrors.amount} />
-            </Field>
-
-            <Field>
+            <OfferFormField>
               <label
                 htmlFor="endedAt"
-                className="text-sm font-medium text-[var(--color-fg)]"
+                className="text-sm font-medium text-gray-500"
               >
                 オファー終了日
               </label>
@@ -710,12 +459,12 @@ export function OfferFormPageContent({
                 className={buildFieldClassName(fieldErrors.endedAt)}
               />
               <FieldErrorMessage message={fieldErrors.endedAt} />
-            </Field>
+            </OfferFormField>
 
-            <Field>
+            <OfferFormField>
               <label
                 htmlFor="roastedAt"
-                className="text-sm font-medium text-[var(--color-fg)]"
+                className="text-sm font-medium text-gray-500"
               >
                 焙煎日
               </label>
@@ -731,12 +480,12 @@ export function OfferFormPageContent({
                 className={buildFieldClassName(fieldErrors.roastedAt)}
               />
               <FieldErrorMessage message={fieldErrors.roastedAt} />
-            </Field>
+            </OfferFormField>
 
-            <Field>
+            <OfferFormField>
               <label
                 htmlFor="receiptStartedAt"
-                className="text-sm font-medium text-[var(--color-fg)]"
+                className="text-sm font-medium text-gray-500"
               >
                 受け取り開始日
               </label>
@@ -752,12 +501,12 @@ export function OfferFormPageContent({
                 className={buildFieldClassName(fieldErrors.receiptStartedAt)}
               />
               <FieldErrorMessage message={fieldErrors.receiptStartedAt} />
-            </Field>
+            </OfferFormField>
 
-            <Field>
+            <OfferFormField>
               <label
                 htmlFor="receiptEndedAt"
-                className="text-sm font-medium text-[var(--color-fg)]"
+                className="text-sm font-medium text-gray-500"
               >
                 受け取り終了日
               </label>
@@ -773,10 +522,81 @@ export function OfferFormPageContent({
                 className={buildFieldClassName(fieldErrors.receiptEndedAt)}
               />
               <FieldErrorMessage message={fieldErrors.receiptEndedAt} />
-            </Field>
+            </OfferFormField>
+
+            <div className="grid gap-5 md:grid-cols-3">
+              <OfferFormField>
+                <label
+                  htmlFor="price"
+                  className="text-sm font-medium text-gray-500"
+                >
+                  価格
+                </label>
+                <input
+                  id="price"
+                  name="price"
+                  type="number"
+                  min="1"
+                  value={formValues.price}
+                  placeholder="販売価格（円）"
+                  onChange={(event) => {
+                    handleFieldChange("price", event.target.value)
+                  }}
+                  aria-invalid={fieldErrors.price ? "true" : "false"}
+                  className={buildFieldClassName(fieldErrors.price)}
+                />
+                <FieldErrorMessage message={fieldErrors.price} />
+              </OfferFormField>
+
+              <OfferFormField>
+                <label
+                  htmlFor="weight"
+                  className="text-sm font-medium text-gray-500"
+                >
+                  内容量(g)
+                </label>
+                <input
+                  id="weight"
+                  name="weight"
+                  type="number"
+                  min="1"
+                  value={formValues.weight}
+                  placeholder="内容量（g）"
+                  onChange={(event) => {
+                    handleFieldChange("weight", event.target.value)
+                  }}
+                  aria-invalid={fieldErrors.weight ? "true" : "false"}
+                  className={buildFieldClassName(fieldErrors.weight)}
+                />
+                <FieldErrorMessage message={fieldErrors.weight} />
+              </OfferFormField>
+
+              <OfferFormField>
+                <label
+                  htmlFor="amount"
+                  className="text-sm font-medium text-gray-500"
+                >
+                  数量
+                </label>
+                <input
+                  id="amount"
+                  name="amount"
+                  type="number"
+                  min="1"
+                  value={formValues.amount}
+                  placeholder="数量"
+                  onChange={(event) => {
+                    handleFieldChange("amount", event.target.value)
+                  }}
+                  aria-invalid={fieldErrors.amount ? "true" : "false"}
+                  className={buildFieldClassName(fieldErrors.amount)}
+                />
+                <FieldErrorMessage message={fieldErrors.amount} />
+              </OfferFormField>
+            </div>
           </div>
 
-          <div className="flex flex-wrap justify-end gap-3">
+          <div className="flex flex-wrap items-center justify-center gap-4">
             <Link
               href={offer ? `/offers/${offer.id}` : "/offers"}
               className="btn btn-secondary"
@@ -823,61 +643,43 @@ export function OfferWantedUsersPageContent({
 }: OfferWantedUsersPageContentProps) {
   return (
     <main className="space-y-6">
-      <ContentHeader title="Wanted users" />
+      <ContentHeader title="ウォントしたユーザー" />
 
-      <section className="page-card space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--color-border)] pb-6">
-          <div>
-            <OfferStatusBadge status={offer.status} />
-            <h2 className="title-font mt-3 text-2xl text-[var(--color-fg)]">{offer.bean.name}</h2>
-            <p className="mt-2 text-sm text-[var(--color-muted)]">
-              Wants {offer.want.count} / {offer.amount}
-            </p>
-          </div>
+      <section className="mt-16">
+        <OfferDetailSummaryCard offer={offer} />
+      </section>
 
-          <div className="flex gap-3">
-            <Link
-              href={`/offers/${offer.id}`}
-              className="btn btn-secondary"
-            >
-              オファー詳細
-            </Link>
-            <Link
-              href="/offers"
-              className="btn btn-secondary"
-            >
-              一覧へ戻る
-            </Link>
-          </div>
-        </div>
-
-        {users.length ? (
-          <div className="divide-y divide-[var(--color-border)] overflow-hidden rounded-xl border border-[var(--color-border)]">
+      {users.length ? (
+        <section className="page-card overflow-hidden py-4 text-[var(--color-fg)]">
+          <ol>
             {users.map((user) => (
-              <Link
-                key={user.id}
-                href={`/users/${user.id}`}
-                className="list-item-link"
-              >
-                <div>
-                  <p className="text-base text-[var(--color-fg)]">{user.name}</p>
-                  <p className="mt-1 text-sm text-[var(--color-muted)]">{user.email}</p>
-                </div>
-                <span className="metric-chip">{user.prefecture_code}</span>
-              </Link>
+              <li key={user.id}>
+                <Link
+                  href={`/users/${user.id}`}
+                  className="list-item-link"
+                >
+                  <div className="flex items-center gap-4">
+                    <UserThumbnail user={user} />
+                    <div>
+                      <p className="text-base">{user.name}</p>
+                      <p className="mt-1 text-sm text-[var(--color-muted)]">{user.email}</p>
+                    </div>
+                  </div>
+                  <span className="metric-chip">{user.prefecture_code}</span>
+                </Link>
+              </li>
             ))}
-          </div>
-        ) : (
+          </ol>
+        </section>
+      ) : (
+        <section className="page-card">
           <div className="empty-state">
             <h2 className="title-font text-2xl text-[var(--color-fg)]">
-              Wanted users はまだいません
+              ウォントしているユーザーがいません
             </h2>
-            <p className="mt-2 text-sm text-[var(--color-muted)]">
-              ユーザーがオファーをウォントすると、この画面に一覧表示されます。
-            </p>
           </div>
-        )}
-      </section>
+        </section>
+      )}
     </main>
   )
 }
@@ -908,65 +710,347 @@ function OfferStatusBadge({ status }: { status: OfferApiResponse["status"] }) {
   )
 }
 
+function OfferIndexCard({ offer }: { offer: OfferApiResponse }) {
+  return (
+    <article className="overflow-visible rounded-lg border border-gray-100 bg-white py-2 shadow-md">
+      <div className="px-4 md:px-8">
+        <div className="mx-auto w-11/12">
+          <div className="flex -mt-16 items-end justify-center md:justify-end">
+            <BeanThumbnail offer={offer} />
+          </div>
+          <div className="mb-2 flex items-end justify-between">
+            <OfferStatusBadge status={offer.status} />
+            <WantedUsersStat
+              offer={offer}
+              linked
+            />
+          </div>
+          {offer.status === "on_offering" ? (
+            <p className="text-right text-sm text-[var(--color-muted)]">
+              焙煎まであと{getNumberOfDaysFromTodayTo(offer.roasted_at)}日です
+            </p>
+          ) : null}
+          <div className="md:flex md:items-baseline">
+            <h2 className="title-font text-xl text-[var(--color-fg)] md:mt-2 lg:text-2xl">
+              {offer.bean.name}
+            </h2>
+            <div className="text-right md:ml-4">
+              <Link
+                href={`/offers/${offer.id}`}
+                className="btn btn-secondary"
+              >
+                <span className="inline-block min-w-16">詳細</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4 lg:grid lg:grid-cols-2 lg:content-between">
+          <OfferBeanProfile offer={offer} />
+          <OfferSchedulePanel offer={offer} />
+          <div className="col-span-full flex justify-end pr-2 pt-4">
+            <OfferPricePerWeight offer={offer} />
+          </div>
+        </div>
+      </div>
+    </article>
+  )
+}
+
+function OfferDetailSummaryCard({
+  offer,
+  showWantedUsersLink = false,
+}: {
+  offer: OfferApiResponse
+  showWantedUsersLink?: boolean
+}) {
+  return (
+    <section className="overflow-visible rounded-lg border border-gray-100 bg-white py-2 shadow-md">
+      <div className="px-4 md:px-8">
+        <div className="mx-auto w-11/12">
+          <div className="flex -mt-16 justify-center md:justify-end">
+            <RoasterThumbnail offer={offer} />
+          </div>
+          <div className="mb-2 flex justify-between">
+            <OfferStatusBadge status={offer.status} />
+            <div className="ml-auto w-2/3 text-right md:w-1/3">
+              <Link
+                href={`/roasters/${offer.roaster.id}`}
+                className="legacy-text-link text-sm"
+              >
+                {offer.roaster.name}
+              </Link>
+            </div>
+          </div>
+          <div className="flex justify-end">
+            <div className="mr-4">
+              <WantedUsersStat
+                offer={offer}
+                linked={showWantedUsersLink}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4 lg:grid lg:grid-cols-2 lg:content-between">
+          <OfferSchedulePanel offer={offer} />
+          <div className="col-span-full flex justify-end pr-2 pt-4">
+            <OfferPricePerWeight offer={offer} />
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function OfferBeanInfoCard({ offer }: { offer: OfferApiResponse }) {
+  return (
+    <section className="rounded-lg border border-gray-100 bg-white py-4 shadow-md">
+      <div className="w-11/12 mx-auto">
+        <h2 className="title-font pb-2 text-center text-xl text-gray-900 lg:text-2xl">
+          {offer.bean.name}
+        </h2>
+        <div className="flex flex-col items-center justify-center">
+          <div className="h-64 w-full overflow-hidden rounded-md border border-gray-100 bg-white lg:h-96 lg:w-[36rem]">
+            <OfferImagePanel offer={offer} />
+          </div>
+
+          <div className="w-full pt-4 text-center lg:w-10/12">
+            <p className="leading-relaxed text-[var(--color-fg)]">
+              {offer.bean.describe ?? "豆の紹介文はまだ登録されていません。"}
+            </p>
+
+            <section className="w-11/12 mx-auto pt-4">
+              <div className="bean-section-title mb-2">〜 Flavor 〜</div>
+              <p className="text-sm leading-7 text-[var(--color-fg)]">
+                {offer.bean.taste.names.join(", ") || "未設定"}
+              </p>
+            </section>
+
+            <section className="pt-4">
+              <div className="bean-section-title mb-2">〜 Detail 〜</div>
+              <div className="lg:grid lg:grid-cols-2 lg:content-between">
+                <OfferBeanDetailRows offer={offer} />
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 function OfferImagePanel({ offer }: { offer: OfferApiResponse }) {
   return (
-    <div className="space-y-4">
-      <div className="overflow-hidden rounded-2xl border border-[var(--color-border)] bg-white">
-        {offer.bean.thumbnail_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={offer.bean.thumbnail_url}
-            alt={`${offer.bean.name}の画像`}
-            className="h-72 w-full object-cover"
-          />
-        ) : (
-          <div className="flex h-72 items-center justify-center bg-slate-50 text-sm text-[var(--color-muted)]">
-            No Image
-          </div>
-        )}
-      </div>
-
-      <div className="detail-tile">
-        <p className="text-xs uppercase tracking-[0.24em] text-gray-400">Bean profile</p>
-        <dl className="mt-3 space-y-3 text-sm text-[var(--color-fg)]">
-          <div className="flex justify-between gap-4">
-            <dt className="text-[var(--color-muted)]">生産国</dt>
-            <dd>{offer.bean.country.name}</dd>
-          </div>
-          <div className="flex justify-between gap-4">
-            <dt className="text-[var(--color-muted)]">焙煎度</dt>
-            <dd>{offer.bean.roast_level.name}</dd>
-          </div>
-          <div className="flex justify-between gap-4">
-            <dt className="text-[var(--color-muted)]">フレーバー</dt>
-            <dd className="text-right">{offer.bean.taste.names.join(", ") || "未設定"}</dd>
-          </div>
-        </dl>
-      </div>
+    <div className="h-full overflow-hidden rounded-md bg-white">
+      {offer.bean.thumbnail_url ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={offer.bean.thumbnail_url}
+          alt={`${offer.bean.name}の画像`}
+          className="h-full w-full object-cover"
+        />
+      ) : (
+        <div className="flex h-full min-h-64 items-center justify-center bg-slate-50 text-sm text-[var(--color-muted)] lg:min-h-96">
+          No Image
+        </div>
+      )}
     </div>
   )
 }
 
-function StatsTile({ label, value }: { label: string; value: number }) {
+function OfferFormField({ children }: { children: ReactNode }) {
+  return <div className="mt-3 space-y-2">{children}</div>
+}
+
+function OfferDetailItem({ label, value }: { label: string; value: string }) {
   return (
-    <section className="detail-tile">
-      <p className="text-xs uppercase tracking-[0.24em] text-gray-400">{label}</p>
-      <p className="title-font mt-3 text-3xl text-[var(--color-fg)]">{value}</p>
-    </section>
+    <div className="mx-auto flex w-11/12 border-t border-gray-200 py-2">
+      <span className="text-gray-500">{label}</span>
+      <span className="ml-auto text-right text-gray-800">{value}</span>
+    </div>
   )
 }
 
-function DetailTile({ label, value }: { label: string; value: string }) {
+function OfferBeanProfile({ offer }: { offer: OfferApiResponse }) {
   return (
-    <section className="detail-tile">
-      <p className="text-xs uppercase tracking-[0.24em] text-gray-400">{label}</p>
-      <p className="mt-3 text-base text-[var(--color-fg)]">{value}</p>
-    </section>
+    <>
+      <OfferDetailItem
+        label="生産国"
+        value={offer.bean.country.name}
+      />
+      <OfferDetailItem
+        label="焙煎度"
+        value={offer.bean.roast_level.name}
+      />
+      <OfferDetailItem
+        label="地域"
+        value={offer.bean.subregion ?? "未設定"}
+      />
+      <OfferDetailItem
+        label="精製方法"
+        value={offer.bean.process ?? "未設定"}
+      />
+      <OfferDetailItem
+        label="フレーバー"
+        value={offer.bean.taste.names.join(", ") || "未設定"}
+      />
+    </>
   )
 }
 
-function Field({ children }: { children: ReactNode }) {
-  return <div className="rounded-2xl border border-[var(--color-border)] bg-slate-50 p-4">{children}</div>
+function OfferBeanDetailRows({ offer }: { offer: OfferApiResponse }) {
+  return (
+    <>
+      <OfferDetailItem
+        label="生産国"
+        value={offer.bean.country.name}
+      />
+      <OfferDetailItem
+        label="焙煎度"
+        value={offer.bean.roast_level.name}
+      />
+      <OfferDetailItem
+        label="地域"
+        value={offer.bean.subregion ?? "未設定"}
+      />
+      <OfferDetailItem
+        label="農園"
+        value={offer.bean.farm ?? "未設定"}
+      />
+      <OfferDetailItem
+        label="品種"
+        value={offer.bean.variety ?? "未設定"}
+      />
+      <OfferDetailItem
+        label="精製方法"
+        value={offer.bean.process ?? "未設定"}
+      />
+      <OfferDetailItem
+        label="標高"
+        value={offer.bean.elevation === null ? "未設定" : `${offer.bean.elevation} m`}
+      />
+      <OfferDetailItem
+        label="収穫時期"
+        value={formatCroppedAt(offer.bean.cropped_at)}
+      />
+    </>
+  )
+}
+
+function OfferSchedulePanel({ offer }: { offer: OfferApiResponse }) {
+  return (
+    <>
+      <OfferDetailItem
+        label="オファー作成日"
+        value={formatJaDate(offer.created_at)}
+      />
+      <OfferDetailItem
+        label="オファー終了日"
+        value={formatJaDate(offer.ended_at)}
+      />
+      <OfferDetailItem
+        label="焙煎日"
+        value={formatJaDate(offer.roasted_at)}
+      />
+      <OfferDetailItem
+        label="受け取り開始日"
+        value={formatJaDate(offer.receipt_started_at)}
+      />
+      <OfferDetailItem
+        label="受け取り終了日"
+        value={formatJaDate(offer.receipt_ended_at)}
+      />
+    </>
+  )
+}
+
+function OfferPricePerWeight({ offer }: { offer: OfferApiResponse }) {
+  return <div className="text-2xl text-[var(--color-fg)]">{`${offer.price}円 / ${offer.weight} g`}</div>
+}
+
+function WantedUsersStat({
+  offer,
+  linked = false,
+}: {
+  offer: OfferApiResponse
+  linked?: boolean
+}) {
+  const content = (
+    <span className="text-sm text-[var(--color-fg)]">{`${offer.want.count} wants / ${offer.amount}`}</span>
+  )
+
+  if (!linked) {
+    return content
+  }
+
+  return (
+    <Link
+      href={`/offers/${offer.id}/wanted_users`}
+      className="legacy-text-link"
+    >
+      {content}
+    </Link>
+  )
+}
+
+function BeanThumbnail({ offer }: { offer: OfferApiResponse }) {
+  return (
+    <div className="overflow-hidden rounded-full border-4 border-white bg-white shadow-md">
+      {offer.bean.thumbnail_url ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={offer.bean.thumbnail_url}
+          alt={`${offer.bean.name}の画像`}
+          className="h-28 w-28 object-cover"
+        />
+      ) : (
+        <div className="flex h-28 w-28 items-center justify-center bg-slate-100 text-xs text-[var(--color-muted)]">
+          No Image
+        </div>
+      )}
+    </div>
+  )
+}
+
+function RoasterThumbnail({ offer }: { offer: OfferApiResponse }) {
+  return (
+    <Link href={`/roasters/${offer.roaster.id}`}>
+      <div className="overflow-hidden rounded-full border-4 border-white bg-white shadow-md">
+        {offer.roaster.thumbnail_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={offer.roaster.thumbnail_url}
+            alt={`${offer.roaster.name}の画像`}
+            className="h-24 w-24 object-cover"
+          />
+        ) : (
+          <div className="flex h-24 w-24 items-center justify-center bg-slate-100 text-xs text-[var(--color-muted)]">
+            Roaster
+          </div>
+        )}
+      </div>
+    </Link>
+  )
+}
+
+function UserThumbnail({ user }: { user: UserApiResponse }) {
+  return (
+    <div className="overflow-hidden rounded-full border border-[var(--color-border)] bg-white shadow-sm">
+      {user.thumbnail_url ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={user.thumbnail_url}
+          alt={`${user.name}の画像`}
+          className="h-14 w-14 object-cover"
+        />
+      ) : (
+        <div className="flex h-14 w-14 items-center justify-center bg-slate-100 text-xs text-[var(--color-muted)]">
+          User
+        </div>
+      )}
+    </div>
+  )
 }
 
 function FieldErrorMessage({ message }: { message?: string }) {
@@ -983,6 +1067,16 @@ function formatJaDate(value: string) {
   return `${year}年${Number(month)}月${Number(date)}日`
 }
 
+function formatCroppedAt(value: string | null) {
+  if (!value) {
+    return "未設定"
+  }
+
+  const date = new Date(`${value}T00:00:00`)
+
+  return `${date.getFullYear()}年 ${date.getMonth() + 1}月`
+}
+
 function todayKey() {
   const now = new Date()
 
@@ -991,6 +1085,15 @@ function todayKey() {
     String(now.getMonth() + 1).padStart(2, "0"),
     String(now.getDate()).padStart(2, "0"),
   ].join("-")
+}
+
+function getNumberOfDaysFromTodayTo(value: string) {
+  const target = new Date(`${value}T00:00:00`)
+  const today = new Date()
+  const start = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+  const diff = target.getTime() - start.getTime()
+
+  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)))
 }
 
 async function readErrorMessage(response: Response) {
@@ -1008,8 +1111,8 @@ async function readErrorMessage(response: Response) {
 }
 
 function buildFieldClassName(message?: string) {
-  return `mt-2 w-full rounded-xl border bg-white px-4 py-3 text-sm text-[var(--color-fg)] ${
-    message ? "border-rose-300 bg-rose-50/40" : "border-[var(--color-border)]"
+  return `w-full rounded-md border bg-white px-4 py-3 text-sm text-gray-600 shadow-sm focus:outline-none ${
+    message ? "border-rose-300 bg-rose-50/40" : "border-gray-100"
   }`
 }
 
