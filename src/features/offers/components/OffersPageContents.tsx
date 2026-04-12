@@ -6,6 +6,13 @@ import { useEffect, useRef, useState } from "react"
 
 import { ContentHeader } from "@/components/layout/ContentHeader"
 import { StatusBanner } from "@/components/ui/StatusBanner"
+import {
+  hasMissingRequiredOfferFields,
+  validateOfferForm,
+  type OfferFormErrors,
+  type OfferFormField,
+  type OfferFormValues,
+} from "@/features/offers/components/offer-form-validation"
 import type { OfferApiResponse, OffersStatsApiResponse } from "@/server/offers"
 import type { UserApiResponse } from "@/server/profiles/dto"
 
@@ -444,12 +451,27 @@ export function OfferFormPageContent({
   submitLabel,
   title,
 }: OfferFormPageContentProps) {
-  const selectedBeanId = defaultBeanId ?? String(offer?.bean_id ?? "")
-  const selectedBean = beans.find((bean) => String(bean.id) === selectedBeanId)
-  const formRef = useRef<HTMLFormElement>(null)
+  const [formValues, setFormValues] = useState<OfferFormValues>(() => ({
+    amount: String(offer?.amount ?? ""),
+    beanId: defaultBeanId ?? String(offer?.bean_id ?? ""),
+    endedAt: offer?.ended_at ?? "",
+    price: String(offer?.price ?? ""),
+    receiptEndedAt: offer?.receipt_ended_at ?? "",
+    receiptStartedAt: offer?.receipt_started_at ?? "",
+    roastedAt: offer?.roasted_at ?? "",
+    weight: String(offer?.weight ?? ""),
+  }))
+  const [fieldErrors, setFieldErrors] = useState<OfferFormErrors>({})
+  const [submitError, setSubmitError] = useState<string | null>(error ?? null)
+  const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false)
   const submitReadyRef = useRef(false)
   const submitMarkerRef = useRef<HTMLDivElement>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const selectedBean = beans.find((bean) => String(bean.id) === formValues.beanId)
+  const requireBeanSelection = !offer
+  const isSubmitDisabled =
+    isSubmitting || hasMissingRequiredOfferFields(formValues, requireBeanSelection)
+  const summaryMessages = buildOfferFormSummaryMessages(fieldErrors, submitError)
 
   useEffect(() => {
     submitReadyRef.current = true
@@ -457,12 +479,25 @@ export function OfferFormPageContent({
   }, [])
 
   async function handleSubmit() {
-    if (!submitReadyRef.current || !formRef.current) {
+    if (!submitReadyRef.current) {
       return
     }
+
+    setHasAttemptedSubmit(true)
+    setSubmitError(null)
+
+    const validationErrors = validateOfferForm(formValues, {
+      requireBeanSelection,
+    })
+
+    if (Object.keys(validationErrors).length > 0) {
+      setFieldErrors(validationErrors)
+      return
+    }
+
     setIsSubmitting(true)
 
-    const formData = new FormData(formRef.current)
+    const formData = buildOfferFormData(formValues)
     const response = await fetch(offer ? `/api/v1/offers/${offer.id}` : "/api/v1/offers", {
       body: formData,
       method: offer ? "PATCH" : "POST",
@@ -489,23 +524,54 @@ export function OfferFormPageContent({
       return
     }
 
-    const message = await readErrorMessage(response)
-    const fallbackPath = offer
-      ? `/offers/${offer.id}/edit`
-      : `/offers/new?beanId=${encodeURIComponent(String(formData.get("beanId") ?? selectedBeanId))}`
-    const separator = fallbackPath.includes("?") ? "&" : "?"
+    setIsSubmitting(false)
+    setSubmitError(await readErrorMessage(response))
+  }
 
-    window.location.assign(`${fallbackPath}${separator}error=${encodeURIComponent(message)}`)
+  function handleFieldChange(field: OfferFormField, value: string) {
+    const nextValues = {
+      ...formValues,
+      [field]: value,
+    }
+
+    setFormValues(nextValues)
+    setSubmitError(null)
+
+    if (!hasAttemptedSubmit) {
+      if (fieldErrors[field]) {
+        setFieldErrors((current) => ({
+          ...current,
+          [field]: undefined,
+        }))
+      }
+      return
+    }
+
+    setFieldErrors(
+      validateOfferForm(nextValues, {
+        requireBeanSelection,
+      }),
+    )
   }
 
   return (
     <main className="space-y-6">
-      {error ? <StatusBanner>{error}</StatusBanner> : null}
+      {summaryMessages.length ? (
+        <StatusBanner>
+          <div className="space-y-2">
+            <p className="font-medium">入力内容を確認してください。</p>
+            <ul className="list-disc pl-5">
+              {summaryMessages.map((message) => (
+                <li key={message}>{message}</li>
+              ))}
+            </ul>
+          </div>
+        </StatusBanner>
+      ) : null}
       <ContentHeader title={title} />
 
       {beans.length ? (
         <form
-          ref={formRef}
           className="form-shell space-y-8"
         >
           <div
@@ -538,8 +604,12 @@ export function OfferFormPageContent({
                 <select
                   id="beanId"
                   name="beanId"
-                  defaultValue={selectedBeanId}
-                  className="mt-2 w-full rounded-xl border border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-fg)]"
+                  value={formValues.beanId}
+                  onChange={(event) => {
+                    handleFieldChange("beanId", event.target.value)
+                  }}
+                  aria-invalid={fieldErrors.beanId ? "true" : "false"}
+                  className={buildFieldClassName(fieldErrors.beanId)}
                 >
                   <option value="">選択してください</option>
                   {beans.map((bean) => (
@@ -551,6 +621,7 @@ export function OfferFormPageContent({
                     </option>
                   ))}
                 </select>
+                <FieldErrorMessage message={fieldErrors.beanId} />
               </Field>
             )}
 
@@ -566,9 +637,14 @@ export function OfferFormPageContent({
                 name="price"
                 type="number"
                 min="1"
-                defaultValue={offer?.price ?? ""}
-                className="mt-2 w-full rounded-xl border border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-fg)]"
+                value={formValues.price}
+                onChange={(event) => {
+                  handleFieldChange("price", event.target.value)
+                }}
+                aria-invalid={fieldErrors.price ? "true" : "false"}
+                className={buildFieldClassName(fieldErrors.price)}
               />
+              <FieldErrorMessage message={fieldErrors.price} />
             </Field>
 
             <Field>
@@ -583,9 +659,14 @@ export function OfferFormPageContent({
                 name="weight"
                 type="number"
                 min="1"
-                defaultValue={offer?.weight ?? ""}
-                className="mt-2 w-full rounded-xl border border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-fg)]"
+                value={formValues.weight}
+                onChange={(event) => {
+                  handleFieldChange("weight", event.target.value)
+                }}
+                aria-invalid={fieldErrors.weight ? "true" : "false"}
+                className={buildFieldClassName(fieldErrors.weight)}
               />
+              <FieldErrorMessage message={fieldErrors.weight} />
             </Field>
 
             <Field>
@@ -600,9 +681,14 @@ export function OfferFormPageContent({
                 name="amount"
                 type="number"
                 min="1"
-                defaultValue={offer?.amount ?? ""}
-                className="mt-2 w-full rounded-xl border border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-fg)]"
+                value={formValues.amount}
+                onChange={(event) => {
+                  handleFieldChange("amount", event.target.value)
+                }}
+                aria-invalid={fieldErrors.amount ? "true" : "false"}
+                className={buildFieldClassName(fieldErrors.amount)}
               />
+              <FieldErrorMessage message={fieldErrors.amount} />
             </Field>
 
             <Field>
@@ -616,9 +702,14 @@ export function OfferFormPageContent({
                 id="endedAt"
                 name="endedAt"
                 type="date"
-                defaultValue={offer?.ended_at ?? ""}
-                className="mt-2 w-full rounded-xl border border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-fg)]"
+                value={formValues.endedAt}
+                onChange={(event) => {
+                  handleFieldChange("endedAt", event.target.value)
+                }}
+                aria-invalid={fieldErrors.endedAt ? "true" : "false"}
+                className={buildFieldClassName(fieldErrors.endedAt)}
               />
+              <FieldErrorMessage message={fieldErrors.endedAt} />
             </Field>
 
             <Field>
@@ -632,9 +723,14 @@ export function OfferFormPageContent({
                 id="roastedAt"
                 name="roastedAt"
                 type="date"
-                defaultValue={offer?.roasted_at ?? ""}
-                className="mt-2 w-full rounded-xl border border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-fg)]"
+                value={formValues.roastedAt}
+                onChange={(event) => {
+                  handleFieldChange("roastedAt", event.target.value)
+                }}
+                aria-invalid={fieldErrors.roastedAt ? "true" : "false"}
+                className={buildFieldClassName(fieldErrors.roastedAt)}
               />
+              <FieldErrorMessage message={fieldErrors.roastedAt} />
             </Field>
 
             <Field>
@@ -648,9 +744,14 @@ export function OfferFormPageContent({
                 id="receiptStartedAt"
                 name="receiptStartedAt"
                 type="date"
-                defaultValue={offer?.receipt_started_at ?? ""}
-                className="mt-2 w-full rounded-xl border border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-fg)]"
+                value={formValues.receiptStartedAt}
+                onChange={(event) => {
+                  handleFieldChange("receiptStartedAt", event.target.value)
+                }}
+                aria-invalid={fieldErrors.receiptStartedAt ? "true" : "false"}
+                className={buildFieldClassName(fieldErrors.receiptStartedAt)}
               />
+              <FieldErrorMessage message={fieldErrors.receiptStartedAt} />
             </Field>
 
             <Field>
@@ -664,9 +765,14 @@ export function OfferFormPageContent({
                 id="receiptEndedAt"
                 name="receiptEndedAt"
                 type="date"
-                defaultValue={offer?.receipt_ended_at ?? ""}
-                className="mt-2 w-full rounded-xl border border-[var(--color-border)] bg-white px-4 py-3 text-sm text-[var(--color-fg)]"
+                value={formValues.receiptEndedAt}
+                onChange={(event) => {
+                  handleFieldChange("receiptEndedAt", event.target.value)
+                }}
+                aria-invalid={fieldErrors.receiptEndedAt ? "true" : "false"}
+                className={buildFieldClassName(fieldErrors.receiptEndedAt)}
               />
+              <FieldErrorMessage message={fieldErrors.receiptEndedAt} />
             </Field>
           </div>
 
@@ -682,7 +788,7 @@ export function OfferFormPageContent({
               onClick={() => {
                 void handleSubmit()
               }}
-              disabled={isSubmitting}
+              disabled={isSubmitDisabled}
               className="btn btn-primary"
             >
               {submitLabel}
@@ -863,6 +969,14 @@ function Field({ children }: { children: ReactNode }) {
   return <div className="rounded-2xl border border-[var(--color-border)] bg-slate-50 p-4">{children}</div>
 }
 
+function FieldErrorMessage({ message }: { message?: string }) {
+  if (!message) {
+    return null
+  }
+
+  return <p className="mt-2 text-sm text-rose-700">{message}</p>
+}
+
 function formatJaDate(value: string) {
   const [year, month, date] = value.split("-")
 
@@ -891,4 +1005,30 @@ async function readErrorMessage(response: Response) {
   } catch {
     return "入力内容を確認してください"
   }
+}
+
+function buildFieldClassName(message?: string) {
+  return `mt-2 w-full rounded-xl border bg-white px-4 py-3 text-sm text-[var(--color-fg)] ${
+    message ? "border-rose-300 bg-rose-50/40" : "border-[var(--color-border)]"
+  }`
+}
+
+function buildOfferFormData(values: OfferFormValues) {
+  const formData = new FormData()
+
+  for (const [key, value] of Object.entries(values)) {
+    formData.set(key, value)
+  }
+
+  return formData
+}
+
+function buildOfferFormSummaryMessages(errors: OfferFormErrors, submitError: string | null) {
+  const messages = [...new Set(Object.values(errors).filter((value): value is string => Boolean(value)))]
+
+  if (submitError) {
+    messages.unshift(submitError)
+  }
+
+  return [...new Set(messages)]
 }
