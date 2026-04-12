@@ -222,6 +222,13 @@ img {
   position: relative;
 }
 
+.bean-select-input {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: none;
+}
+
 .bean-select-chevron {
   position: absolute;
   top: 50%;
@@ -284,7 +291,6 @@ img {
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   width: 100%;
   padding: 0.85rem 1rem;
   border: 0;
@@ -324,6 +330,9 @@ img {
 }
 
 .bean-selected-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
   padding: 0.5rem 0.85rem;
   border: 0;
   border-radius: 9999px;
@@ -331,7 +340,35 @@ img {
   color: white;
   font-size: 0.875rem;
   font-weight: 600;
+}
+
+.bean-selected-tag-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.2rem;
+  height: 1.2rem;
+  padding: 0;
+  border: 0;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.18);
+  color: white;
+  font-size: 0.95rem;
+  line-height: 1;
   cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    transform 160ms ease;
+}
+
+.bean-selected-tag-button:hover {
+  background: rgba(255, 255, 255, 0.28);
+  transform: scale(1.04);
+}
+
+.bean-selected-tag-button:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 2px;
 }
 
 .bean-slider-card {

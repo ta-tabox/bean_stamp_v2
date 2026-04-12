@@ -129,6 +129,10 @@ export function BeanTasteTagPicker({
     })
   }
 
+  function removeTasteTag(id: number) {
+    setSelectedIds((current) => current.filter((currentId) => currentId !== id))
+  }
+
   const helperMessage =
     selectedIds.length < MIN_TASTE_TAGS
       ? `あと${MIN_TASTE_TAGS - selectedIds.length}個選択してください`
@@ -145,7 +149,15 @@ export function BeanTasteTagPicker({
               key={tag.id}
               className="bean-selected-tag"
             >
-              {tag.name}
+              <span>{tag.name}</span>
+              <button
+                type="button"
+                onClick={() => removeTasteTag(tag.id)}
+                className="bean-selected-tag-button"
+                aria-label={`${tag.name}を選択解除`}
+              >
+                ×
+              </button>
             </span>
           ))
         ) : (
@@ -175,12 +187,6 @@ export function BeanTasteTagPicker({
                 className="bean-tag-option-input"
               />
               <span className="pointer-events-none">{option.name}</span>
-              <span
-                aria-hidden="true"
-                className="pointer-events-none text-xs uppercase tracking-[0.2em] text-[var(--color-muted)]"
-              >
-                {selected ? "ON" : "OFF"}
-              </span>
             </label>
           )
         })}

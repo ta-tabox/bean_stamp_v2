@@ -430,11 +430,8 @@ export function BeanFormPageContent({
             </>
           ) : null}
 
-          <div className="space-y-3 text-center">
+          <div className="text-center">
             <p className="bean-section-title">〜 Bean Form 〜</p>
-            <p className="text-sm leading-7 text-[var(--color-muted)]">
-              旧 Bean フォームに寄せて、画像・基本情報・味覚情報をまとめて入力します。
-            </p>
           </div>
 
           <BeanImageFieldPicker
@@ -779,7 +776,7 @@ function SelectField({
           required
           name={name}
           defaultValue={defaultValue}
-          className="field-input pr-12"
+          className="field-input bean-select-input pr-12"
         >
           <option value="0">選択してください</option>
           {options.map((option) => (
