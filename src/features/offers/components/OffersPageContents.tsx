@@ -734,12 +734,12 @@ function OfferIndexCard({ offer }: { offer: OfferApiResponse }) {
             <h2 className="title-font text-xl text-[var(--color-fg)] md:mt-2 lg:text-2xl">
               {offer.bean.name}
             </h2>
-            <div className="text-right md:ml-4">
+            <div className="mt-3 text-right md:mt-0 md:ml-4">
               <Link
                 href={`/offers/${offer.id}`}
-                className="btn btn-secondary"
+                className="btn btn-secondary btn-compact w-20 md:w-auto"
               >
-                <span className="inline-block min-w-16">詳細</span>
+                詳細
               </Link>
             </div>
           </div>

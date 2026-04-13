@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { useId, useState, useTransition } from "react"
 
 import { ArrowPathIcon } from "@/components/icon/Icon"
+import { HomeTasteChart } from "@/components/home/HomeTasteChart"
 import type { HomeOfferStatus } from "@/features/home/types"
 
 type HomeOfferCardProps = {
@@ -120,7 +121,7 @@ export function HomeOfferCard({
             <div className="mt-3 text-right md:mt-0 md:ml-4">
               <Link
                 href={href}
-                className="btn btn-secondary w-20 whitespace-nowrap md:w-16"
+                className="btn btn-secondary btn-compact w-20 whitespace-nowrap md:w-16"
               >
                 詳細
               </Link>
@@ -196,27 +197,14 @@ export function HomeOfferCard({
                   role="tabpanel"
                   id={`${tabGroupId}-taste`}
                   aria-label="Taste"
-                  className="mx-auto max-w-sm space-y-4"
+                  className="flex h-full items-center justify-center"
                 >
-                  <HomeTasteMetricRow
-                    label="酸味"
-                    value={acidity}
-                  />
-                  <HomeTasteMetricRow
-                    label="フレーバー"
-                    value={flavor}
-                  />
-                  <HomeTasteMetricRow
-                    label="ボディ"
-                    value={body}
-                  />
-                  <HomeTasteMetricRow
-                    label="苦味"
-                    value={bitterness}
-                  />
-                  <HomeTasteMetricRow
-                    label="甘味"
-                    value={sweetness}
+                  <HomeTasteChart
+                    acidity={acidity}
+                    bitterness={bitterness}
+                    body={body}
+                    flavor={flavor}
+                    sweetness={sweetness}
                   />
                 </div>
               ) : null}
@@ -319,29 +307,6 @@ function HomeDetailItem({ label, value }: { label: string; value: string }) {
     <div className="mx-auto flex w-11/12 border-t border-gray-200 py-2">
       <span className="text-gray-500">{label}</span>
       <span className="ml-auto text-right text-gray-800">{value}</span>
-    </div>
-  )
-}
-
-function HomeTasteMetricRow({
-  label,
-  value,
-}: {
-  label: string
-  value: number
-}) {
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between text-sm">
-        <span className="font-medium text-[var(--color-fg)]">{label}</span>
-        <span className="bean-slider-value">{value}</span>
-      </div>
-      <div className="bean-static-meter">
-        <div
-          className="bean-static-meter-fill"
-          style={{ width: `${(value / 5) * 100}%` }}
-        />
-      </div>
     </div>
   )
 }

@@ -98,6 +98,7 @@ img {
   border-radius: 0.5rem;
   font-size: 0.95rem;
   font-weight: 500;
+  white-space: nowrap;
   transition:
     background-color 160ms ease,
     border-color 160ms ease,
@@ -127,6 +128,12 @@ img {
 
 .btn-secondary:hover {
   background: #f9fafb;
+}
+
+.btn-compact {
+  min-height: 2rem;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
 }
 
 .page-card,
