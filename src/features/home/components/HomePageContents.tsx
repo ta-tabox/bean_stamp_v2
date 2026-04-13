@@ -105,17 +105,29 @@ function HomeOffersSection({
             className={index === 0 ? "mt-4" : "mt-20"}
           >
             <HomeOfferCard
+              acidity={offer.acidity}
+              amount={offer.amount}
               beanImageUrl={offer.beanImageUrl}
               beanName={offer.beanName}
+              bitterness={offer.bitterness}
+              body={offer.body}
               countryName={offer.countryName}
+              createdAt={offer.createdAt}
+              endedAt={offer.endedAt}
+              flavor={offer.flavor}
               href={`/offers/${offer.id}`}
               price={offer.price}
               process={offer.process}
+              receiptEndedAt={offer.receiptEndedAt}
+              receiptStartedAt={offer.receiptStartedAt}
               roastLevelName={offer.roastLevelName}
+              roastedAt={offer.roastedAt}
               roasterHref={`/roasters/${offer.roasterId}`}
               roasterImageUrl={offer.roasterImageUrl}
               roasterName={offer.roasterName}
               status={offer.status}
+              sweetness={offer.sweetness}
+              tasteNames={offer.tasteNames}
               wantsCount={offer.wantsCount}
               weight={offer.weight}
             />

@@ -473,6 +473,29 @@ img {
   font-weight: 600;
 }
 
+.home-offer-tab-list {
+  display: flex;
+}
+
+.home-offer-tab {
+  flex-grow: 1;
+  padding: 0.25rem 0.25rem 0.5rem;
+  border: 0;
+  border-bottom: 2px solid #e5e7eb;
+  background: transparent;
+  color: #6b7280;
+  font-size: 1.125rem;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+}
+
+.home-offer-tab-selected {
+  color: #6366f1;
+  border-left: 2px solid #6366f1;
+  border-bottom-color: #6366f1;
+}
+
 .profile-avatar {
   display: inline-flex;
   align-items: center;
