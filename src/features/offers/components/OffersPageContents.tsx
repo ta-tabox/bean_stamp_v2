@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react"
 
 import { ContentHeader } from "@/components/layout/ContentHeader"
 import { StatusBanner } from "@/components/ui/StatusBanner"
+import { OfferEngagementPanel } from "@/features/offers/components/OfferEngagementPanel"
 import {
   hasMissingRequiredOfferFields,
   validateOfferForm,
@@ -146,11 +147,7 @@ export function OffersListPageContent({
   )
 }
 
-export function OfferDetailPageContent({
-  canManage,
-  offer,
-  status,
-}: OfferDetailPageContentProps) {
+export function OfferDetailPageContent({ canManage, offer, status }: OfferDetailPageContentProps) {
   const canEdit = canManage && todayKey() < offer.ended_at
   const deleteReadyRef = useRef(false)
   const deleteMarkerRef = useRef<HTMLDivElement>(null)
@@ -247,6 +244,7 @@ export function OfferDetailPageContent({
 
       <section className="mt-16">
         <OfferDetailSummaryCard
+          canInteract={!canManage}
           offer={offer}
           showWantedUsersLink={canManage}
         />
@@ -386,9 +384,7 @@ export function OfferFormPageContent({
       <ContentHeader title={title} />
 
       {beans.length ? (
-        <form
-          className="mx-auto max-w-3xl space-y-4"
-        >
+        <form className="mx-auto max-w-3xl space-y-4">
           <div
             ref={submitMarkerRef}
             data-form-ready="0"
@@ -637,10 +633,7 @@ export function OfferFormPageContent({
   )
 }
 
-export function OfferWantedUsersPageContent({
-  offer,
-  users,
-}: OfferWantedUsersPageContentProps) {
+export function OfferWantedUsersPageContent({ offer, users }: OfferWantedUsersPageContentProps) {
   return (
     <main className="space-y-6">
       <ContentHeader title="ウォントしたユーザー" />
@@ -757,11 +750,13 @@ function OfferIndexCard({ offer }: { offer: OfferApiResponse }) {
   )
 }
 
-function OfferDetailSummaryCard({
+export function OfferDetailSummaryCard({
   offer,
+  canInteract = false,
   showWantedUsersLink = false,
 }: {
   offer: OfferApiResponse
+  canInteract?: boolean
   showWantedUsersLink?: boolean
 }) {
   return (
@@ -783,11 +778,27 @@ function OfferDetailSummaryCard({
             </div>
           </div>
           <div className="flex justify-end">
-            <div className="mr-4">
-              <WantedUsersStat
-                offer={offer}
-                linked={showWantedUsersLink}
-              />
+            <div className="w-full">
+              {canInteract ? (
+                <OfferEngagementPanel
+                  amount={offer.amount}
+                  beanName={offer.bean.name}
+                  canInteract
+                  initialLikeId={offer.like.id}
+                  initialWantCount={offer.want.count}
+                  initialWantId={offer.want.id}
+                  offerId={offer.id}
+                  receiptStartedAt={offer.receipt_started_at}
+                  wantActionEnabled={offer.status === "on_offering"}
+                />
+              ) : (
+                <div className="mr-4 flex justify-end">
+                  <WantedUsersStat
+                    offer={offer}
+                    linked={showWantedUsersLink}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -803,7 +814,7 @@ function OfferDetailSummaryCard({
   )
 }
 
-function OfferBeanInfoCard({ offer }: { offer: OfferApiResponse }) {
+export function OfferBeanInfoCard({ offer }: { offer: OfferApiResponse }) {
   return (
     <section className="rounded-lg border border-gray-100 bg-white py-4 shadow-md">
       <div className="w-11/12 mx-auto">
@@ -966,16 +977,12 @@ function OfferSchedulePanel({ offer }: { offer: OfferApiResponse }) {
 }
 
 function OfferPricePerWeight({ offer }: { offer: OfferApiResponse }) {
-  return <div className="text-2xl text-[var(--color-fg)]">{`${offer.price}円 / ${offer.weight} g`}</div>
+  return (
+    <div className="text-2xl text-[var(--color-fg)]">{`${offer.price}円 / ${offer.weight} g`}</div>
+  )
 }
 
-function WantedUsersStat({
-  offer,
-  linked = false,
-}: {
-  offer: OfferApiResponse
-  linked?: boolean
-}) {
+function WantedUsersStat({ offer, linked = false }: { offer: OfferApiResponse; linked?: boolean }) {
   const content = (
     <span className="text-sm text-[var(--color-fg)]">{`${offer.want.count} wants / ${offer.amount}`}</span>
   )
@@ -1127,7 +1134,9 @@ function buildOfferFormData(values: OfferFormValues) {
 }
 
 function buildOfferFormSummaryMessages(errors: OfferFormErrors, submitError: string | null) {
-  const messages = [...new Set(Object.values(errors).filter((value): value is string => Boolean(value)))]
+  const messages = [
+    ...new Set(Object.values(errors).filter((value): value is string => Boolean(value))),
+  ]
 
   if (submitError) {
     messages.unshift(submitError)

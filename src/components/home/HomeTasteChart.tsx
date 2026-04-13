@@ -15,10 +15,10 @@ type Point = {
 
 const chartAxes = [
   { angle: -Math.PI / 2, label: "酸味" },
-  { angle: (-Math.PI / 2) + (Math.PI * 2) / 5, label: "フレーバー" },
-  { angle: (-Math.PI / 2) + ((Math.PI * 2) / 5) * 2, label: "ボディ" },
-  { angle: (-Math.PI / 2) + ((Math.PI * 2) / 5) * 3, label: "苦味" },
-  { angle: (-Math.PI / 2) + ((Math.PI * 2) / 5) * 4, label: "甘味" },
+  { angle: -Math.PI / 2 + (Math.PI * 2) / 5, label: "フレーバー" },
+  { angle: -Math.PI / 2 + ((Math.PI * 2) / 5) * 2, label: "ボディ" },
+  { angle: -Math.PI / 2 + ((Math.PI * 2) / 5) * 3, label: "苦味" },
+  { angle: -Math.PI / 2 + ((Math.PI * 2) / 5) * 4, label: "甘味" },
 ] as const
 
 const chartCenter = 120
@@ -35,7 +35,11 @@ export function HomeTasteChart({
   sweetness,
 }: HomeTasteChartProps) {
   const values = [acidity, flavor, body, bitterness, sweetness]
-  const outerPoints = buildRadarPolygon(chartAxes.map(() => chartSteps), chartRadius, chartCenter)
+  const outerPoints = buildRadarPolygon(
+    chartAxes.map(() => chartSteps),
+    chartRadius,
+    chartCenter,
+  )
   const dataPoints = buildRadarPolygon(values, chartRadius, chartCenter)
 
   return (
@@ -48,7 +52,11 @@ export function HomeTasteChart({
     >
       {Array.from({ length: chartSteps }, (_, index) => {
         const step = index + 1
-        const ringPoints = buildRadarPolygon(chartAxes.map(() => step), chartRadius, chartCenter)
+        const ringPoints = buildRadarPolygon(
+          chartAxes.map(() => step),
+          chartRadius,
+          chartCenter,
+        )
 
         return (
           <polygon
@@ -114,7 +122,11 @@ export function HomeTasteChart({
   )
 }
 
-export function buildRadarPolygon(values: readonly number[], radius: number, center: number): Point[] {
+export function buildRadarPolygon(
+  values: readonly number[],
+  radius: number,
+  center: number,
+): Point[] {
   return values.map((value, index) => {
     const normalized = clampRadarValue(value) / chartSteps
 

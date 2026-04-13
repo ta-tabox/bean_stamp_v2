@@ -284,9 +284,7 @@ function HomeTabButton({
       aria-controls={controlsId}
       onClick={onClick}
       className={`home-offer-tab ${
-        active
-          ? "home-offer-tab-selected"
-          : "text-gray-500 hover:text-gray-700"
+        active ? "home-offer-tab-selected" : "text-gray-500 hover:text-gray-700"
       }`}
     >
       {label}

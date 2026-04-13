@@ -14,5 +14,10 @@ export default async function WantedUsersPage({ params }: WantedUsersPageProps) 
     listWantedUsersForOffer(session.roasterId!, id),
   ])
 
-  return <OfferWantedUsersPageContent offer={offer} users={users} />
+  return (
+    <OfferWantedUsersPageContent
+      offer={offer}
+      users={users}
+    />
+  )
 }

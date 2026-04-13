@@ -1,4 +1,4 @@
-import { OfferStatus, Prisma } from "@prisma/client"
+import { OfferStatus } from "@prisma/client"
 import { z } from "zod"
 
 import { prisma } from "@/server/db"
@@ -9,6 +9,7 @@ import {
   buildWantedUsersApiResponse,
   calculateOfferStatus,
 } from "@/server/offers/dto"
+import { buildOfferSelect, type OfferRecord } from "@/server/offers/select"
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/
 
@@ -61,107 +62,6 @@ const offerMutationSchema = z
 
 export type OfferMutationInput = z.infer<typeof offerMutationSchema>
 
-const offerSelect = (viewerUserId: bigint | null) =>
-  ({
-    _count: {
-      select: {
-        wants: true,
-      },
-    },
-    amount: true,
-    bean: {
-      select: {
-        acidity: true,
-        beanImages: {
-          orderBy: {
-            id: "asc",
-          },
-          select: {
-            image: true,
-          },
-        },
-        beanTasteTags: {
-          orderBy: {
-            id: "asc",
-          },
-          select: {
-            tasteTag: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
-          },
-        },
-        bitterness: true,
-        body: true,
-        country: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        croppedAt: true,
-        describe: true,
-        elevation: true,
-        farm: true,
-        flavor: true,
-        id: true,
-        name: true,
-        process: true,
-        roastLevel: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        roaster: {
-          select: {
-            id: true,
-            image: true,
-            name: true,
-          },
-        },
-        roasterId: true,
-        subregion: true,
-        sweetness: true,
-        variety: true,
-      },
-    },
-    beanId: true,
-    createdAt: true,
-    endedAt: true,
-    id: true,
-    likes: {
-      select: {
-        id: true,
-      },
-      take: 1,
-      where: {
-        userId: viewerUserId ?? BigInt(0),
-      },
-    },
-    price: true,
-    receiptEndedAt: true,
-    receiptStartedAt: true,
-    roastedAt: true,
-    status: true,
-    wants: {
-      select: {
-        id: true,
-      },
-      take: 1,
-      where: {
-        userId: viewerUserId ?? BigInt(0),
-      },
-    },
-    weight: true,
-  }) satisfies Prisma.OfferSelect
-
-type OfferRecord = Prisma.OfferGetPayload<{
-  select: ReturnType<typeof offerSelect>
-}>
-
 export function parseOfferMutationInput(input: Record<string, unknown>): OfferMutationInput {
   const parsed = offerMutationSchema.safeParse({
     amount: readRequiredInteger(input.amount),
@@ -210,7 +110,7 @@ export async function listOffersForRoaster(
 ) {
   const offers = await prisma.offer.findMany({
     orderBy: [{ createdAt: "desc" }, { id: "desc" }],
-    select: offerSelect(parseOptionalId(viewerUserId)),
+    select: buildOfferSelect(parseOptionalId(viewerUserId)),
     where: {
       bean: {
         roasterId: parseId(roasterId, "ロースターID"),
@@ -223,7 +123,7 @@ export async function listOffersForRoaster(
 
 export async function getOfferForViewer(offerId: string, viewerUserId: string) {
   const offer = await prisma.offer.findUnique({
-    select: offerSelect(parseOptionalId(viewerUserId)),
+    select: buildOfferSelect(parseOptionalId(viewerUserId)),
     where: {
       id: parseId(offerId, "オファーID"),
     },
@@ -236,7 +136,11 @@ export async function getOfferForViewer(offerId: string, viewerUserId: string) {
   return buildOfferRecord(offer)
 }
 
-export async function createOffer(roasterId: string, viewerUserId: string, input: OfferMutationInput) {
+export async function createOffer(
+  roasterId: string,
+  viewerUserId: string,
+  input: OfferMutationInput,
+) {
   await ensureBeanOwnership(roasterId, input.beanId)
 
   const offer = await prisma.offer.create({
@@ -251,7 +155,7 @@ export async function createOffer(roasterId: string, viewerUserId: string, input
       status: calculateOfferStatus(buildOfferSchedule(input)),
       weight: input.weight,
     },
-    select: offerSelect(parseOptionalId(viewerUserId)),
+    select: buildOfferSelect(parseOptionalId(viewerUserId)),
   })
 
   return buildOfferRecord(offer)
@@ -278,7 +182,7 @@ export async function updateOffer(
       status: calculateOfferStatus(buildOfferSchedule(input)),
       weight: input.weight,
     },
-    select: offerSelect(parseOptionalId(viewerUserId)),
+    select: buildOfferSelect(parseOptionalId(viewerUserId)),
     where: {
       id: parseId(offerId, "オファーID"),
     },

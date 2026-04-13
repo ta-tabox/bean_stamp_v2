@@ -8,10 +8,13 @@ import { AppNavigation } from "@/components/layout/AppNavigation"
 import { buildAppNavigationLinks, resolveAppNavigationMode } from "@/components/layout/navigation"
 import { NotificationPanel } from "@/components/layout/NotificationPanel"
 import { SidebarModeSwitcher } from "@/components/layout/SidebarModeSwitcher"
+import type { OffersStatsApiResponse } from "@/server/offers"
+import type { WantsStatsApiResponse } from "@/server/wants"
 
 type AppChromeProps = Readonly<{
   children: ReactNode
   currentUserLabel: string
+  offerNotifications?: OffersStatsApiResponse | null
   roasterId?: string | null
   roasterImageUrl?: string | null
   roasterName?: string | null
@@ -19,11 +22,13 @@ type AppChromeProps = Readonly<{
   userId: string
   userImageUrl?: string | null
   userName: string
+  wantNotifications?: WantsStatsApiResponse | null
 }>
 
 export function AppChrome({
   children,
   currentUserLabel,
+  offerNotifications,
   roasterId,
   roasterImageUrl,
   roasterName,
@@ -31,6 +36,7 @@ export function AppChrome({
   userId,
   userImageUrl,
   userName,
+  wantNotifications,
 }: AppChromeProps) {
   const pathname = usePathname()
   const navigationMode = resolveAppNavigationMode({
@@ -100,10 +106,19 @@ export function AppChrome({
           <div className="container mx-auto my-6 px-4 lg:my-14">{children}</div>
         </div>
         <aside className="hidden w-full max-w-xs border-l border-gray-200 bg-gray-100 lg:block">
-          <NotificationPanel />
+          <NotificationPanel
+            mode={navigationMode}
+            offersStats={offerNotifications}
+            wantsStats={wantNotifications}
+          />
         </aside>
         <div className="border-t border-gray-200 bg-gray-100 p-4 lg:hidden">
-          <NotificationPanel compact />
+          <NotificationPanel
+            compact
+            mode={navigationMode}
+            offersStats={offerNotifications}
+            wantsStats={wantNotifications}
+          />
           <div className="mt-4">
             <SidebarModeSwitcher
               isRoasterRoute={navigationMode === "roaster"}

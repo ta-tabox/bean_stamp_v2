@@ -240,6 +240,8 @@ docker compose exec app pnpm prisma:seed:dev
 - `roaster2@example.com`
 - `follower@example.com`
 
+投入される開発用アカウント、豆、オファーの詳細は [docs/DEVELOPMENT_SEED.md](/Users/daiki/repos/github.com/ta-tabox/bean_stamp_v2/docs/DEVELOPMENT_SEED.md) を参照。
+
 Prisma Client 再生成:
 
 ```bash
