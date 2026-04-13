@@ -1,13 +1,24 @@
-import { PlaceholderPage } from "@/components/shared/PlaceholderPage"
-import { offersRoutes } from "@/features/offers"
+import { OffersListPageContent } from "@/features/offers/components/OffersPageContents"
+import { requireRoasterMembership } from "@/server/auth/guards"
+import { listOffersForRoaster } from "@/server/offers"
 
-export default function OffersPage() {
+type OffersPageProps = {
+  searchParams?: Promise<{
+    deleted?: string
+    status?: string
+  }>
+}
+
+export default async function OffersPage({ searchParams }: OffersPageProps) {
+  const session = await requireRoasterMembership()
+  const params = (await searchParams) ?? {}
+  const offers = await listOffersForRoaster(session.roasterId!, session.id, params.status)
+
   return (
-    <PlaceholderPage
-      eyebrow="Offers"
-      title="オファー一覧"
-      description="Offer 一覧と検索結果導線の基点です。"
-      links={offersRoutes}
+    <OffersListPageContent
+      deleted={params.deleted === "1"}
+      offers={offers}
+      statusFilter={params.status}
     />
   )
 }

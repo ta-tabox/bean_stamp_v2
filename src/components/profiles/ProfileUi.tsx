@@ -94,37 +94,37 @@ export function ProfileSummaryCard({
 }: ProfileSummaryCardProps) {
   return (
     <section className="page-card">
-      <div className="flex flex-col gap-8 lg:flex-row">
-        <div className="min-w-0 flex-1 text-center lg:mx-4 lg:text-left">
-          <div className="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
-            <div>
+      <div className="flex flex-col gap-8 lg:grid lg:grid-cols-[minmax(0,1fr)_14rem] lg:items-start lg:gap-10">
+        <div className="min-w-0 text-center lg:pl-4 lg:text-left">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between lg:gap-4">
+            <div className="min-w-0 flex-1">
               <p className="panel-label">{kind}</p>
               <h2 className="title-font mt-2 text-3xl text-[var(--color-fg)]">{name}</h2>
             </div>
-            {actions ? <div className="flex justify-center lg:justify-end">{actions}</div> : null}
+            {actions ? <div className="flex justify-center lg:shrink-0 lg:justify-end">{actions}</div> : null}
           </div>
 
-          <div className="mt-4 text-sm leading-7 text-gray-500">
+          <div className="mt-4 max-w-xl text-sm leading-7 text-gray-500">
             <div>{handle}</div>
             <p className="mt-4">{description}</p>
           </div>
 
-          {children ? <div className="mt-4">{children}</div> : null}
+          {children ? <div className="mt-6 max-w-xl">{children}</div> : null}
 
-          <dl className="mt-5 space-y-2 text-sm text-gray-600">
+          <dl className="mt-6 max-w-xl space-y-2 text-sm leading-7 text-gray-600">
             {details.map((detail) => (
               <div
                 key={`${detail.label}-${detail.value}`}
-                className="flex flex-col gap-1 sm:flex-row sm:gap-3"
+                className="grid gap-x-3 gap-y-1 border-b border-[var(--color-border)] pb-2 sm:grid-cols-[8rem_minmax(0,1fr)]"
               >
-                <dt className="w-28 shrink-0 font-medium text-gray-800">{detail.label}</dt>
-                <dd className="min-w-0">{detail.value}</dd>
+                <dt className="font-medium text-gray-800">{detail.label}</dt>
+                <dd className="min-w-0 break-words text-gray-700">{detail.value}</dd>
               </div>
             ))}
           </dl>
         </div>
 
-        <div className="flex justify-center lg:w-[22rem] lg:justify-end">
+        <div className="flex justify-center lg:justify-end">
           <ProfileAvatar
             name={name}
             imageUrl={imageUrl}

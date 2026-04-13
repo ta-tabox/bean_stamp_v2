@@ -1,21 +1,18 @@
-import { PlaceholderPage } from "@/components/shared/PlaceholderPage"
-import { offersRoutes } from "@/features/offers"
+import { OfferWantedUsersPageContent } from "@/features/offers/components/OffersPageContents"
 import { requireRoasterMembership } from "@/server/auth/guards"
+import { getOfferForViewer, listWantedUsersForOffer } from "@/server/offers"
 
 type WantedUsersPageProps = Readonly<{
   params: Promise<{ id: string }>
 }>
 
 export default async function WantedUsersPage({ params }: WantedUsersPageProps) {
-  await requireRoasterMembership()
+  const session = await requireRoasterMembership()
   const { id } = await params
+  const [offer, users] = await Promise.all([
+    getOfferForViewer(id, session.id),
+    listWantedUsersForOffer(session.roasterId!, id),
+  ])
 
-  return (
-    <PlaceholderPage
-      eyebrow="Offers"
-      title={`応募ユーザー一覧 #${id}`}
-      description="Offer に対して Want 済みのユーザー一覧を表示するルートです。"
-      links={offersRoutes}
-    />
-  )
+  return <OfferWantedUsersPageContent offer={offer} users={users} />
 }

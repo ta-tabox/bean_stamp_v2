@@ -95,7 +95,7 @@ export function UserProfilePageContent({ canEdit, status, user }: UserProfilePag
           canEdit ? (
             <Link
               href="/users/edit"
-              className="btn btn-secondary"
+              className="btn btn-secondary btn-compact"
             >
               編集
             </Link>
@@ -156,7 +156,7 @@ export function RoasterProfilePageContent({
           canEdit ? (
             <Link
               href="/roasters/edit"
-              className="btn btn-secondary"
+              className="btn btn-secondary btn-compact"
             >
               編集
             </Link>
