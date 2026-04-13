@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 
 import { HeartIcon, ShoppingBagIcon } from "@/components/icon/Icon"
-import { StatusBanner } from "@/components/ui/StatusBanner"
+import { useToast } from "@/components/ui/ToastProvider"
 
 type OfferEngagementPanelProps = {
   amount: number
@@ -36,13 +36,12 @@ export function OfferEngagementPanel({
   wantActionEnabled,
 }: OfferEngagementPanelProps) {
   const [likeId, setLikeId] = useState<number | null>(initialLikeId ?? null)
-  const [message, setMessage] = useState<string | null>(null)
-  const [messageTone, setMessageTone] = useState<"error" | "success">("success")
   const [wantCount, setWantCount] = useState(initialWantCount)
   const [wantId, setWantId] = useState<number | null>(initialWantId ?? null)
   const [isLikePending, setIsLikePending] = useState(false)
   const [isWantPending, setIsWantPending] = useState(false)
   const router = useRouter()
+  const { showToast } = useToast()
 
   async function handleWantClick() {
     if (isWantPending || !canInteract || !wantActionEnabled) {
@@ -63,8 +62,7 @@ export function OfferEngagementPanel({
 
         setWantId(null)
         setWantCount((count) => Math.max(0, count - 1))
-        setMessage(`${beanName}のウォントを取り消しました`)
-        setMessageTone("success")
+        showToast(`${beanName}のウォントを取り消しました`, "success")
       } else {
         const response = await fetch("/api/v1/wants", {
           body: JSON.stringify({ offer_id: offerId }),
@@ -82,16 +80,15 @@ export function OfferEngagementPanel({
 
         setWantId(payload.id)
         setWantCount((count) => count + 1)
-        setMessage(
+        showToast(
           `${beanName}をウォントしました。${formatJaDate(receiptStartedAt)}から受け取れます。`,
+          "success",
         )
-        setMessageTone("success")
       }
 
       router.refresh()
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "ウォントの更新に失敗しました")
-      setMessageTone("error")
+      showToast(error instanceof Error ? error.message : "ウォントの更新に失敗しました", "error")
     } finally {
       setIsWantPending(false)
     }
@@ -115,8 +112,7 @@ export function OfferEngagementPanel({
         }
 
         setLikeId(null)
-        setMessage(`${beanName}をお気に入りから外しました`)
-        setMessageTone("success")
+        showToast(`${beanName}をお気に入りから外しました`, "success")
       } else {
         const response = await fetch("/api/v1/likes", {
           body: JSON.stringify({ offer_id: offerId }),
@@ -133,14 +129,12 @@ export function OfferEngagementPanel({
         const payload = (await response.json()) as { id: number }
 
         setLikeId(payload.id)
-        setMessage(`${beanName}をお気に入りに追加しました`)
-        setMessageTone("success")
+        showToast(`${beanName}をお気に入りに追加しました`, "success")
       }
 
       router.refresh()
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "お気に入りの更新に失敗しました")
-      setMessageTone("error")
+      showToast(error instanceof Error ? error.message : "お気に入りの更新に失敗しました", "error")
     } finally {
       setIsLikePending(false)
     }
@@ -205,14 +199,6 @@ export function OfferEngagementPanel({
 
         <div className="text-right text-sm text-[var(--color-fg)]">{`${wantCount} wants / ${amount}`}</div>
       </div>
-
-      {message ? (
-        <div role="status">
-          <StatusBanner>
-            <span className={messageTone === "error" ? "text-rose-700" : undefined}>{message}</span>
-          </StatusBanner>
-        </div>
-      ) : null}
     </div>
   )
 }
