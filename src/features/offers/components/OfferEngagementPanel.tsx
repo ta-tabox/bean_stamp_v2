@@ -151,43 +151,53 @@ export function OfferEngagementPanel({
       <div className="flex items-end justify-between gap-4">
         {canInteract ? (
           <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={() => {
-                void handleWantClick()
-              }}
-              disabled={isWantPending || !wantActionEnabled || (!wantId && wantCount >= amount)}
-              aria-pressed={Boolean(wantId)}
-              aria-label={wantId ? "ウォント解除" : "ウォント"}
-              className={`relative flex h-14 w-14 items-center justify-center rounded-full border transition ${
-                wantId
-                  ? "border-sky-200 bg-sky-50 text-sky-700"
-                  : "border-slate-200 bg-white text-slate-600"
-              } disabled:cursor-not-allowed disabled:opacity-50`}
-            >
-              <ShoppingBagIcon className="h-7 w-7" />
-              <span className="sr-only">{wantId ? "ウォント解除" : "ウォント"}</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                void handleLikeClick()
-              }}
-              disabled={isLikePending}
-              aria-pressed={Boolean(likeId)}
-              aria-label={likeId ? "お気に入り解除" : "お気に入り"}
-              className={`relative flex h-14 w-14 items-center justify-center rounded-full border transition ${
-                likeId
-                  ? "border-rose-200 bg-rose-50 text-rose-700"
-                  : "border-slate-200 bg-white text-slate-600"
-              } disabled:cursor-not-allowed disabled:opacity-50`}
-            >
-              <HeartIcon
-                className="h-7 w-7"
-                fill={likeId ? "currentColor" : "none"}
-              />
-              <span className="sr-only">{likeId ? "お気に入り解除" : "お気に入り"}</span>
-            </button>
+            <div className="flex w-14 flex-col items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  void handleWantClick()
+                }}
+                disabled={isWantPending || !wantActionEnabled || (!wantId && wantCount >= amount)}
+                aria-pressed={Boolean(wantId)}
+                aria-label={wantId ? "ウォント解除" : "ウォント"}
+                className={`relative flex h-14 w-14 cursor-pointer items-center justify-center rounded-full border shadow-sm transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 focus-visible:ring-offset-2 ${
+                  wantId
+                    ? "border-sky-200 bg-sky-50 text-sky-700 hover:border-sky-300 hover:bg-sky-100"
+                    : "border-slate-200 bg-white text-slate-600 hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700"
+                } disabled:translate-y-0 disabled:cursor-not-allowed disabled:shadow-sm disabled:opacity-50 disabled:hover:bg-inherit`}
+              >
+                <ShoppingBagIcon className="h-7 w-7" />
+                <span className="sr-only">{wantId ? "ウォント解除" : "ウォント"}</span>
+              </button>
+              <span className="w-full text-center text-xs tracking-[0.18em] uppercase text-[var(--color-muted)]">
+                {wantId ? "Wanted" : "Want"}
+              </span>
+            </div>
+            <div className="flex w-14 flex-col items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  void handleLikeClick()
+                }}
+                disabled={isLikePending}
+                aria-pressed={Boolean(likeId)}
+                aria-label={likeId ? "お気に入り解除" : "お気に入り"}
+                className={`relative flex h-14 w-14 cursor-pointer items-center justify-center rounded-full border shadow-sm transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300 focus-visible:ring-offset-2 ${
+                  likeId
+                    ? "border-rose-200 bg-rose-50 text-rose-700 hover:border-rose-300 hover:bg-rose-100"
+                    : "border-slate-200 bg-white text-slate-600 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700"
+                } disabled:translate-y-0 disabled:cursor-not-allowed disabled:shadow-sm disabled:opacity-50 disabled:hover:bg-inherit`}
+              >
+                <HeartIcon
+                  className="h-7 w-7"
+                  fill={likeId ? "currentColor" : "none"}
+                />
+                <span className="sr-only">{likeId ? "お気に入り解除" : "お気に入り"}</span>
+              </button>
+              <span className="w-full text-center text-xs tracking-[0.18em] uppercase text-[var(--color-muted)]">
+                {likeId ? "Liked" : "Like"}
+              </span>
+            </div>
           </div>
         ) : (
           <div />
@@ -195,13 +205,6 @@ export function OfferEngagementPanel({
 
         <div className="text-right text-sm text-[var(--color-fg)]">{`${wantCount} wants / ${amount}`}</div>
       </div>
-
-      {canInteract ? (
-        <div className="flex gap-3 text-xs tracking-[0.18em] uppercase text-[var(--color-muted)]">
-          <span>{wantId ? "Wanted" : "Want"}</span>
-          <span>{likeId ? "Liked" : "Like"}</span>
-        </div>
-      ) : null}
 
       {message ? (
         <div role="status">
