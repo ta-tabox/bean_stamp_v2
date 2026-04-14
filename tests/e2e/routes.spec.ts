@@ -111,6 +111,7 @@ test("認証フローとセッション API が動作する", async ({ page }) =
   await page.goto(`/users/${userId}`)
   await expect(page.getByRole("heading", { name: "ユーザー詳細", exact: true })).toBeVisible()
   await expect(page.getByText(updatedEmail)).toHaveCount(0)
+  await expect(page.getByText("東京都", { exact: true })).toBeVisible()
   await expect(page.getByRole("link", { name: "フォロー一覧" })).toBeVisible()
   await expectCompactActionLink(page, "編集")
   await expectProfileSummaryDesktopLayout(page, "Auth Tester")
@@ -270,7 +271,8 @@ test("認証フローとセッション API が動作する", async ({ page }) =
 
   await page.goto(`/users/${secondUserId}/following`)
   await expect(page.getByRole("heading", { name: "フォロー", exact: true })).toBeVisible()
-  await expect(page.getByRole("link", { name: "ロースターを探す" })).toBeVisible()
+  await expect(page.getByRole("link", { name: /Auth Roaster/ })).toBeVisible()
+  await expect(page.getByRole("link", { name: "プロフィールを編集" })).toHaveCount(0)
 
   await page.goto(`/roasters/${roasterId}/follower`)
   await expect(page.getByRole("heading", { name: "フォロワー", exact: true })).toBeVisible()
@@ -548,17 +550,28 @@ test("ユーザーは Offer 詳細から Want / Like を操作でき、一覧ペ
   await page.goto(`/roasters/${roasterId}`)
   await page.getByRole("button", { name: "フォローする" }).click()
   await expect(page.getByText("ロースターをフォローしました。")).toBeVisible()
+  await expect(page.getByText("このロースターのオファー")).toBeVisible()
+  await expect(page.getByText("Want Like Blend")).toBeVisible()
+  await expect(page.getByRole("button", { name: "ウォント", exact: true }).first()).toBeVisible()
 
   await page.goto("/users/home")
+  await expect(page.getByText("Want Like Blend")).toBeVisible()
+  await expect(page.getByRole("button", { name: "ウォント", exact: true }).first()).toBeVisible()
+  await expect(page.getByRole("button", { name: "お気に入り", exact: true }).first()).toBeVisible()
+  await page.getByRole("button", { name: "ウォント", exact: true }).first().click()
+  await expect(page.getByText("Want Like Blendをウォントしました。")).toBeVisible()
+  await expect(
+    page.getByRole("button", { name: "ウォント解除", exact: true }).first(),
+  ).toBeVisible()
+  await page.getByRole("button", { name: "お気に入り", exact: true }).first().click()
+  await expect(page.getByText("Want Like Blendをお気に入りに追加しました")).toBeVisible()
+  await expect(
+    page.getByRole("button", { name: "お気に入り解除", exact: true }).first(),
+  ).toBeVisible()
+
   await page.getByRole("link", { name: "詳細", exact: true }).first().click()
   await expect(page).toHaveURL(/\/offers\/\d+$/)
-
-  await page.getByRole("button", { name: "ウォント", exact: true }).click()
-  await expect(page.getByText("Want Like Blendをウォントしました。")).toBeVisible()
   await expect(page.getByRole("button", { name: "ウォント解除", exact: true })).toBeVisible()
-
-  await page.getByRole("button", { name: "お気に入り", exact: true }).click()
-  await expect(page.getByText("Want Like Blendをお気に入りに追加しました")).toBeVisible()
   await expect(page.getByRole("button", { name: "お気に入り解除", exact: true })).toBeVisible()
 
   await page.goto("/wants")

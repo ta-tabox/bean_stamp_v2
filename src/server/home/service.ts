@@ -62,11 +62,29 @@ const homeOfferSelect = {
   createdAt: true,
   endedAt: true,
   id: true,
+  likes: {
+    orderBy: {
+      id: "desc",
+    },
+    select: {
+      id: true,
+      userId: true,
+    },
+  },
   price: true,
   receiptEndedAt: true,
   receiptStartedAt: true,
   roastedAt: true,
   status: true,
+  wants: {
+    orderBy: {
+      id: "desc",
+    },
+    select: {
+      id: true,
+      userId: true,
+    },
+  },
   weight: true,
 } satisfies Prisma.OfferSelect
 
@@ -75,6 +93,7 @@ type HomeOfferRecord = Prisma.OfferGetPayload<{
 }>
 
 export async function listCurrentOffersForUserHome(userId: string) {
+  const currentUserId = parseId(userId)
   const offers = await prisma.offer.findMany({
     orderBy: [{ roastedAt: "desc" }, { id: "desc" }],
     select: homeOfferSelect,
@@ -84,7 +103,7 @@ export async function listCurrentOffersForUserHome(userId: string) {
         roaster: {
           followers: {
             some: {
-              followerId: parseId(userId),
+              followerId: currentUserId,
             },
           },
         },
@@ -95,10 +114,11 @@ export async function listCurrentOffersForUserHome(userId: string) {
     },
   })
 
-  return offers.map(buildHomeOfferCard)
+  return offers.map((offer) => buildHomeOfferCard(offer, currentUserId))
 }
 
-export async function listCurrentOffersForRoasterHome(roasterId: string) {
+export async function listCurrentOffersForRoasterHome(roasterId: string, userId: string) {
+  const currentUserId = parseId(userId)
   const offers = await prisma.offer.findMany({
     orderBy: [{ roastedAt: "desc" }, { id: "desc" }],
     select: homeOfferSelect,
@@ -110,10 +130,13 @@ export async function listCurrentOffersForRoasterHome(roasterId: string) {
     },
   })
 
-  return offers.map(buildHomeOfferCard)
+  return offers.map((offer) => buildHomeOfferCard(offer, currentUserId))
 }
 
-export function buildHomeOfferCard(offer: HomeOfferRecord): HomeOfferSummary {
+export function buildHomeOfferCard(offer: HomeOfferRecord, userId: bigint): HomeOfferSummary {
+  const currentLike = offer.likes.find((like) => like.userId === userId) ?? null
+  const currentWant = offer.wants.find((want) => want.userId === userId) ?? null
+
   return {
     acidity: offer.bean.acidity ?? 0,
     amount: offer.amount,
@@ -126,6 +149,8 @@ export function buildHomeOfferCard(offer: HomeOfferRecord): HomeOfferSummary {
     endedAt: formatDateOnly(offer.endedAt),
     flavor: offer.bean.flavor ?? 0,
     id: offer.id.toString(),
+    initialLikeId: currentLike ? Number(currentLike.id) : null,
+    initialWantId: currentWant ? Number(currentWant.id) : null,
     price: offer.price,
     process: offer.bean.process.trim() || "精製方法未設定",
     receiptEndedAt: formatDateOnly(offer.receiptEndedAt),

@@ -6,22 +6,29 @@ import { StatusBanner } from "@/components/profiles/ProfileUi"
 import type { HomeOfferSummary } from "@/features/home/types"
 
 type UsersHomePageContentProps = {
+  currentRoasterId?: string | null
   offers: readonly HomeOfferSummary[]
   userName: string
 }
 
 type RoastersHomePageContentProps = {
+  currentRoasterId?: string | null
   deleted?: boolean
   offers: readonly HomeOfferSummary[]
   roasterName: string
 }
 
-export function UsersHomePageContent({ offers, userName }: UsersHomePageContentProps) {
+export function UsersHomePageContent({
+  currentRoasterId,
+  offers,
+  userName,
+}: UsersHomePageContentProps) {
   return (
     <main className="space-y-6">
       <HomePageHeader title={`${userName}のホーム`} />
       <HomeReloadButton />
       <HomeOffersSection
+        currentRoasterId={currentRoasterId}
         emptyActionHref="/search/roasters"
         emptyActionLabel="ロースターをフォローしてオファーを受け取る"
         emptyMessage="オファーがありません"
@@ -32,6 +39,7 @@ export function UsersHomePageContent({ offers, userName }: UsersHomePageContentP
 }
 
 export function RoastersHomePageContent({
+  currentRoasterId,
   deleted = false,
   offers,
   roasterName,
@@ -41,6 +49,7 @@ export function RoastersHomePageContent({
       {deleted ? <StatusBanner>ロースターを削除しました。</StatusBanner> : null}
       <HomePageHeader title={`${roasterName}のホーム`} />
       <HomeOffersSection
+        currentRoasterId={currentRoasterId}
         emptyActionHref="/beans"
         emptyActionLabel="オファーを作成する"
         offers={offers}
@@ -72,11 +81,13 @@ function HomePageHeader({ title }: { title: string }) {
 }
 
 function HomeOffersSection({
+  currentRoasterId,
   emptyActionHref,
   emptyActionLabel,
   emptyMessage,
   offers,
 }: {
+  currentRoasterId?: string | null
   emptyActionHref: string
   emptyActionLabel: string
   emptyMessage?: string
@@ -116,6 +127,9 @@ function HomeOffersSection({
               endedAt={offer.endedAt}
               flavor={offer.flavor}
               href={`/offers/${offer.id}`}
+              id={offer.id}
+              initialLikeId={offer.initialLikeId}
+              initialWantId={offer.initialWantId}
               price={offer.price}
               process={offer.process}
               receiptEndedAt={offer.receiptEndedAt}
@@ -125,6 +139,7 @@ function HomeOffersSection({
               roasterHref={`/roasters/${offer.roasterId}`}
               roasterImageUrl={offer.roasterImageUrl}
               roasterName={offer.roasterName}
+              showEngagement={currentRoasterId !== offer.roasterId}
               status={offer.status}
               sweetness={offer.sweetness}
               tasteNames={offer.tasteNames}

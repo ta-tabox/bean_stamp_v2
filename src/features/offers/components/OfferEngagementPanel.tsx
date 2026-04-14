@@ -15,6 +15,7 @@ type OfferEngagementPanelProps = {
   initialWantId?: number
   offerId: number
   receiptStartedAt: string
+  showWantCount?: boolean
   wantActionEnabled: boolean
 }
 
@@ -33,6 +34,7 @@ export function OfferEngagementPanel({
   initialWantId,
   offerId,
   receiptStartedAt,
+  showWantCount = true,
   wantActionEnabled,
 }: OfferEngagementPanelProps) {
   const [likeId, setLikeId] = useState<number | null>(initialLikeId ?? null)
@@ -197,7 +199,9 @@ export function OfferEngagementPanel({
           <div />
         )}
 
-        <div className="text-right text-sm text-[var(--color-fg)]">{`${wantCount} wants / ${amount}`}</div>
+        {showWantCount ? (
+          <div className="text-right text-sm text-[var(--color-fg)]">{`${wantCount} wants / ${amount}`}</div>
+        ) : null}
       </div>
     </div>
   )

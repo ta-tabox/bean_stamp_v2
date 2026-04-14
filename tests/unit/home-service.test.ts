@@ -26,48 +26,53 @@ describe("home/service", () => {
 
   it("ホーム用オファー DTO を表示向けに正規化する", () => {
     expect(
-      buildHomeOfferCard({
-        _count: { wants: 4 },
-        amount: 12,
-        bean: {
-          acidity: 4,
-          beanImages: [{ image: "https://example.com/bean.jpg" }],
-          beanTasteTags: [
-            {
-              tasteTag: {
-                name: "rose",
+      buildHomeOfferCard(
+        {
+          _count: { wants: 4 },
+          amount: 12,
+          bean: {
+            acidity: 4,
+            beanImages: [{ image: "https://example.com/bean.jpg" }],
+            beanTasteTags: [
+              {
+                tasteTag: {
+                  name: "rose",
+                },
               },
-            },
-            {
-              tasteTag: {
-                name: "orange",
+              {
+                tasteTag: {
+                  name: "orange",
+                },
               },
+            ],
+            bitterness: 2,
+            body: 3,
+            country: { name: "Ethiopia" },
+            flavor: 5,
+            name: "Test Bean",
+            process: "Washed",
+            roastLevel: { name: "Light" },
+            roaster: {
+              id: 5n,
+              image: "https://example.com/roaster.jpg",
+              name: "Roaster Five",
             },
-          ],
-          bitterness: 2,
-          body: 3,
-          country: { name: "Ethiopia" },
-          flavor: 5,
-          name: "Test Bean",
-          process: "Washed",
-          roastLevel: { name: "Light" },
-          roaster: {
-            id: 5n,
-            image: "https://example.com/roaster.jpg",
-            name: "Roaster Five",
+            sweetness: 1,
           },
-          sweetness: 1,
+          createdAt: new Date("2026-04-01T00:00:00.000Z"),
+          endedAt: new Date("2026-04-10T00:00:00.000Z"),
+          id: 9n,
+          likes: [{ id: 14n, userId: 77n }],
+          price: 1800,
+          receiptEndedAt: new Date("2026-04-14T00:00:00.000Z"),
+          receiptStartedAt: new Date("2026-04-12T00:00:00.000Z"),
+          roastedAt: new Date("2026-04-11T00:00:00.000Z"),
+          status: OfferStatus.on_offering,
+          wants: [{ id: 15n, userId: 77n }],
+          weight: 200,
         },
-        createdAt: new Date("2026-04-01T00:00:00.000Z"),
-        endedAt: new Date("2026-04-10T00:00:00.000Z"),
-        id: 9n,
-        price: 1800,
-        receiptEndedAt: new Date("2026-04-14T00:00:00.000Z"),
-        receiptStartedAt: new Date("2026-04-12T00:00:00.000Z"),
-        roastedAt: new Date("2026-04-11T00:00:00.000Z"),
-        status: OfferStatus.on_offering,
-        weight: 200,
-      }),
+        77n,
+      ),
     ).toEqual({
       acidity: 4,
       amount: 12,
@@ -80,6 +85,8 @@ describe("home/service", () => {
       endedAt: "2026-04-10",
       flavor: 5,
       id: "9",
+      initialLikeId: 14,
+      initialWantId: 15,
       price: 1800,
       process: "Washed",
       receiptEndedAt: "2026-04-14",
@@ -126,7 +133,7 @@ describe("home/service", () => {
   it("ロースターホームは自身のオファーを取得する", async () => {
     mockPrisma.offer.findMany.mockResolvedValue([])
 
-    await listCurrentOffersForRoasterHome("5")
+    await listCurrentOffersForRoasterHome("5", "7")
 
     expect(mockPrisma.offer.findMany).toHaveBeenCalledWith(
       expect.objectContaining({

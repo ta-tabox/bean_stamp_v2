@@ -10,6 +10,7 @@ export default async function UsersHomePage() {
 
   return (
     <UsersHomePageContent
+      currentRoasterId={session.roasterId}
       offers={offers}
       userName={user.name}
     />
