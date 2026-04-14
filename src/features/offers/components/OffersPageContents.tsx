@@ -5,8 +5,10 @@ import type { ReactNode } from "react"
 import { useEffect, useRef, useState } from "react"
 
 import { ContentHeader } from "@/components/layout/ContentHeader"
+import { resolvePrefectureLabel } from "@/components/shared/prefecture-label"
 import { StatusBanner } from "@/components/ui/StatusBanner"
 import { OfferEngagementPanel } from "@/features/offers/components/OfferEngagementPanel"
+import { offerStatusLabel } from "@/features/offers/components/offer-status-label"
 import {
   hasMissingRequiredOfferFields,
   validateOfferForm,
@@ -50,14 +52,6 @@ type OfferFormPageContentProps = {
 type OfferWantedUsersPageContentProps = {
   offer: OfferApiResponse
   users: readonly UserApiResponse[]
-}
-
-const offerStatusLabel: Record<OfferApiResponse["status"], string> = {
-  end_of_sales: "受け取り終了",
-  on_offering: "オファー中",
-  on_preparing: "準備中",
-  on_roasting: "ロースト期間",
-  on_selling: "受け取り期間",
 }
 
 const offerStatusClassName: Record<OfferApiResponse["status"], string> = {
@@ -658,7 +652,9 @@ export function OfferWantedUsersPageContent({ offer, users }: OfferWantedUsersPa
                       <p className="mt-1 text-sm text-[var(--color-muted)]">{user.email}</p>
                     </div>
                   </div>
-                  <span className="metric-chip">{user.prefecture_code}</span>
+                  <span className="metric-chip">
+                    {resolvePrefectureLabel(user.prefecture_code)}
+                  </span>
                 </Link>
               </li>
             ))}

@@ -7,6 +7,7 @@ import { useState } from "react"
 import { ContentHeader } from "@/components/layout/ContentHeader"
 import { StatusBanner } from "@/components/ui/StatusBanner"
 import { OfferEngagementPanel } from "@/features/offers/components/OfferEngagementPanel"
+import { offerStatusLabel } from "@/features/offers/components/offer-status-label"
 import {
   OfferBeanInfoCard,
   OfferDetailSummaryCard,
@@ -313,7 +314,7 @@ function WantListItemCard({ canInteract, want }: { canInteract: boolean; want: W
             <dl className="grid gap-2 text-sm text-[var(--color-fg)]">
               <div className="flex justify-between gap-4 border-t border-gray-100 pt-2">
                 <dt>ステータス</dt>
-                <dd>{want.offer.status}</dd>
+                <dd>{offerStatusLabel[want.offer.status]}</dd>
               </div>
               <div className="flex justify-between gap-4 border-t border-gray-100 pt-2">
                 <dt>受け取り開始日</dt>

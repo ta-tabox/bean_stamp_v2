@@ -3,6 +3,7 @@
 import Link from "next/link"
 
 import { OfferEngagementPanel } from "@/features/offers/components/OfferEngagementPanel"
+import { offerStatusLabel } from "@/features/offers/components/offer-status-label"
 import type { LikeApiResponse } from "@/server/likes"
 
 type LikesPageContentProps = {
@@ -86,7 +87,7 @@ export function LikesPageContent({ currentRoasterId, likes, statusFilter }: Like
                         <dl className="grid gap-2 text-sm text-[var(--color-fg)]">
                           <div className="flex justify-between gap-4 border-t border-gray-100 pt-2">
                             <dt>ステータス</dt>
-                            <dd>{like.offer.status}</dd>
+                            <dd>{offerStatusLabel[like.offer.status]}</dd>
                           </div>
                           <div className="flex justify-between gap-4 border-t border-gray-100 pt-2">
                             <dt>受け取り開始日</dt>
