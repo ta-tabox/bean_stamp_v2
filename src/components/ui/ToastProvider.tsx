@@ -20,6 +20,8 @@ type ToastState = {
   tone: ToastTone
 }
 
+type ToastPhase = "entering" | "visible" | "leaving"
+
 type ToastContextValue = {
   showToast: (message: string, tone: ToastTone) => void
 }
@@ -32,6 +34,7 @@ type ToastProviderProps = {
 
 export function ToastProvider({ children }: ToastProviderProps) {
   const [toast, setToast] = useState<ToastState | null>(null)
+  const [toastPhase, setToastPhase] = useState<ToastPhase>("entering")
   const toastIdRef = useRef(0)
 
   useEffect(() => {
@@ -39,7 +42,27 @@ export function ToastProvider({ children }: ToastProviderProps) {
       return
     }
 
-    const timeoutId = window.setTimeout(() => {
+    const enterTimeoutId = window.setTimeout(() => {
+      setToastPhase((currentPhase) => {
+        if (currentPhase !== "entering") {
+          return currentPhase
+        }
+
+        return "visible"
+      })
+    }, 20)
+
+    const leaveTimeoutId = window.setTimeout(() => {
+      setToastPhase((currentPhase) => {
+        if (currentPhase === "leaving") {
+          return currentPhase
+        }
+
+        return "leaving"
+      })
+    }, 3600)
+
+    const removeTimeoutId = window.setTimeout(() => {
       setToast((currentToast) => {
         if (!currentToast || currentToast.id !== toast.id) {
           return currentToast
@@ -50,7 +73,9 @@ export function ToastProvider({ children }: ToastProviderProps) {
     }, 4000)
 
     return () => {
-      window.clearTimeout(timeoutId)
+      window.clearTimeout(enterTimeoutId)
+      window.clearTimeout(leaveTimeoutId)
+      window.clearTimeout(removeTimeoutId)
     }
   }, [toast])
 
@@ -58,6 +83,7 @@ export function ToastProvider({ children }: ToastProviderProps) {
     () => ({
       showToast(message, tone) {
         toastIdRef.current += 1
+        setToastPhase("entering")
         setToast({
           id: toastIdRef.current,
           message,
@@ -72,11 +98,11 @@ export function ToastProvider({ children }: ToastProviderProps) {
     <ToastContext.Provider value={contextValue}>
       {children}
       {toast ? (
-        <div className="pointer-events-none fixed inset-x-0 top-6 z-50 flex justify-center px-4">
+        <div className="toast-viewport">
           <div
             role={toast.tone === "error" ? "alert" : "status"}
             aria-live={toast.tone === "error" ? "assertive" : "polite"}
-            className="w-full max-w-2xl"
+            className={`toast-shell toast-shell-${toastPhase}`}
           >
             <StatusBanner>
               <span className={toast.tone === "error" ? "text-rose-700" : undefined}>

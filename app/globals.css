@@ -161,6 +161,35 @@ img {
   font-size: 0.875rem;
 }
 
+.toast-viewport {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 50;
+  width: min(24rem, calc(100vw - 2rem));
+  pointer-events: none;
+}
+
+.toast-shell {
+  width: 100%;
+  opacity: 0;
+  transform: translateY(0.75rem);
+  transition:
+    opacity 240ms ease,
+    transform 240ms ease;
+}
+
+.toast-shell-entering,
+.toast-shell-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast-shell-leaving {
+  opacity: 0;
+  transform: translateY(0.75rem);
+}
+
 .empty-state {
   display: flex;
   flex-direction: column;
