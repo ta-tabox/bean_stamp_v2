@@ -89,70 +89,72 @@ export function HomeOfferCard({
   const tabGroupId = useId()
 
   return (
-    <article className="overflow-visible rounded-lg border border-gray-100 bg-white px-4 py-5 shadow-md md:px-6">
+    <article className="relative overflow-visible rounded-lg border border-gray-100 bg-white px-4 py-5 shadow-md md:px-6">
       <section>
-        <div className="mx-auto mb-2 w-full">
-          <div className="mb-4 flex justify-end">
-            <div className="flex max-w-40 flex-col items-center gap-2 text-center md:items-end md:text-right">
-              <Link href={roasterHref}>
-                <img
-                  src={roasterImageUrl ?? "/images/default-roaster.png"}
-                  alt={`${roasterName}の画像`}
-                  className="h-24 w-24 rounded-full border-4 border-white object-cover shadow-md"
-                />
-              </Link>
-              <Link
-                href={roasterHref}
-                className="legacy-text-link text-sm"
-              >
-                {roasterName}
-              </Link>
+        <div className="mx-auto w-full">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+            <div className="min-w-0 flex-1 space-y-4 pr-28 pt-10 sm:pr-32 sm:pt-12 lg:pr-0 lg:pt-0">
+              <div className="mb-2 flex flex-wrap items-start gap-2">
+                <HomeOfferStatusTag status={status} />
+                {tasteNames.map((tasteName) => (
+                  <span
+                    key={tasteName}
+                    className="rounded-full border border-gray-200 px-2 py-1 text-xs capitalize text-gray-500"
+                  >
+                    {tasteName}
+                  </span>
+                ))}
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex flex-wrap items-center gap-3">
+                  <h2 className="title-font text-xl text-gray-800 md:text-2xl">{beanName}</h2>
+                  <Link
+                    href={href}
+                    className="btn btn-secondary btn-compact w-20 whitespace-nowrap md:w-16"
+                  >
+                    詳細
+                  </Link>
+                  <div className="text-sm text-gray-700">{`${wantsCount} wants / ${amount}`}</div>
+                </div>
+
+                {showEngagement ? (
+                  <div className="flex justify-start">
+                    <OfferEngagementPanel
+                      amount={amount}
+                      beanName={beanName}
+                      canInteract
+                      initialLikeId={initialLikeId ?? undefined}
+                      initialWantCount={wantsCount}
+                      initialWantId={initialWantId ?? undefined}
+                      offerId={Number(id)}
+                      receiptStartedAt={receiptStartedAt}
+                      showWantCount={false}
+                      wantActionEnabled={status === "on_offering"}
+                    />
+                  </div>
+                ) : null}
+              </div>
+            </div>
+
+            <div className="absolute right-4 top-0 flex -translate-y-1/4 flex-col items-end gap-2 text-right sm:right-6 lg:static lg:w-full lg:translate-y-0 lg:gap-2 lg:max-w-48">
+              <div className="flex flex-col items-end gap-2 text-right">
+                <Link href={roasterHref}>
+                  <img
+                    src={roasterImageUrl ?? "/images/default-roaster.png"}
+                    alt={`${roasterName}の画像`}
+                    className="h-20 w-20 rounded-full border-4 border-white object-cover shadow-md sm:h-24 sm:w-24"
+                  />
+                </Link>
+                <Link
+                  href={roasterHref}
+                  className="legacy-text-link max-w-28 text-right text-xs sm:max-w-32 sm:text-sm"
+                >
+                  {roasterName}
+                </Link>
+              </div>
             </div>
           </div>
-
-          <div className="mt-1 mb-2 flex flex-wrap items-start gap-2">
-            <HomeOfferStatusTag status={status} />
-            {tasteNames.map((tasteName) => (
-              <span
-                key={tasteName}
-                className="rounded-full border border-gray-200 px-2 py-1 text-xs capitalize text-gray-500"
-              >
-                {tasteName}
-              </span>
-            ))}
-          </div>
-
-          <div className="md:flex md:items-center">
-            <h2 className="title-font text-xl text-gray-800 md:text-2xl">{beanName}</h2>
-            <div className="mt-3 text-right md:mt-0 md:ml-4">
-              <Link
-                href={href}
-                className="btn btn-secondary btn-compact w-20 whitespace-nowrap md:w-16"
-              >
-                詳細
-              </Link>
-            </div>
-          </div>
-
-          <div className="flex justify-end items-end">
-            <div className="mr-4 text-sm text-gray-700">{`${wantsCount} wants / ${amount}`}</div>
-          </div>
-          {showEngagement ? (
-            <div className="mt-4 flex justify-end">
-              <OfferEngagementPanel
-                amount={amount}
-                beanName={beanName}
-                canInteract
-                initialLikeId={initialLikeId ?? undefined}
-                initialWantCount={wantsCount}
-                initialWantId={initialWantId ?? undefined}
-                offerId={Number(id)}
-                receiptStartedAt={receiptStartedAt}
-                showWantCount={false}
-                wantActionEnabled={status === "on_offering"}
-              />
-            </div>
-          ) : null}
         </div>
       </section>
 

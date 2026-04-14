@@ -119,7 +119,7 @@ function HomeOffersSection({
         {offers.map((offer, index) => (
           <li
             key={offer.id}
-            className={index === 0 ? "mt-4" : "mt-20"}
+            className={index === 0 ? "mt-16" : "mt-24"}
           >
             <HomeOfferCard
               acidity={offer.acidity}
@@ -178,7 +178,7 @@ function HomeRecommendationsSection({
         </Link>
       </div>
       {offers.length ? (
-        <ol className="space-y-10">
+        <ol className="space-y-10 pt-8 sm:pt-10">
           {offers.map((offer) => (
             <li key={offer.id}>
               <HomeOfferCard

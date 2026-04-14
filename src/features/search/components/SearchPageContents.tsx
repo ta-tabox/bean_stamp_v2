@@ -305,7 +305,7 @@ function OffersSearchResults({
         {offers.map((offer, index) => (
           <li
             key={offer.id}
-            className={index === 0 ? "mt-10" : "mt-20"}
+            className={index === 0 ? "mt-16" : "mt-24"}
           >
             <HomeOfferCard
               acidity={offer.acidity}
