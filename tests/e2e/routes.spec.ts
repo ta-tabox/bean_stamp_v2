@@ -552,10 +552,13 @@ test("ユーザーは Offer 詳細から Want / Like を操作でき、一覧ペ
   await expect(page.getByText("ロースターをフォローしました。")).toBeVisible()
   await expect(page.getByText("このロースターのオファー")).toBeVisible()
   await expect(page.getByText("Want Like Blend")).toBeVisible()
+  await expect(page.getByText("募集中").first()).toBeVisible()
   await expect(page.getByRole("button", { name: "ウォント", exact: true }).first()).toBeVisible()
+  await expect(page.getByRole("button", { name: "ウォント", exact: true }).first()).toBeEnabled()
 
   await page.goto("/users/home")
   await expect(page.getByText("Want Like Blend")).toBeVisible()
+  await expect(page.getByText("募集中").first()).toBeVisible()
   await expect(page.getByRole("button", { name: "ウォント", exact: true }).first()).toBeVisible()
   await expect(page.getByRole("button", { name: "お気に入り", exact: true }).first()).toBeVisible()
   await page.getByRole("button", { name: "ウォント", exact: true }).first().click()

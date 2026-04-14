@@ -67,11 +67,11 @@ describe("home/service", () => {
           receiptEndedAt: new Date("2026-04-14T00:00:00.000Z"),
           receiptStartedAt: new Date("2026-04-12T00:00:00.000Z"),
           roastedAt: new Date("2026-04-11T00:00:00.000Z"),
-          status: OfferStatus.on_offering,
           wants: [{ id: 15n, userId: 77n }],
           weight: 200,
         },
         77n,
+        new Date("2026-04-14T00:00:00.000Z"),
       ),
     ).toEqual({
       acidity: 4,
@@ -96,12 +96,53 @@ describe("home/service", () => {
       roasterId: "5",
       roasterImageUrl: "https://example.com/roaster.jpg",
       roasterName: "Roaster Five",
-      status: OfferStatus.on_offering,
+      status: OfferStatus.on_selling,
       sweetness: 1,
       tasteNames: ["rose", "orange"],
       wantsCount: 4,
       weight: 200,
     })
+  })
+
+  it("ホーム用オファー DTO では保存済み status ではなく日付から状態を再計算する", () => {
+    expect(
+      buildHomeOfferCard(
+        {
+          _count: { wants: 1 },
+          amount: 3,
+          bean: {
+            acidity: 1,
+            beanImages: [],
+            beanTasteTags: [],
+            bitterness: 1,
+            body: 1,
+            country: { name: "Japan" },
+            flavor: 1,
+            name: "Timed Offer",
+            process: "Washed",
+            roastLevel: { name: "Light" },
+            roaster: {
+              id: 5n,
+              image: null,
+              name: "Roaster Five",
+            },
+            sweetness: 1,
+          },
+          createdAt: new Date("2026-04-01T00:00:00.000Z"),
+          endedAt: new Date("2026-04-10T00:00:00.000Z"),
+          id: 10n,
+          likes: [],
+          price: 1800,
+          receiptEndedAt: new Date("2026-04-14T00:00:00.000Z"),
+          receiptStartedAt: new Date("2026-04-12T00:00:00.000Z"),
+          roastedAt: new Date("2026-04-11T00:00:00.000Z"),
+          wants: [],
+          weight: 200,
+        },
+        77n,
+        new Date("2026-04-14T00:00:00.000Z"),
+      ).status,
+    ).toBe(OfferStatus.on_selling)
   })
 
   it("ユーザーホームはフォロー中ロースターの募集中オファーを取得する", async () => {
@@ -111,7 +152,6 @@ describe("home/service", () => {
 
     expect(mockPrisma.offer.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        take: 10,
         where: {
           bean: {
             roaster: {
@@ -122,12 +162,89 @@ describe("home/service", () => {
               },
             },
           },
-          status: {
-            not: OfferStatus.end_of_sales,
+          receiptEndedAt: {
+            gte: expect.any(Date),
           },
         },
       }),
     )
+  })
+
+  it("ユーザーホームは受け取り終了済みオファーを除外し、状態も再計算する", async () => {
+    mockPrisma.offer.findMany.mockResolvedValue([
+      {
+        _count: { wants: 2 },
+        amount: 5,
+        bean: {
+          acidity: 2,
+          beanImages: [],
+          beanTasteTags: [],
+          bitterness: 2,
+          body: 2,
+          country: { name: "Japan" },
+          flavor: 2,
+          name: "Expired Offer",
+          process: "Natural",
+          roastLevel: { name: "Light" },
+          roaster: {
+            id: 5n,
+            image: null,
+            name: "Roaster Five",
+          },
+          sweetness: 2,
+        },
+        createdAt: new Date("2026-04-01T00:00:00.000Z"),
+        endedAt: new Date("2026-04-10T00:00:00.000Z"),
+        id: 11n,
+        likes: [],
+        price: 1800,
+        receiptEndedAt: new Date("2026-04-13T00:00:00.000Z"),
+        receiptStartedAt: new Date("2026-04-12T00:00:00.000Z"),
+        roastedAt: new Date("2026-04-11T00:00:00.000Z"),
+        wants: [],
+        weight: 200,
+      },
+      {
+        _count: { wants: 1 },
+        amount: 5,
+        bean: {
+          acidity: 2,
+          beanImages: [],
+          beanTasteTags: [],
+          bitterness: 2,
+          body: 2,
+          country: { name: "Japan" },
+          flavor: 2,
+          name: "Active Offer",
+          process: "Natural",
+          roastLevel: { name: "Light" },
+          roaster: {
+            id: 5n,
+            image: null,
+            name: "Roaster Five",
+          },
+          sweetness: 2,
+        },
+        createdAt: new Date("2026-04-01T00:00:00.000Z"),
+        endedAt: new Date("2026-04-10T00:00:00.000Z"),
+        id: 12n,
+        likes: [],
+        price: 1800,
+        receiptEndedAt: new Date("2999-04-14T00:00:00.000Z"),
+        receiptStartedAt: new Date("2999-04-12T00:00:00.000Z"),
+        roastedAt: new Date("2999-04-11T00:00:00.000Z"),
+        wants: [],
+        weight: 200,
+      },
+    ])
+
+    const offers = await listCurrentOffersForUserHome("7", new Date("2026-04-14T00:00:00.000Z"))
+
+    expect(offers).toHaveLength(1)
+    expect(offers[0]).toMatchObject({
+      beanName: "Active Offer",
+      status: OfferStatus.on_roasting,
+    })
   })
 
   it("ロースターホームは自身のオファーを取得する", async () => {
