@@ -18,7 +18,7 @@ const userProfileSchema = z.object({
     .union([z.url("画像URLを確認してください"), z.literal(""), z.null(), z.undefined()])
     .optional(),
   name: z.string().trim().min(1, "名前を入力してください"),
-  prefectureCode: z.string().trim().min(1, "都道府県コードを入力してください"),
+  prefectureCode: z.string().trim().min(1, "都道府県を選択してください"),
 })
 
 const roasterProfileSchema = z.object({
@@ -29,7 +29,7 @@ const roasterProfileSchema = z.object({
     .optional(),
   name: z.string().trim().min(1, "ロースター名を入力してください"),
   phoneNumber: z.string().trim().min(1, "電話番号を入力してください"),
-  prefectureCode: z.string().trim().min(1, "都道府県コードを入力してください"),
+  prefectureCode: z.string().trim().min(1, "都道府県を選択してください"),
 })
 
 export type UserProfileInput = z.infer<typeof userProfileSchema>

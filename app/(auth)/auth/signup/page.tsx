@@ -1,5 +1,6 @@
 import Link from "next/link"
 
+import { prefectureOptions } from "@/components/shared/prefecture-label"
 import { AuthFormShell } from "@/features/auth/components/AuthFormShell"
 import { AuthStatusMessage } from "@/features/auth/components/AuthStatusMessage"
 import { signUpAction } from "@/server/auth/actions"
@@ -50,14 +51,23 @@ export default async function SignUpPage({ searchParams }: SignUpPageProps) {
           />
         </label>
         <label className="block space-y-2 text-sm font-medium">
-          <span>都道府県コード</span>
-          <input
+          <span>都道府県</span>
+          <select
             required
-            type="text"
             name="prefectureCode"
-            placeholder="13"
             className="w-full rounded-2xl border border-[var(--color-border)] bg-white px-4 py-3 outline-none transition focus:border-[var(--color-accent)]"
-          />
+            defaultValue=""
+          >
+            <option value="">選択してください</option>
+            {prefectureOptions.map((option) => (
+              <option
+                key={option.value}
+                value={option.value}
+              >
+                {option.label}
+              </option>
+            ))}
+          </select>
         </label>
         <label className="block space-y-2 text-sm font-medium">
           <span>パスワード</span>

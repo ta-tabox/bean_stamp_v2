@@ -70,6 +70,14 @@ type ProfileFieldProps = {
   type?: "email" | "text" | "url"
 }
 
+type ProfileSelectFieldProps = {
+  defaultValue: string
+  label: string
+  name: string
+  options: ReadonlyArray<{ label: string; value: string }>
+  required?: boolean
+}
+
 type ProfileTextareaProps = {
   defaultValue: string
   label: string
@@ -142,12 +150,16 @@ export function ProfileLinksRow({ links, title }: { links: readonly ActionLink[]
   return (
     <div className="space-y-2">
       <h3 className="text-sm font-medium text-gray-600">{title}</h3>
-      <div className="flex flex-col items-start gap-2">
+      <div className="flex flex-wrap items-center gap-3">
         {links.map((link) => (
           <Link
             key={link.href}
             href={link.href}
-            className="legacy-text-link"
+            className={
+              link.tone === "primary"
+                ? "btn btn-primary btn-compact"
+                : "btn btn-secondary btn-compact"
+            }
           >
             {link.label}
           </Link>
@@ -313,6 +325,36 @@ export function ProfileTextarea({ defaultValue, label, name, rows = 5 }: Profile
         rows={rows}
         className="field-input min-h-36 resize-y"
       />
+    </label>
+  )
+}
+
+export function ProfileSelectField({
+  defaultValue,
+  label,
+  name,
+  options,
+  required = true,
+}: ProfileSelectFieldProps) {
+  return (
+    <label className="field-row">
+      <span className="field-label">{label}</span>
+      <select
+        required={required}
+        name={name}
+        defaultValue={defaultValue}
+        className="field-input"
+      >
+        <option value="">選択してください</option>
+        {options.map((option) => (
+          <option
+            key={option.value}
+            value={option.value}
+          >
+            {option.label}
+          </option>
+        ))}
+      </select>
     </label>
   )
 }

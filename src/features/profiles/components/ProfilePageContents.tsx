@@ -9,12 +9,14 @@ import {
   ProfileLinksRow,
   ProfileListItemLink,
   ProfileListSection,
+  ProfileSelectField,
   ProfileSummaryCard,
   ProfileTextarea,
   StatusBanner,
 } from "@/components/profiles/ProfileUi"
-import { resolvePrefectureLabel } from "@/components/shared/prefecture-label"
+import { prefectureOptions, resolvePrefectureLabel } from "@/components/shared/prefecture-label"
 import type { HomeOfferSummary } from "@/features/home/types"
+import { RoasterFollowStatusToast } from "@/features/profiles/components/RoasterFollowStatusToast"
 import type { RoasterProfileView, UserProfileView } from "@/features/profiles/types"
 
 type FormAction = (formData: FormData) => Promise<void>
@@ -136,27 +138,19 @@ export function RoasterProfilePageContent({
   return (
     <main className="space-y-6">
       <ContentHeader title="ロースター" />
+      <RoasterFollowStatusToast
+        followed={status?.followed}
+        unfollowed={status?.unfollowed}
+      />
       <StatusMessages
         messages={[
           status?.created ? "ロースターを作成しました。" : null,
           status?.updated ? "ロースターを更新しました。" : null,
-          status?.followed ? "ロースターをフォローしました。" : null,
-          status?.unfollowed ? "ロースターのフォローを解除しました。" : null,
         ]}
       />
-      <ProfileSummaryCard
-        kind="Roaster"
-        name={roaster.name}
-        handle={roaster.address}
-        imageUrl={roaster.thumbnail_url}
-        placeholder="roaster"
-        description={roaster.describe ?? "ロースター紹介はまだありません。"}
-        details={[
-          { label: "電話番号", value: roaster.phone_number },
-          { label: "都道府県", value: resolvePrefectureLabel(roaster.prefecture_code) },
-          { label: "住所", value: roaster.address },
-          { label: "フォロワー数", value: String(roaster.followers_count ?? 0) },
-        ]}
+      <RoasterSummaryCard
+        roaster={roaster}
+        followersCount={roaster.followers_count ?? 0}
         actions={
           canEdit ? (
             <Link
@@ -171,17 +165,16 @@ export function RoasterProfilePageContent({
         }
       >
         <ProfileLinksRow
-          title="関連導線"
+          title="関連ページ"
           links={[
             {
               href: `/roasters/${roaster.id}/follower`,
               label: "フォロワー一覧",
               tone: "secondary",
             },
-            { href: "/search/roasters", label: "ロースター検索へ", tone: "secondary" },
           ]}
         />
-      </ProfileSummaryCard>
+      </RoasterSummaryCard>
 
       <section className="space-y-6">
         <div className="flex items-end justify-between gap-4">
@@ -281,42 +274,36 @@ export function RoasterFollowerPageContent({
   return (
     <main className="space-y-6">
       <ContentHeader title="フォロワー" />
-      <ProfileSummaryCard
-        kind="Roasters"
-        name={roaster.name}
-        handle={`@ roaster-${roaster.id}`}
-        imageUrl={roaster.thumbnail_url}
-        placeholder="roaster"
-        description={roaster.describe ?? "ロースター紹介はまだありません。"}
-        details={[
-          { label: "電話番号", value: roaster.phone_number },
-          { label: "都道府県", value: resolvePrefectureLabel(roaster.prefecture_code) },
-          { label: "住所", value: roaster.address },
-          { label: "フォロワー数", value: String(followers.length) },
-        ]}
+      <RoasterSummaryCard
+        roaster={roaster}
+        followersCount={followers.length}
         actions={
           canEdit ? (
             <Link
               href="/roasters/edit"
-              className="btn btn-secondary"
+              className="btn btn-secondary btn-compact"
             >
-              ロースターを編集
+              編集
             </Link>
           ) : null
         }
       >
         <ProfileLinksRow
-          title="導線"
+          title="関連ページ"
           links={[
             {
               href: `/roasters/${roaster.id}`,
               label: "ロースター詳細へ戻る",
+              tone: "primary",
+            },
+            {
+              href: `/roasters/${roaster.id}/follower`,
+              label: "フォロワー一覧を更新",
               tone: "secondary",
             },
-            { href: "/search/roasters", label: "ロースター検索へ", tone: "secondary" },
           ]}
         />
-      </ProfileSummaryCard>
+      </RoasterSummaryCard>
 
       <ProfileListSection
         title="フォロワー一覧"
@@ -486,10 +473,11 @@ export function RoasterNewPageContent({ action }: RoasterNewPageContentProps) {
               name="phoneNumber"
               defaultValue=""
             />
-            <ProfileField
-              label="都道府県コード"
+            <ProfileSelectField
+              label="都道府県"
               name="prefectureCode"
               defaultValue=""
+              options={prefectureOptions}
             />
             <ProfileField
               label="住所"
@@ -548,4 +536,36 @@ function StatusMessages({ messages }: { messages: readonly (string | null)[] }) 
   return messages
     .filter((message): message is string => Boolean(message))
     .map((message) => <StatusBanner key={message}>{message}</StatusBanner>)
+}
+
+function RoasterSummaryCard({
+  actions,
+  children,
+  followersCount,
+  roaster,
+}: {
+  actions?: ReactNode
+  children?: ReactNode
+  followersCount: number
+  roaster: RoasterProfileView
+}) {
+  return (
+    <ProfileSummaryCard
+      kind="Roaster"
+      name={roaster.name}
+      handle={roaster.address}
+      imageUrl={roaster.thumbnail_url}
+      placeholder="roaster"
+      description={roaster.describe ?? "ロースター紹介はまだありません。"}
+      details={[
+        { label: "電話番号", value: roaster.phone_number },
+        { label: "都道府県", value: resolvePrefectureLabel(roaster.prefecture_code) },
+        { label: "住所", value: roaster.address },
+        { label: "フォロワー数", value: String(followersCount) },
+      ]}
+      actions={actions}
+    >
+      {children}
+    </ProfileSummaryCard>
+  )
 }
