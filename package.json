@@ -18,6 +18,7 @@
     "test:unit:watch": "vitest",
     "test:e2e": "sh scripts/run-e2e.sh",
     "test:e2e:spec": "playwright test",
+    "prisma:reset": "prisma migrate reset --force",
     "prisma:reset:e2e": "prisma migrate reset --force",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
