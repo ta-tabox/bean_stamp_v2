@@ -17,7 +17,7 @@ const signUpSchema = z
     name: z.string().trim().min(1, "名前を入力してください"),
     password: z.string().min(8, "パスワードは8文字以上で入力してください"),
     passwordConfirmation: z.string().min(1),
-    prefectureCode: z.string().trim().min(1, "都道府県コードを入力してください"),
+    prefectureCode: z.string().trim().min(1, "都道府県を選択してください"),
   })
   .refine((value) => value.password === value.passwordConfirmation, {
     message: "確認用パスワードが一致しません",

@@ -231,13 +231,18 @@ docker compose exec app pnpm prisma:seed:dev
 ```
 
 `pnpm prisma:seed` は本番でも必要なマスタデータのみを投入する。
-`pnpm prisma:seed:dev` はマスタデータに加えて、ブラウザ確認用のユーザー、ロースター、フォロー関係のサンプルデータを投入する。
+`pnpm prisma:seed:dev` はマスタデータに加えて、ブラウザ確認用の複数ユーザー、複数ロースター、フォロー、豆、オファー、Like / Want のサンプルデータを投入する。
+開発 DB をレコードごと初期化したい場合は `docker compose exec app pnpm prisma:reset` を使う。
 ログイン確認用の共通パスワードは `password123`。
 主なアカウント:
 
 - `user1@example.com`
+- `user2@example.com`
+- `user3@example.com`
 - `roaster1@example.com`
 - `roaster2@example.com`
+- `roaster3@example.com`
+- `roaster4@example.com`
 - `follower@example.com`
 
 投入される開発用アカウント、豆、オファーの詳細は [docs/DEVELOPMENT_SEED.md](/Users/daiki/repos/github.com/ta-tabox/bean_stamp_v2/docs/DEVELOPMENT_SEED.md) を参照。

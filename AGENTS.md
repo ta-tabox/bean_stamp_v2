@@ -32,6 +32,7 @@
 - 整形: `docker compose exec app pnpm format`
 - ビルド確認: `docker compose exec app pnpm build`
 - Prisma Client 再生成: `docker compose exec app pnpm prisma:generate`
+- Prisma DB リセット: `docker compose exec app pnpm prisma:reset`
 - Prisma migration: `docker compose exec app pnpm prisma:migrate`
 - Prisma migration deploy: `docker compose exec app pnpm prisma:migrate:deploy`
 - Prisma seed: `docker compose exec app pnpm prisma:seed`
