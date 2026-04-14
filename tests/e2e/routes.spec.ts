@@ -71,7 +71,7 @@ test("認証フローとセッション API が動作する", async ({ page }) =
     page.getByRole("heading", { name: "Auth Testerのホーム", exact: true }),
   ).toBeVisible()
   await expect(page.getByRole("button", { name: "更新" })).toBeVisible()
-  await expect(page.getByText("オファーがありません")).toBeVisible()
+  await expect(page.getByText("オファーがありません", { exact: true })).toBeVisible()
   await expect(
     page.getByRole("link", { name: "ロースターをフォローしてオファーを受け取る" }),
   ).toBeVisible()
@@ -197,7 +197,7 @@ test("認証フローとセッション API が動作する", async ({ page }) =
 
   await page.goto("/search")
   await expect(page).toHaveURL(/\/search$/)
-  await expect(page.getByRole("heading", { name: "検索トップ", exact: true })).toBeVisible()
+  await expect(page.getByRole("heading", { name: "探す", exact: true })).toBeVisible()
 
   await visibleButton(page, "SignOut").evaluate((button) => button.closest("form")?.requestSubmit())
   await expect(page).toHaveURL(/\/auth\/signin$/)
@@ -551,13 +551,17 @@ test("ユーザーは Offer 詳細から Want / Like を操作でき、一覧ペ
   await page.getByRole("button", { name: "フォローする" }).click()
   await expect(page.getByText("ロースターをフォローしました。")).toBeVisible()
   await expect(page.getByText("このロースターのオファー")).toBeVisible()
-  await expect(page.getByText("Want Like Blend")).toBeVisible()
+  await expect(
+    page.getByRole("heading", { name: "Want Like Blend", exact: true }).first(),
+  ).toBeVisible()
   await expect(page.getByText("募集中").first()).toBeVisible()
   await expect(page.getByRole("button", { name: "ウォント", exact: true }).first()).toBeVisible()
   await expect(page.getByRole("button", { name: "ウォント", exact: true }).first()).toBeEnabled()
 
   await page.goto("/users/home")
-  await expect(page.getByText("Want Like Blend")).toBeVisible()
+  await expect(
+    page.getByRole("heading", { name: "Want Like Blend", exact: true }).first(),
+  ).toBeVisible()
   await expect(page.getByText("募集中").first()).toBeVisible()
   await expect(page.getByRole("button", { name: "ウォント", exact: true }).first()).toBeVisible()
   await expect(page.getByRole("button", { name: "お気に入り", exact: true }).first()).toBeVisible()
@@ -591,6 +595,84 @@ test("ユーザーは Offer 詳細から Want / Like を操作でき、一覧ペ
   await page.getByRole("button", { name: "お気に入り解除", exact: true }).click()
   await expect(page.getByText("Want Like Blendをお気に入りから外しました")).toBeVisible()
   await expect(page.getByText("お気に入りがありません")).toBeVisible()
+})
+
+test("ユーザーは検索画面からロースターとオファーを探せて、おすすめオファーも表示される", async ({
+  page,
+}) => {
+  const uniqueSuffix = Date.now()
+  const roasterEmail = `search-roaster-${uniqueSuffix}@example.com`
+  const userEmail = `search-user-${uniqueSuffix}@example.com`
+  const password = `Search-${uniqueSuffix}`
+
+  await signUpAndSignIn(page, {
+    email: roasterEmail,
+    name: "Search Feature Roaster User",
+    password,
+    prefectureCode: "13",
+  })
+
+  await createRoaster(page, {
+    address: "Tokyo",
+    describe: "検索検証用のロースターです。",
+    name: "Search Feature Roaster",
+    phoneNumber: "03-9999-0000",
+    prefectureCode: "13",
+  })
+
+  const beanId = await createBean(page, {
+    describe: "検索で見つける豆です。",
+    name: "Search Feature Blend",
+  })
+
+  await page.goto(`/beans/${beanId}`)
+  await page.getByRole("link", { name: "この豆をオファーする" }).click()
+  await page.getByLabel("価格").fill("2200")
+  await page.getByLabel("内容量(g)").fill("180")
+  await page.getByLabel("数量").fill("8")
+  await page.getByLabel("オファー終了日").fill(offsetDate(1))
+  await page.getByLabel("焙煎日").fill(offsetDate(2))
+  await page.getByLabel("受け取り開始日").fill(offsetDate(3))
+  await page.getByLabel("受け取り終了日").fill(offsetDate(4))
+  await page.getByRole("button", { name: "保存する" }).click()
+  await expect(page).toHaveURL(/\/offers\/\d+\?created=1$/)
+
+  await visibleButton(page, "SignOut").evaluate((button) => button.closest("form")?.requestSubmit())
+  await expect(page).toHaveURL(/\/auth\/signin$/)
+
+  await signUpAndSignIn(page, {
+    email: userEmail,
+    name: "Search Feature User",
+    password,
+    prefectureCode: "13",
+  })
+
+  await page.goto("/search")
+  await expect(page.getByRole("heading", { name: "探す", exact: true })).toBeVisible()
+  await expect(page.getByRole("link", { name: "Roaster", exact: true })).toBeVisible()
+  await expect(page.getByRole("link", { name: "Offer", exact: true })).toBeVisible()
+
+  await page.getByLabel("ロースター名").fill("Search Feature Roaster")
+  await page.getByRole("button", { name: "検索" }).click()
+  await expect(page).toHaveURL(/\/search\/roasters\?name=Search\+Feature\+Roaster/)
+  await expect(page.getByRole("link", { name: /Search Feature Roaster/ })).toBeVisible()
+
+  await page.getByRole("link", { name: "Offer", exact: true }).click()
+  await page.getByLabel("都道府県コード").fill("13")
+  await page.getByLabel("生産国").selectOption("44")
+  await page.getByLabel("焙煎度").selectOption("2")
+  await page.getByLabel("テイストタグ").selectOption("24")
+  await page.getByRole("button", { name: "検索" }).click()
+  await expect(page).toHaveURL(/\/search\/offers\?/)
+  await expect(page.getByText("Search Feature Blend")).toBeVisible()
+  await expect(page.getByText("Search Feature Roaster")).toBeVisible()
+
+  await page.goto("/users/home")
+  await expect(
+    page.getByRole("heading", { name: "Search Feature Userのホーム", exact: true }),
+  ).toBeVisible()
+  await expect(page.getByText("おすすめオファー")).toBeVisible()
+  await expect(page.getByText("Search Feature Blend")).toBeVisible()
 })
 
 function visibleAppNavLink(page: Page, href: string) {

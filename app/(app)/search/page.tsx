@@ -1,13 +1,13 @@
-import { PlaceholderPage } from "@/components/shared/PlaceholderPage"
-import { searchRoutes } from "@/features/search"
+import { SearchPageContent } from "@/features/search"
+import { requireSession } from "@/server/auth/guards"
 
-export default function SearchPage() {
+export default async function SearchPage() {
+  await requireSession()
+
   return (
-    <PlaceholderPage
-      eyebrow="Search"
-      title="検索トップ"
-      description="ロースター検索とオファー検索の分岐点です。"
-      links={searchRoutes}
+    <SearchPageContent
+      currentTab="roasters"
+      showResults={false}
     />
   )
 }

@@ -1,13 +1,34 @@
-import { PlaceholderPage } from "@/components/shared/PlaceholderPage"
-import { searchRoutes } from "@/features/search"
+import { SearchPageContent } from "@/features/search"
+import { requireSession } from "@/server/auth/guards"
+import { listRoastersBySearch } from "@/server/search"
 
-export default function SearchRoastersPage() {
+type SearchRoastersPageProps = Readonly<{
+  searchParams?: Promise<{
+    name?: string
+    page?: string
+    prefecture_code?: string
+  }>
+}>
+
+export default async function SearchRoastersPage({ searchParams }: SearchRoastersPageProps) {
+  await requireSession()
+  const currentParams = (await searchParams) ?? {}
+  const result = await listRoastersBySearch({
+    name: currentParams.name,
+    page: currentParams.page,
+    prefectureCode: currentParams.prefecture_code,
+  })
+
   return (
-    <PlaceholderPage
-      eyebrow="Search"
-      title="ロースター検索"
-      description="ロースター一覧検索のルートです。"
-      links={searchRoutes}
+    <SearchPageContent
+      currentPage={result.pagination.currentPage}
+      currentTab="roasters"
+      roasters={result.items}
+      searchParams={{
+        name: currentParams.name,
+        prefectureCode: currentParams.prefecture_code,
+      }}
+      totalPages={result.pagination.totalPages}
     />
   )
 }

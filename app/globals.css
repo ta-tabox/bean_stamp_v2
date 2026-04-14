@@ -573,6 +573,69 @@ img {
   height: 5rem;
 }
 
+.search-tab-list {
+  display: flex;
+  gap: 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.75rem;
+}
+
+.search-tab {
+  border: 1px solid var(--color-border);
+  border-radius: 9999px;
+  background: #fff;
+  color: var(--color-muted);
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  padding: 0.7rem 1.2rem;
+  text-transform: uppercase;
+  transition: all 0.2s ease;
+}
+
+.search-tab-active {
+  border-color: var(--color-fg);
+  background: var(--color-fg);
+  color: #fff;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.5rem 0 2rem;
+}
+
+.page-link {
+  min-width: 3rem;
+  border: 1px solid var(--color-border);
+  border-radius: 9999px;
+  background: #fff;
+  color: var(--color-fg);
+  font-size: 0.875rem;
+  font-weight: 700;
+  padding: 0.75rem 1rem;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.page-link:hover {
+  background: var(--color-surface);
+}
+
+.page-link.is-active {
+  border-color: var(--color-fg);
+  background: var(--color-fg);
+  color: #fff;
+}
+
+.page-link.is-disabled {
+  color: var(--color-muted);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 .field-row {
   display: block;
 }

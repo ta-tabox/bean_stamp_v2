@@ -8,6 +8,7 @@ import type { HomeOfferSummary } from "@/features/home/types"
 type UsersHomePageContentProps = {
   currentRoasterId?: string | null
   offers: readonly HomeOfferSummary[]
+  recommendedOffers: readonly HomeOfferSummary[]
   userName: string
 }
 
@@ -21,6 +22,7 @@ type RoastersHomePageContentProps = {
 export function UsersHomePageContent({
   currentRoasterId,
   offers,
+  recommendedOffers,
   userName,
 }: UsersHomePageContentProps) {
   return (
@@ -33,6 +35,10 @@ export function UsersHomePageContent({
         emptyActionLabel="ロースターをフォローしてオファーを受け取る"
         emptyMessage="オファーがありません"
         offers={offers}
+      />
+      <HomeRecommendationsSection
+        currentRoasterId={currentRoasterId}
+        offers={recommendedOffers}
       />
     </main>
   )
@@ -149,6 +155,71 @@ function HomeOffersSection({
           </li>
         ))}
       </ol>
+    </section>
+  )
+}
+
+function HomeRecommendationsSection({
+  currentRoasterId,
+  offers,
+}: {
+  currentRoasterId?: string | null
+  offers: readonly HomeOfferSummary[]
+}) {
+  return (
+    <section className="space-y-4">
+      <div className="flex items-end justify-between gap-4">
+        <h2 className="title-font text-2xl text-[var(--color-fg)]">おすすめオファー</h2>
+        <Link
+          href="/search/offers"
+          className="legacy-text-link"
+        >
+          もっと探す
+        </Link>
+      </div>
+      {offers.length ? (
+        <ol className="space-y-10">
+          {offers.map((offer) => (
+            <li key={offer.id}>
+              <HomeOfferCard
+                acidity={offer.acidity}
+                amount={offer.amount}
+                beanImageUrl={offer.beanImageUrl}
+                beanName={offer.beanName}
+                bitterness={offer.bitterness}
+                body={offer.body}
+                countryName={offer.countryName}
+                createdAt={offer.createdAt}
+                endedAt={offer.endedAt}
+                flavor={offer.flavor}
+                href={`/offers/${offer.id}`}
+                id={offer.id}
+                initialLikeId={offer.initialLikeId}
+                initialWantId={offer.initialWantId}
+                price={offer.price}
+                process={offer.process}
+                receiptEndedAt={offer.receiptEndedAt}
+                receiptStartedAt={offer.receiptStartedAt}
+                roastLevelName={offer.roastLevelName}
+                roastedAt={offer.roastedAt}
+                roasterHref={`/roasters/${offer.roasterId}`}
+                roasterImageUrl={offer.roasterImageUrl}
+                roasterName={offer.roasterName}
+                showEngagement={currentRoasterId !== offer.roasterId}
+                status={offer.status}
+                sweetness={offer.sweetness}
+                tasteNames={offer.tasteNames}
+                wantsCount={offer.wantsCount}
+                weight={offer.weight}
+              />
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <section className="page-card text-center text-gray-400">
+          <p>おすすめのオファーがありません</p>
+        </section>
+      )}
     </section>
   )
 }
