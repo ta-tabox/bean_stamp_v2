@@ -1,19 +1,20 @@
-import { PlaceholderPage } from "@/components/shared/PlaceholderPage"
-import { wantsRoutes } from "@/features/wants"
+import { WantDetailPageContent } from "@/features/wants/components/WantsPageContents"
+import { requireSession } from "@/server/auth/guards"
+import { getWantForUser } from "@/server/wants"
 
 type WantPageProps = Readonly<{
   params: Promise<{ id: string }>
 }>
 
 export default async function WantPage({ params }: WantPageProps) {
+  const session = await requireSession()
   const { id } = await params
+  const want = await getWantForUser(session.id, id)
 
   return (
-    <PlaceholderPage
-      eyebrow="Wants"
-      title={`Want 詳細 #${id}`}
-      description="受け取り・評価フローを載せる詳細画面です。"
-      links={wantsRoutes}
+    <WantDetailPageContent
+      canInteract={session.roasterId !== String(want.offer.roaster.id)}
+      want={want}
     />
   )
 }

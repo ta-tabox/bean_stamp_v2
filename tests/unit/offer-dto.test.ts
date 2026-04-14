@@ -77,10 +77,7 @@ describe("offer dto builders", () => {
         farm: "Sun Farm",
         flavor: 5,
         id: 10,
-        image_urls: [
-          "https://example.com/bean-1.jpg",
-          "https://example.com/bean-2.jpg",
-        ],
+        image_urls: ["https://example.com/bean-1.jpg", "https://example.com/bean-2.jpg"],
         name: "Spring Blend",
         process: "Washed",
         roast_level: {

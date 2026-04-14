@@ -16,7 +16,9 @@ export default async function RoastersHomePage({ searchParams }: RoastersHomePag
   const session = await requireSession()
   const params = (await searchParams) ?? {}
   const roaster = session.roasterId ? await getRoasterProfile(session.roasterId, session.id) : null
-  const offers = session.roasterId ? await listCurrentOffersForRoasterHome(session.roasterId) : []
+  const offers = session.roasterId
+    ? await listCurrentOffersForRoasterHome(session.roasterId, session.id)
+    : []
 
   if (!roaster) {
     return <RoasterHomeMissingContent />
@@ -24,6 +26,7 @@ export default async function RoastersHomePage({ searchParams }: RoastersHomePag
 
   return (
     <RoastersHomePageContent
+      currentRoasterId={session.roasterId}
       deleted={params.deleted === "1"}
       offers={offers}
       roasterName={roaster.name}

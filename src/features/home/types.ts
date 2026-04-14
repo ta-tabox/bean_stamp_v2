@@ -17,6 +17,8 @@ export type HomeOfferSummary = {
   endedAt: string
   flavor: number
   id: string
+  initialLikeId: number | null
+  initialWantId: number | null
   price: number
   process: string
   receiptEndedAt: string

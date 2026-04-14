@@ -104,10 +104,7 @@ export function BeanImagePicker({
   )
 }
 
-export function BeanTasteTagPicker({
-  initialSelectedIds = [],
-  options,
-}: TasteTagPickerProps) {
+export function BeanTasteTagPicker({ initialSelectedIds = [], options }: TasteTagPickerProps) {
   const [selectedIds, setSelectedIds] = useState<number[]>([...initialSelectedIds])
 
   const selectedTags = useMemo(
@@ -192,18 +189,12 @@ export function BeanTasteTagPicker({
         })}
       </div>
 
-      <p className="text-xs text-[var(--color-muted)]">
-        2〜3個選択してください。{helperMessage}
-      </p>
+      <p className="text-xs text-[var(--color-muted)]">2〜3個選択してください。{helperMessage}</p>
     </div>
   )
 }
 
-export function BeanTasteSliderField({
-  defaultValue,
-  label,
-  name,
-}: TasteSliderFieldProps) {
+export function BeanTasteSliderField({ defaultValue, label, name }: TasteSliderFieldProps) {
   const [value, setValue] = useState(defaultValue)
 
   return (

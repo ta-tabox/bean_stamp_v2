@@ -89,6 +89,8 @@ docker compose exec app pnpm prisma:seed
 - `roaster2@example.com`
 - `follower@example.com`
 
+投入される開発用アカウント、豆、オファーの詳細は [docs/DEVELOPMENT_SEED.md](/Users/daiki/repos/github.com/ta-tabox/bean_stamp_v2/docs/DEVELOPMENT_SEED.md) を参照。
+
 停止:
 
 ```bash
@@ -155,6 +157,7 @@ docker compose exec app pnpm prisma:seed
 
 - 全体仕様: `docs/NEXTJS_REPLACE_SPEC.md`
 - 開発環境ガイド: `docs/DEVELOPMENT_ENV.md`
+- 開発用 seed 一覧: `docs/DEVELOPMENT_SEED.md`
 - 移行資材INDEX: `docs/migration-resources/INDEX.md`
 - Issue一覧: `docs/issues/ISSUE_INDEX.md`
 - Issue 00: `docs/issues/ISSUE_00.md`

@@ -44,7 +44,11 @@ export function validateOfferForm(
     errors.roastedAt = "焙煎日はオファー終了日より後の日付を指定してください"
   }
 
-  if (!errors.roastedAt && !errors.receiptStartedAt && values.receiptStartedAt <= values.roastedAt) {
+  if (
+    !errors.roastedAt &&
+    !errors.receiptStartedAt &&
+    values.receiptStartedAt <= values.roastedAt
+  ) {
     errors.receiptStartedAt = "受け取り開始日は焙煎日より後の日付を指定してください"
   }
 

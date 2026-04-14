@@ -158,10 +158,7 @@ export function BeansListPageContent({ beans, deleted = false }: BeansListPageCo
   )
 }
 
-export function BeanDetailPageContent({
-  bean,
-  status,
-}: BeanDetailPageContentProps) {
+export function BeanDetailPageContent({ bean, status }: BeanDetailPageContentProps) {
   const deleteReadyRef = useRef(false)
   const deleteMarkerRef = useRef<HTMLDivElement>(null)
 
@@ -351,12 +348,7 @@ export function BeanDetailPageContent({
   )
 }
 
-export function BeanFormPageContent({
-  bean,
-  error,
-  submitLabel,
-  title,
-}: BeanFormPageContentProps) {
+export function BeanFormPageContent({ bean, error, submitLabel, title }: BeanFormPageContentProps) {
   const [clientError, setClientError] = useState(error ?? "")
   const formReadyRef = useRef(false)
   const formMarkerRef = useRef<HTMLDivElement>(null)
@@ -682,7 +674,13 @@ function BeanTasteTags({
   }
 
   return (
-    <div className={centered ? "mt-4 flex flex-wrap items-center justify-center gap-2" : "mt-4 flex flex-wrap gap-2"}>
+    <div
+      className={
+        centered
+          ? "mt-4 flex flex-wrap items-center justify-center gap-2"
+          : "mt-4 flex flex-wrap gap-2"
+      }
+    >
       {tastes.map((taste) => (
         <span
           key={taste}
@@ -698,21 +696,13 @@ function BeanTasteTags({
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="py-2">
-      <dt className="text-sm font-medium text-gray-500">
-        {label}
-      </dt>
+      <dt className="text-sm font-medium text-gray-500">{label}</dt>
       <dd className="mt-1 text-sm text-[var(--color-fg)]">{value}</dd>
     </div>
   )
 }
 
-function TasteMetricRow({
-  value,
-  label,
-}: {
-  value: number
-  label: string
-}) {
+function TasteMetricRow({ value, label }: { value: number; label: string }) {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between text-sm">
@@ -729,13 +719,7 @@ function TasteMetricRow({
   )
 }
 
-function BeanThumbnail({
-  beanName,
-  imageUrl,
-}: {
-  beanName: string
-  imageUrl: string | null
-}) {
+function BeanThumbnail({ beanName, imageUrl }: { beanName: string; imageUrl: string | null }) {
   return (
     <div className="h-20 w-20 overflow-hidden rounded-full border-2 border-[var(--color-accent)] bg-white shadow-[0_8px_20px_rgba(99,102,241,0.15)]">
       {imageUrl ? (
@@ -806,12 +790,6 @@ function SelectField({
   )
 }
 
-function Field({
-  children,
-  className,
-}: {
-  children: ReactNode
-  className?: string
-}) {
+function Field({ children, className }: { children: ReactNode; className?: string }) {
   return <label className={className ? `field-row ${className}` : "field-row"}>{children}</label>
 }

@@ -45,18 +45,12 @@ describe("offers/service", () => {
       roastedAt: new Date("2026-04-15T00:00:00.000Z"),
     }
 
-    expect(calculateOfferStatus(schedule, new Date("2026-04-14T00:00:00.000Z"))).toBe(
-      "on_offering",
-    )
-    expect(calculateOfferStatus(schedule, new Date("2026-04-15T00:00:00.000Z"))).toBe(
-      "on_roasting",
-    )
+    expect(calculateOfferStatus(schedule, new Date("2026-04-14T00:00:00.000Z"))).toBe("on_offering")
+    expect(calculateOfferStatus(schedule, new Date("2026-04-15T00:00:00.000Z"))).toBe("on_roasting")
     expect(calculateOfferStatus(schedule, new Date("2026-04-16T00:00:00.000Z"))).toBe(
       "on_preparing",
     )
-    expect(calculateOfferStatus(schedule, new Date("2026-04-17T00:00:00.000Z"))).toBe(
-      "on_selling",
-    )
+    expect(calculateOfferStatus(schedule, new Date("2026-04-17T00:00:00.000Z"))).toBe("on_selling")
     expect(calculateOfferStatus(schedule, new Date("2026-04-19T00:00:00.000Z"))).toBe(
       "end_of_sales",
     )

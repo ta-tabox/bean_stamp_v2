@@ -2,6 +2,7 @@ import type { ReactNode } from "react"
 import Link from "next/link"
 
 import { ContentHeader } from "@/components/layout/ContentHeader"
+import { HomeOfferCard } from "@/components/home/HomeUi"
 import {
   ProfileField,
   ProfileFormShell,
@@ -12,6 +13,8 @@ import {
   ProfileTextarea,
   StatusBanner,
 } from "@/components/profiles/ProfileUi"
+import { resolvePrefectureLabel } from "@/components/shared/prefecture-label"
+import type { HomeOfferSummary } from "@/features/home/types"
 import type { RoasterProfileView, UserProfileView } from "@/features/profiles/types"
 
 type FormAction = (formData: FormData) => Promise<void>
@@ -26,7 +29,9 @@ type UserProfilePageContentProps = {
 
 type RoasterProfilePageContentProps = {
   canEdit: boolean
+  currentRoasterId?: string | null
   roaster: RoasterProfileView
+  offers: readonly HomeOfferSummary[]
   status?: {
     created?: boolean
     followed?: boolean
@@ -37,9 +42,7 @@ type RoasterProfilePageContentProps = {
 }
 
 type UserFollowingPageContentProps = {
-  canEdit: boolean
   roasters: readonly RoasterProfileView[]
-  user: UserProfileView
 }
 
 type RoasterFollowerPageContentProps = {
@@ -78,13 +81,13 @@ export function UserProfilePageContent({ canEdit, status, user }: UserProfilePag
       <ProfileSummaryCard
         kind="User"
         name={user.name}
-        handle={`@ ${user.prefecture_code}`}
+        handle={`@ ${resolvePrefectureLabel(user.prefecture_code)}`}
         imageUrl={user.thumbnail_url}
         placeholder="user"
         description={user.describe ?? "自己紹介はまだ設定されていません。"}
         details={[
           { label: "メールアドレス", value: user.email },
-          { label: "都道府県コード", value: user.prefecture_code },
+          { label: "都道府県", value: resolvePrefectureLabel(user.prefecture_code) },
           {
             label: "所属ロースター",
             value: user.roaster_id === null ? "未所属" : `#${user.roaster_id}`,
@@ -124,7 +127,9 @@ export function UserProfilePageContent({ canEdit, status, user }: UserProfilePag
 
 export function RoasterProfilePageContent({
   canEdit,
+  currentRoasterId,
   followAction,
+  offers,
   roaster,
   status,
 }: RoasterProfilePageContentProps) {
@@ -148,7 +153,7 @@ export function RoasterProfilePageContent({
         description={roaster.describe ?? "ロースター紹介はまだありません。"}
         details={[
           { label: "電話番号", value: roaster.phone_number },
-          { label: "都道府県コード", value: roaster.prefecture_code },
+          { label: "都道府県", value: resolvePrefectureLabel(roaster.prefecture_code) },
           { label: "住所", value: roaster.address },
           { label: "フォロワー数", value: String(roaster.followers_count ?? 0) },
         ]}
@@ -177,53 +182,72 @@ export function RoasterProfilePageContent({
           ]}
         />
       </ProfileSummaryCard>
+
+      <section className="space-y-6">
+        <div className="flex items-end justify-between gap-4">
+          <h2 className="title-font text-2xl text-[var(--color-fg)]">このロースターのオファー</h2>
+          <p className="text-sm text-[var(--color-muted)]">{`${offers.length}件`}</p>
+        </div>
+
+        {offers.length ? (
+          <ol className="space-y-10">
+            {offers.map((offer) => (
+              <li key={offer.id}>
+                <HomeOfferCard
+                  acidity={offer.acidity}
+                  amount={offer.amount}
+                  beanImageUrl={offer.beanImageUrl}
+                  beanName={offer.beanName}
+                  bitterness={offer.bitterness}
+                  body={offer.body}
+                  countryName={offer.countryName}
+                  createdAt={offer.createdAt}
+                  endedAt={offer.endedAt}
+                  flavor={offer.flavor}
+                  href={`/offers/${offer.id}`}
+                  id={offer.id}
+                  initialLikeId={offer.initialLikeId}
+                  initialWantId={offer.initialWantId}
+                  price={offer.price}
+                  process={offer.process}
+                  receiptEndedAt={offer.receiptEndedAt}
+                  receiptStartedAt={offer.receiptStartedAt}
+                  roastLevelName={offer.roastLevelName}
+                  roastedAt={offer.roastedAt}
+                  roasterHref={`/roasters/${offer.roasterId}`}
+                  roasterImageUrl={offer.roasterImageUrl}
+                  roasterName={offer.roasterName}
+                  showEngagement={currentRoasterId !== offer.roasterId}
+                  status={offer.status}
+                  sweetness={offer.sweetness}
+                  tasteNames={offer.tasteNames}
+                  wantsCount={offer.wantsCount}
+                  weight={offer.weight}
+                />
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <section className="page-card">
+            <div className="empty-state">
+              <h3 className="title-font text-2xl text-[var(--color-fg)]">
+                まだオファーがありません
+              </h3>
+              <p className="mt-2 text-sm text-[var(--color-muted)]">
+                このロースターがオファーを公開すると、ここに一覧表示されます。
+              </p>
+            </div>
+          </section>
+        )}
+      </section>
     </main>
   )
 }
 
-export function UserFollowingPageContent({
-  canEdit,
-  roasters,
-  user,
-}: UserFollowingPageContentProps) {
+export function UserFollowingPageContent({ roasters }: UserFollowingPageContentProps) {
   return (
     <main className="space-y-6">
       <ContentHeader title="フォロー" />
-      <ProfileSummaryCard
-        kind="Users"
-        name={user.name}
-        handle={`@ user-${user.id}`}
-        imageUrl={user.thumbnail_url}
-        placeholder="user"
-        description={user.describe ?? "自己紹介はまだ設定されていません。"}
-        details={[
-          { label: "メールアドレス", value: user.email },
-          { label: "都道府県コード", value: user.prefecture_code },
-          {
-            label: "所属ロースター",
-            value: user.roaster_id === null ? "未所属" : `#${user.roaster_id}`,
-          },
-          { label: "フォロー件数", value: String(roasters.length) },
-        ]}
-        actions={
-          canEdit ? (
-            <Link
-              href="/users/edit"
-              className="btn btn-secondary"
-            >
-              プロフィールを編集
-            </Link>
-          ) : null
-        }
-      >
-        <ProfileLinksRow
-          title="導線"
-          links={[
-            { href: `/users/${user.id}`, label: "ユーザー詳細へ戻る", tone: "secondary" },
-            { href: "/search/roasters", label: "ロースターを探す", tone: "primary" },
-          ]}
-        />
-      </ProfileSummaryCard>
 
       <ProfileListSection
         title="フォロー中ロースター"
@@ -241,7 +265,7 @@ export function UserFollowingPageContent({
             description={roaster.describe ?? "紹介文はまだ登録されていません。"}
             imageUrl={roaster.thumbnail_url}
             placeholder="roaster"
-            badge={roaster.prefecture_code}
+            badge={resolvePrefectureLabel(roaster.prefecture_code)}
           />
         ))}
       </ProfileListSection>
@@ -266,7 +290,7 @@ export function RoasterFollowerPageContent({
         description={roaster.describe ?? "ロースター紹介はまだありません。"}
         details={[
           { label: "電話番号", value: roaster.phone_number },
-          { label: "都道府県コード", value: roaster.prefecture_code },
+          { label: "都道府県", value: resolvePrefectureLabel(roaster.prefecture_code) },
           { label: "住所", value: roaster.address },
           { label: "フォロワー数", value: String(followers.length) },
         ]}
@@ -309,7 +333,7 @@ export function RoasterFollowerPageContent({
             description={user.describe ?? "自己紹介はまだ設定されていません。"}
             imageUrl={user.thumbnail_url}
             placeholder="user"
-            badge={user.prefecture_code}
+            badge={resolvePrefectureLabel(user.prefecture_code)}
           />
         ))}
       </ProfileListSection>

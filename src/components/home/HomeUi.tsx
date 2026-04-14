@@ -7,6 +7,7 @@ import { useId, useState, useTransition } from "react"
 
 import { ArrowPathIcon } from "@/components/icon/Icon"
 import { HomeTasteChart } from "@/components/home/HomeTasteChart"
+import { OfferEngagementPanel } from "@/features/offers/components/OfferEngagementPanel"
 import type { HomeOfferStatus } from "@/features/home/types"
 
 type HomeOfferCardProps = {
@@ -21,6 +22,9 @@ type HomeOfferCardProps = {
   endedAt: string
   flavor: number
   href: string
+  id: string
+  initialLikeId: number | null
+  initialWantId: number | null
   price: number
   process: string
   receiptEndedAt: string
@@ -30,6 +34,7 @@ type HomeOfferCardProps = {
   roasterHref: string
   roasterImageUrl: string | null
   roasterName: string
+  showEngagement: boolean
   status: HomeOfferStatus
   sweetness: number
   tasteNames: string[]
@@ -61,6 +66,9 @@ export function HomeOfferCard({
   endedAt,
   flavor,
   href,
+  id,
+  initialLikeId,
+  initialWantId,
   price,
   process,
   receiptEndedAt,
@@ -70,6 +78,7 @@ export function HomeOfferCard({
   roasterHref,
   roasterImageUrl,
   roasterName,
+  showEngagement,
   status,
   sweetness,
   tasteNames,
@@ -131,6 +140,22 @@ export function HomeOfferCard({
           <div className="flex justify-end items-end">
             <div className="mr-4 text-sm text-gray-700">{`${wantsCount} wants / ${amount}`}</div>
           </div>
+          {showEngagement ? (
+            <div className="mt-4 flex justify-end">
+              <OfferEngagementPanel
+                amount={amount}
+                beanName={beanName}
+                canInteract
+                initialLikeId={initialLikeId ?? undefined}
+                initialWantCount={wantsCount}
+                initialWantId={initialWantId ?? undefined}
+                offerId={Number(id)}
+                receiptStartedAt={receiptStartedAt}
+                showWantCount={false}
+                wantActionEnabled={status === "on_offering"}
+              />
+            </div>
+          ) : null}
         </div>
       </section>
 
@@ -284,9 +309,7 @@ function HomeTabButton({
       aria-controls={controlsId}
       onClick={onClick}
       className={`home-offer-tab ${
-        active
-          ? "home-offer-tab-selected"
-          : "text-gray-500 hover:text-gray-700"
+        active ? "home-offer-tab-selected" : "text-gray-500 hover:text-gray-700"
       }`}
     >
       {label}

@@ -48,8 +48,9 @@ describe("beans/service", () => {
   })
 
   it("画像が 4 枚を超えると AppError を送出する", () => {
-    const images = Array.from({ length: 5 }, (_, index) =>
-      new File([`image-${index}`], `bean-${index}.svg`, { type: "image/svg+xml" }),
+    const images = Array.from(
+      { length: 5 },
+      (_, index) => new File([`image-${index}`], `bean-${index}.svg`, { type: "image/svg+xml" }),
     )
 
     expect(() =>

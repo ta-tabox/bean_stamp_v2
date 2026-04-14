@@ -24,7 +24,10 @@ export async function POST(request: Request) {
 
   try {
     const session = await requireApiRoasterSession()
-    const bean = await createBean(session.roasterId, parseBeanMutationInput(await readBeanPayload(request)))
+    const bean = await createBean(
+      session.roasterId,
+      parseBeanMutationInput(await readBeanPayload(request)),
+    )
 
     if (isHtmlFormRequest) {
       const beanId = String(bean.id)
@@ -91,8 +94,7 @@ async function readBeanPayload(request: Request) {
       images: payload.images ?? [],
       name: beanPayload.name ?? payload.name,
       process: beanPayload.process ?? payload.process,
-      roastLevelId:
-        beanPayload.roastLevelId ?? beanPayload.roast_level_id ?? payload.roastLevelId,
+      roastLevelId: beanPayload.roastLevelId ?? beanPayload.roast_level_id ?? payload.roastLevelId,
       subregion: beanPayload.subregion ?? payload.subregion,
       sweetness: beanPayload.sweetness ?? payload.sweetness,
       tasteTagIds:
@@ -113,7 +115,10 @@ async function readBeanPayload(request: Request) {
     elevation: formData.get("elevation") ?? formData.get("bean[elevation]"),
     farm: formData.get("farm") ?? formData.get("bean[farm]"),
     flavor: formData.get("flavor") ?? formData.get("bean[flavor]"),
-    images: getFirstNonEmptyArray(formData.getAll("images"), formData.getAll("beanImage[images][]")),
+    images: getFirstNonEmptyArray(
+      formData.getAll("images"),
+      formData.getAll("beanImage[images][]"),
+    ),
     name: formData.get("name") ?? formData.get("bean[name]"),
     process: formData.get("process") ?? formData.get("bean[process]"),
     roastLevelId: formData.get("roastLevelId") ?? formData.get("bean[roastLevelId]"),

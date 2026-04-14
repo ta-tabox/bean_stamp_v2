@@ -1,7 +1,8 @@
-import { OfferStatus, Prisma } from "@prisma/client"
+import { Prisma } from "@prisma/client"
 
 import type { HomeOfferSummary } from "@/features/home/types"
 import { prisma } from "@/server/db"
+import { calculateOfferStatus } from "@/server/offers"
 
 const homeOfferSelect = {
   _count: {
@@ -62,11 +63,28 @@ const homeOfferSelect = {
   createdAt: true,
   endedAt: true,
   id: true,
+  likes: {
+    orderBy: {
+      id: "desc",
+    },
+    select: {
+      id: true,
+      userId: true,
+    },
+  },
   price: true,
   receiptEndedAt: true,
   receiptStartedAt: true,
   roastedAt: true,
-  status: true,
+  wants: {
+    orderBy: {
+      id: "desc",
+    },
+    select: {
+      id: true,
+      userId: true,
+    },
+  },
   weight: true,
 } satisfies Prisma.OfferSelect
 
@@ -74,31 +92,40 @@ type HomeOfferRecord = Prisma.OfferGetPayload<{
   select: typeof homeOfferSelect
 }>
 
-export async function listCurrentOffersForUserHome(userId: string) {
+export async function listCurrentOffersForUserHome(userId: string, now: Date = new Date()) {
+  const currentUserId = parseId(userId)
+  const today = startOfDay(now)
   const offers = await prisma.offer.findMany({
     orderBy: [{ roastedAt: "desc" }, { id: "desc" }],
     select: homeOfferSelect,
-    take: 10,
     where: {
       bean: {
         roaster: {
           followers: {
             some: {
-              followerId: parseId(userId),
+              followerId: currentUserId,
             },
           },
         },
       },
-      status: {
-        not: OfferStatus.end_of_sales,
+      receiptEndedAt: {
+        gte: today,
       },
     },
   })
 
-  return offers.map(buildHomeOfferCard)
+  return offers
+    .map((offer) => buildHomeOfferCard(offer, currentUserId, now))
+    .filter((offer) => offer.status !== "end_of_sales")
+    .slice(0, 10)
 }
 
-export async function listCurrentOffersForRoasterHome(roasterId: string) {
+export async function listCurrentOffersForRoasterHome(
+  roasterId: string,
+  userId: string,
+  now: Date = new Date(),
+) {
+  const currentUserId = parseId(userId)
   const offers = await prisma.offer.findMany({
     orderBy: [{ roastedAt: "desc" }, { id: "desc" }],
     select: homeOfferSelect,
@@ -110,10 +137,18 @@ export async function listCurrentOffersForRoasterHome(roasterId: string) {
     },
   })
 
-  return offers.map(buildHomeOfferCard)
+  return offers.map((offer) => buildHomeOfferCard(offer, currentUserId, now))
 }
 
-export function buildHomeOfferCard(offer: HomeOfferRecord): HomeOfferSummary {
+export function buildHomeOfferCard(
+  offer: HomeOfferRecord,
+  userId: bigint,
+  now: Date = new Date(),
+): HomeOfferSummary {
+  const currentLike = offer.likes.find((like) => like.userId === userId) ?? null
+  const currentWant = offer.wants.find((want) => want.userId === userId) ?? null
+  const status = calculateOfferStatus(offer, now)
+
   return {
     acidity: offer.bean.acidity ?? 0,
     amount: offer.amount,
@@ -126,6 +161,8 @@ export function buildHomeOfferCard(offer: HomeOfferRecord): HomeOfferSummary {
     endedAt: formatDateOnly(offer.endedAt),
     flavor: offer.bean.flavor ?? 0,
     id: offer.id.toString(),
+    initialLikeId: currentLike ? Number(currentLike.id) : null,
+    initialWantId: currentWant ? Number(currentWant.id) : null,
     price: offer.price,
     process: offer.bean.process.trim() || "精製方法未設定",
     receiptEndedAt: formatDateOnly(offer.receiptEndedAt),
@@ -135,7 +172,7 @@ export function buildHomeOfferCard(offer: HomeOfferRecord): HomeOfferSummary {
     roasterId: offer.bean.roaster.id.toString(),
     roasterImageUrl: offer.bean.roaster.image ?? null,
     roasterName: offer.bean.roaster.name.trim() || "ロースター未設定",
-    status: offer.status,
+    status,
     sweetness: offer.bean.sweetness ?? 0,
     tasteNames: offer.bean.beanTasteTags.flatMap((tag) => {
       const name = tag.tasteTag.name?.trim()
@@ -149,6 +186,14 @@ export function buildHomeOfferCard(offer: HomeOfferRecord): HomeOfferSummary {
 
 function parseId(value: string) {
   return BigInt(value)
+}
+
+function startOfDay(value: Date) {
+  const normalized = new Date(value)
+
+  normalized.setHours(0, 0, 0, 0)
+
+  return normalized
 }
 
 function formatDateOnly(value: Date) {

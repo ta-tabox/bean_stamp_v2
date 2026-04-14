@@ -1,5 +1,6 @@
 import { RoasterProfilePageContent } from "@/features/profiles/components/ProfilePageContents"
 import { requireSession } from "@/server/auth/guards"
+import { listCurrentOffersForRoasterHome } from "@/server/home/service"
 import { followRoasterAction, unfollowRoasterAction } from "@/server/profiles/actions"
 import { getRoasterProfile } from "@/server/profiles/service"
 
@@ -16,13 +17,18 @@ type RoasterPageProps = Readonly<{
 export default async function RoasterPage({ params, searchParams }: RoasterPageProps) {
   const { id } = await params
   const session = await requireSession()
-  const roaster = await getRoasterProfile(id, session.id)
+  const [roaster, offers] = await Promise.all([
+    getRoasterProfile(id, session.id),
+    listCurrentOffersForRoasterHome(id, session.id),
+  ])
   const ownRoaster = session.roasterId === id
   const currentParams = (await searchParams) ?? {}
 
   return (
     <RoasterProfilePageContent
       canEdit={ownRoaster}
+      currentRoasterId={session.roasterId}
+      offers={offers}
       roaster={roaster}
       status={{
         created: currentParams.created === "1",

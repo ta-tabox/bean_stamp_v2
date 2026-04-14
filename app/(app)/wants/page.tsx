@@ -1,13 +1,23 @@
-import { PlaceholderPage } from "@/components/shared/PlaceholderPage"
-import { wantsRoutes } from "@/features/wants"
+import { WantsListPageContent } from "@/features/wants/components/WantsPageContents"
+import { requireSession } from "@/server/auth/guards"
+import { listWantsForUser } from "@/server/wants"
 
-export default function WantsPage() {
+type WantsPageProps = {
+  searchParams?: Promise<{
+    status?: string
+  }>
+}
+
+export default async function WantsPage({ searchParams }: WantsPageProps) {
+  const session = await requireSession()
+  const params = (await searchParams) ?? {}
+  const wants = await listWantsForUser(session.id, params.status)
+
   return (
-    <PlaceholderPage
-      eyebrow="Wants"
-      title="Want 一覧"
-      description="応募履歴と評価状態をまとめるルートです。"
-      links={wantsRoutes}
+    <WantsListPageContent
+      currentRoasterId={session.roasterId}
+      statusFilter={params.status}
+      wants={wants}
     />
   )
 }

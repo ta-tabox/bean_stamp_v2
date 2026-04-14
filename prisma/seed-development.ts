@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client"
 
+import { calculateOfferStatus } from "../src/server/offers"
 import { hashPassword } from "../src/server/auth/password"
 import { seedMasterData } from "./seed"
 
@@ -76,6 +77,74 @@ const developmentFollows = [
   },
 ] as const
 
+const developmentBeans = [
+  {
+    acidity: 4,
+    bitterness: 2,
+    body: 3,
+    countryId: 44,
+    describe: "みかんのような明るい酸と華やかさが出るサンプル豆です。",
+    elevation: 1450,
+    farm: "Okumino Farm",
+    flavor: 4,
+    image: "https://picsum.photos/seed/dev-bean-light/1200/900",
+    name: "Shibuya Morning Blend",
+    prefectureCode: "13",
+    process: "Washed",
+    roastLevelId: 2,
+    roasterName: "Light Roast Lab",
+    subregion: "Tokyo",
+    sweetness: 4,
+    tasteTagIds: [5, 24],
+    variety: "Geisha",
+  },
+  {
+    acidity: 2,
+    bitterness: 4,
+    body: 4,
+    countryId: 3,
+    describe: "チョコレート感の強い深煎りブレンドのサンプル豆です。",
+    elevation: 1250,
+    farm: "Medellin Estate",
+    flavor: 3,
+    image: "https://picsum.photos/seed/dev-bean-deep/1200/900",
+    name: "Umeda Night Blend",
+    prefectureCode: "27",
+    process: "Natural",
+    roastLevelId: 5,
+    roasterName: "Deep Roast Works",
+    subregion: "Antioquia",
+    sweetness: 3,
+    tasteTagIds: [61, 66],
+    variety: "Caturra",
+  },
+] as const
+
+const developmentOffers = [
+  {
+    amount: 8,
+    beanName: "Shibuya Morning Blend",
+    endedOffsetDays: 2,
+    name: "Shibuya Morning Blend 100g",
+    price: 1850,
+    receiptEndedOffsetDays: 6,
+    receiptStartedOffsetDays: 5,
+    roastedOffsetDays: 3,
+    weight: 100,
+  },
+  {
+    amount: 12,
+    beanName: "Umeda Night Blend",
+    endedOffsetDays: 1,
+    name: "Umeda Night Blend 200g",
+    price: 2100,
+    receiptEndedOffsetDays: 5,
+    receiptStartedOffsetDays: 4,
+    roastedOffsetDays: 2,
+    weight: 200,
+  },
+] as const
+
 async function main() {
   await seedMasterData(prisma)
 
@@ -84,10 +153,17 @@ async function main() {
 
   await seedDevelopmentUsers(passwordHash, roasterIdByName)
   await seedDevelopmentFollows(roasterIdByName)
+  const beanIdByName = await seedDevelopmentBeans(roasterIdByName)
+  await seedDevelopmentOffers(beanIdByName)
 
   console.info("[seed:dev] development users")
   for (const user of developmentUsers) {
     console.info(`- ${user.email} / ${DEVELOPMENT_PASSWORD}`)
+  }
+
+  console.info("[seed:dev] development offers")
+  for (const offer of developmentOffers) {
+    console.info(`- ${offer.name}`)
   }
 }
 
@@ -200,6 +276,165 @@ async function seedDevelopmentFollows(roasterIdByName: Map<string, bigint>) {
       },
     })
   }
+}
+
+async function seedDevelopmentBeans(roasterIdByName: Map<string, bigint>) {
+  const beanIdByName = new Map<string, bigint>()
+
+  for (const bean of developmentBeans) {
+    const roasterId = roasterIdByName.get(bean.roasterName)
+
+    if (!roasterId) {
+      continue
+    }
+
+    const existingBean = await prisma.bean.findFirst({
+      where: {
+        name: bean.name,
+        roasterId,
+      },
+      select: { id: true },
+    })
+
+    const savedBean = existingBean
+      ? await prisma.bean.update({
+          where: { id: existingBean.id },
+          data: buildBeanUpdateMutation(bean, roasterId),
+          select: { id: true },
+        })
+      : await prisma.bean.create({
+          data: buildBeanCreateMutation(bean, roasterId),
+          select: { id: true },
+        })
+
+    beanIdByName.set(bean.name, savedBean.id)
+  }
+
+  return beanIdByName
+}
+
+async function seedDevelopmentOffers(beanIdByName: Map<string, bigint>) {
+  const today = startOfUtcDay(new Date())
+
+  for (const offer of developmentOffers) {
+    const beanId = beanIdByName.get(offer.beanName)
+
+    if (!beanId) {
+      continue
+    }
+
+    const endedAt = addDays(today, offer.endedOffsetDays)
+    const roastedAt = addDays(today, offer.roastedOffsetDays)
+    const receiptStartedAt = addDays(today, offer.receiptStartedOffsetDays)
+    const receiptEndedAt = addDays(today, offer.receiptEndedOffsetDays)
+
+    const existingOffer = await prisma.offer.findFirst({
+      where: {
+        amount: offer.amount,
+        beanId,
+        price: offer.price,
+        weight: offer.weight,
+      },
+      select: { id: true },
+    })
+
+    const data = {
+      amount: offer.amount,
+      beanId,
+      endedAt,
+      price: offer.price,
+      receiptEndedAt,
+      receiptStartedAt,
+      roastedAt,
+      status: calculateOfferStatus({
+        endedAt,
+        receiptEndedAt,
+        receiptStartedAt,
+        roastedAt,
+      }),
+      weight: offer.weight,
+    }
+
+    if (existingOffer) {
+      await prisma.offer.update({
+        where: { id: existingOffer.id },
+        data,
+      })
+      continue
+    }
+
+    await prisma.offer.create({
+      data,
+    })
+  }
+}
+
+function buildBeanCreateMutation(bean: (typeof developmentBeans)[number], roasterId: bigint) {
+  return {
+    acidity: bean.acidity,
+    beanImages: {
+      create: [
+        {
+          image: bean.image,
+        },
+      ],
+    },
+    beanTasteTags: {
+      create: bean.tasteTagIds.map((tasteTagId) => ({
+        tasteTagId: BigInt(tasteTagId),
+      })),
+    },
+    bitterness: bean.bitterness,
+    body: bean.body,
+    countryId: BigInt(bean.countryId),
+    describe: bean.describe,
+    elevation: bean.elevation,
+    farm: bean.farm,
+    flavor: bean.flavor,
+    name: bean.name,
+    process: bean.process,
+    roastLevelId: BigInt(bean.roastLevelId),
+    roasterId,
+    subregion: bean.subregion,
+    sweetness: bean.sweetness,
+    variety: bean.variety,
+  }
+}
+
+function buildBeanUpdateMutation(bean: (typeof developmentBeans)[number], roasterId: bigint) {
+  return {
+    ...buildBeanCreateMutation(bean, roasterId),
+    beanImages: {
+      deleteMany: {},
+      create: [
+        {
+          image: bean.image,
+        },
+      ],
+    },
+    beanTasteTags: {
+      deleteMany: {},
+      create: bean.tasteTagIds.map((tasteTagId) => ({
+        tasteTagId: BigInt(tasteTagId),
+      })),
+    },
+  }
+}
+
+function addDays(base: Date, days: number) {
+  const value = new Date(base)
+
+  value.setUTCDate(value.getUTCDate() + days)
+
+  return value
+}
+
+function startOfUtcDay(value: Date) {
+  const normalized = new Date(value)
+
+  normalized.setUTCHours(0, 0, 0, 0)
+
+  return normalized
 }
 
 main()

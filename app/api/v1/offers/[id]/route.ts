@@ -178,7 +178,10 @@ async function readOfferPayload(request: Request) {
         payload.receiptStartedAt ??
         payload.receipt_started_at,
       roastedAt:
-        offerPayload.roastedAt ?? offerPayload.roasted_at ?? payload.roastedAt ?? payload.roasted_at,
+        offerPayload.roastedAt ??
+        offerPayload.roasted_at ??
+        payload.roastedAt ??
+        payload.roasted_at,
       weight: offerPayload.weight ?? payload.weight,
     }
   }
@@ -187,7 +190,8 @@ async function readOfferPayload(request: Request) {
 
   return {
     amount: formData.get("amount") ?? formData.get("offer[amount]"),
-    beanId: formData.get("beanId") ?? formData.get("offer[beanId]") ?? formData.get("offer[bean_id]"),
+    beanId:
+      formData.get("beanId") ?? formData.get("offer[beanId]") ?? formData.get("offer[bean_id]"),
     endedAt:
       formData.get("endedAt") ?? formData.get("offer[endedAt]") ?? formData.get("offer[ended_at]"),
     price: formData.get("price") ?? formData.get("offer[price]"),

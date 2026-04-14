@@ -101,7 +101,9 @@ export function ProfileSummaryCard({
               <p className="panel-label">{kind}</p>
               <h2 className="title-font mt-2 text-3xl text-[var(--color-fg)]">{name}</h2>
             </div>
-            {actions ? <div className="flex justify-center lg:shrink-0 lg:justify-end">{actions}</div> : null}
+            {actions ? (
+              <div className="flex justify-center lg:shrink-0 lg:justify-end">{actions}</div>
+            ) : null}
           </div>
 
           <div className="mt-4 max-w-xl text-sm leading-7 text-gray-500">
