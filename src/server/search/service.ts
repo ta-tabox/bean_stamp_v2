@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client"
 
+import { normalizePrefectureCode } from "@/components/shared/prefecture-label"
 import { prisma } from "@/server/db"
 import { AppError } from "@/server/errors"
 import { buildOfferApiResponse, buildOfferSelect, calculateOfferStatus } from "@/server/offers"
@@ -33,13 +34,13 @@ type SearchResult<T> = {
 type RoasterSearchInput = {
   name?: string | null
   page?: string | null
-  prefectureCode?: string | null
+  prefectureCodes?: string[] | null
 }
 
 type OfferSearchInput = {
   countryId?: string | null
   page?: string | null
-  prefectureCode?: string | null
+  prefectureCodes?: string[] | null
   roastLevelId?: string | null
   tasteTagId?: string | null
 }
@@ -234,7 +235,7 @@ export function buildPaginationHeaders(pagination: SearchPagination) {
 function buildRoasterSearchWhere(input: RoasterSearchInput): Prisma.RoasterWhereInput {
   const where: Prisma.RoasterWhereInput = {}
   const name = input.name?.trim()
-  const prefectureCode = input.prefectureCode?.trim()
+  const prefectureCodes = normalizePrefectureCodes(input.prefectureCodes)
 
   if (name) {
     where.name = {
@@ -243,8 +244,10 @@ function buildRoasterSearchWhere(input: RoasterSearchInput): Prisma.RoasterWhere
     }
   }
 
-  if (prefectureCode) {
-    where.prefectureCode = prefectureCode
+  if (prefectureCodes.length) {
+    where.prefectureCode = {
+      in: prefectureCodes,
+    }
   }
 
   return where
@@ -252,11 +255,13 @@ function buildRoasterSearchWhere(input: RoasterSearchInput): Prisma.RoasterWhere
 
 function buildOfferSearchWhere(input: OfferSearchInput, now: Date): Prisma.OfferWhereInput {
   const bean: Prisma.BeanWhereInput = {}
-  const prefectureCode = input.prefectureCode?.trim()
+  const prefectureCodes = normalizePrefectureCodes(input.prefectureCodes)
 
-  if (prefectureCode) {
+  if (prefectureCodes.length) {
     bean.roaster = {
-      prefectureCode,
+      prefectureCode: {
+        in: prefectureCodes,
+      },
     }
   }
 
@@ -341,6 +346,20 @@ function normalizePage(page?: string | null) {
   const parsed = Number(page)
 
   return Number.isInteger(parsed) && parsed > 0 ? parsed : 1
+}
+
+function normalizePrefectureCodes(prefectureCodes?: string[] | null) {
+  const normalizedCodes: string[] = []
+
+  for (const prefectureCode of prefectureCodes ?? []) {
+    const normalizedCode = normalizePrefectureCode(prefectureCode)
+
+    if (normalizedCode) {
+      normalizedCodes.push(normalizedCode)
+    }
+  }
+
+  return normalizedCodes
 }
 
 function startOfDay(value: Date) {

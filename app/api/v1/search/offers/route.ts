@@ -13,7 +13,7 @@ export async function GET(request: Request) {
       {
         countryId: url.searchParams.get("country_id"),
         page: url.searchParams.get("page"),
-        prefectureCode: url.searchParams.get("prefecture_code"),
+        prefectureCodes: url.searchParams.getAll("prefecture_code"),
         roastLevelId: url.searchParams.get("roast_level_id"),
         tasteTagId: url.searchParams.get("taste_tag_id"),
       },

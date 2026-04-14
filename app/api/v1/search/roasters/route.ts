@@ -12,7 +12,7 @@ export async function GET(request: Request) {
     const result = await listRoastersBySearch({
       name: url.searchParams.get("name"),
       page: url.searchParams.get("page"),
-      prefectureCode: url.searchParams.get("prefecture_code"),
+      prefectureCodes: url.searchParams.getAll("prefecture_code"),
     })
 
     return NextResponse.json(result.items, {

@@ -6,7 +6,7 @@ type SearchOffersPageProps = Readonly<{
   searchParams?: Promise<{
     country_id?: string
     page?: string
-    prefecture_code?: string
+    prefecture_code?: string | string[]
     roast_level_id?: string
     taste_tag_id?: string
   }>
@@ -19,7 +19,7 @@ export default async function SearchOffersPage({ searchParams }: SearchOffersPag
     {
       countryId: currentParams.country_id,
       page: currentParams.page,
-      prefectureCode: currentParams.prefecture_code,
+      prefectureCodes: readSearchParamArray(currentParams.prefecture_code),
       roastLevelId: currentParams.roast_level_id,
       tasteTagId: currentParams.taste_tag_id,
     },
@@ -34,11 +34,19 @@ export default async function SearchOffersPage({ searchParams }: SearchOffersPag
       offers={result.items.map(mapOfferToHomeOfferSummary)}
       searchParams={{
         countryId: currentParams.country_id,
-        prefectureCode: currentParams.prefecture_code,
+        prefectureCodes: readSearchParamArray(currentParams.prefecture_code),
         roastLevelId: currentParams.roast_level_id,
         tasteTagId: currentParams.taste_tag_id,
       }}
       totalPages={result.pagination.totalPages}
     />
   )
+}
+
+function readSearchParamArray(value?: string | string[]) {
+  if (!value) {
+    return []
+  }
+
+  return Array.isArray(value) ? value : [value]
 }

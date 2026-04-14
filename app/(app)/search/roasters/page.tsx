@@ -6,7 +6,7 @@ type SearchRoastersPageProps = Readonly<{
   searchParams?: Promise<{
     name?: string
     page?: string
-    prefecture_code?: string
+    prefecture_code?: string | string[]
   }>
 }>
 
@@ -16,7 +16,7 @@ export default async function SearchRoastersPage({ searchParams }: SearchRoaster
   const result = await listRoastersBySearch({
     name: currentParams.name,
     page: currentParams.page,
-    prefectureCode: currentParams.prefecture_code,
+    prefectureCodes: readSearchParamArray(currentParams.prefecture_code),
   })
 
   return (
@@ -26,9 +26,17 @@ export default async function SearchRoastersPage({ searchParams }: SearchRoaster
       roasters={result.items}
       searchParams={{
         name: currentParams.name,
-        prefectureCode: currentParams.prefecture_code,
+        prefectureCodes: readSearchParamArray(currentParams.prefecture_code),
       }}
       totalPages={result.pagination.totalPages}
     />
   )
+}
+
+function readSearchParamArray(value?: string | string[]) {
+  if (!value) {
+    return []
+  }
+
+  return Array.isArray(value) ? value : [value]
 }

@@ -48,6 +48,11 @@ const prefectureLabels = {
   "47": "沖縄県",
 } as const
 
+export const prefectureOptions = Object.entries(prefectureLabels).map(([value, label]) => ({
+  label,
+  value,
+}))
+
 export function resolvePrefectureLabel(code: string) {
   const normalizedCode = normalizePrefectureCode(code)
 
@@ -58,7 +63,7 @@ export function resolvePrefectureLabel(code: string) {
   return prefectureLabels[normalizedCode] ?? code
 }
 
-function normalizePrefectureCode(code: string) {
+export function normalizePrefectureCode(code: string) {
   const trimmedCode = code.trim()
 
   if (!/^\d{1,2}$/.test(trimmedCode)) {

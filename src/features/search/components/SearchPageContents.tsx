@@ -3,8 +3,9 @@ import Link from "next/link"
 import { HomeOfferCard } from "@/components/home/HomeUi"
 import { ContentHeader } from "@/components/layout/ContentHeader"
 import { ProfileListItemLink, ProfileListSection } from "@/components/profiles/ProfileUi"
-import { resolvePrefectureLabel } from "@/components/shared/prefecture-label"
+import { prefectureOptions, resolvePrefectureLabel } from "@/components/shared/prefecture-label"
 import type { HomeOfferSummary } from "@/features/home/types"
+import { SearchPrefectureMultiSelect } from "@/features/search/components/SearchPrefectureMultiSelect"
 import { countriesSeedData, roastLevelsSeedData, tasteTagsSeedData } from "@/server/db/seed-data"
 import type { RoasterApiResponse } from "@/server/profiles/dto"
 
@@ -17,7 +18,7 @@ type SearchPageContentProps = {
   searchParams?: {
     countryId?: string
     name?: string
-    prefectureCode?: string
+    prefectureCodes?: string[]
     roastLevelId?: string
     tasteTagId?: string
   }
@@ -61,12 +62,12 @@ export function SearchPageContent({
           {currentTab === "roasters" ? (
             <RoasterSearchForm
               name={searchParams?.name ?? ""}
-              prefectureCode={searchParams?.prefectureCode ?? ""}
+              prefectureCodes={searchParams?.prefectureCodes ?? []}
             />
           ) : (
             <OfferSearchForm
               countryId={searchParams?.countryId ?? ""}
-              prefectureCode={searchParams?.prefectureCode ?? ""}
+              prefectureCodes={searchParams?.prefectureCodes ?? []}
               roastLevelId={searchParams?.roastLevelId ?? ""}
               tasteTagId={searchParams?.tasteTagId ?? ""}
             />
@@ -126,7 +127,7 @@ function SearchTabLink({ active, href, label }: { active: boolean; href: string;
   )
 }
 
-function RoasterSearchForm({ name, prefectureCode }: { name: string; prefectureCode: string }) {
+function RoasterSearchForm({ name, prefectureCodes }: { name: string; prefectureCodes: string[] }) {
   return (
     <form
       action="/search/roasters"
@@ -138,10 +139,11 @@ function RoasterSearchForm({ name, prefectureCode }: { name: string; prefectureC
         name="name"
         defaultValue={name}
       />
-      <SearchField
-        label="都道府県コード"
+      <SearchPrefectureMultiSelect
+        label="都道府県"
         name="prefecture_code"
-        defaultValue={prefectureCode}
+        defaultValues={prefectureCodes}
+        options={prefectureOptions}
       />
       <SearchActions href="/search/roasters" />
     </form>
@@ -150,12 +152,12 @@ function RoasterSearchForm({ name, prefectureCode }: { name: string; prefectureC
 
 function OfferSearchForm({
   countryId,
-  prefectureCode,
+  prefectureCodes,
   roastLevelId,
   tasteTagId,
 }: {
   countryId: string
-  prefectureCode: string
+  prefectureCodes: string[]
   roastLevelId: string
   tasteTagId: string
 }) {
@@ -165,10 +167,11 @@ function OfferSearchForm({
       method="get"
       className="space-y-5"
     >
-      <SearchField
-        label="都道府県コード"
+      <SearchPrefectureMultiSelect
+        label="都道府県"
         name="prefecture_code"
-        defaultValue={prefectureCode}
+        defaultValues={prefectureCodes}
+        options={prefectureOptions}
       />
       <SearchSelect
         label="生産国"
@@ -302,7 +305,7 @@ function OffersSearchResults({
         {offers.map((offer, index) => (
           <li
             key={offer.id}
-            className={index === 0 ? "mt-4" : "mt-20"}
+            className={index === 0 ? "mt-10" : "mt-20"}
           >
             <HomeOfferCard
               acidity={offer.acidity}
@@ -433,8 +436,8 @@ function buildPageHref(
     params.set("name", searchParams.name)
   }
 
-  if (searchParams?.prefectureCode) {
-    params.set("prefecture_code", searchParams.prefectureCode)
+  for (const prefectureCode of searchParams?.prefectureCodes ?? []) {
+    params.append("prefecture_code", prefectureCode)
   }
 
   if (searchParams?.countryId) {

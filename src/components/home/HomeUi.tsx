@@ -89,21 +89,18 @@ export function HomeOfferCard({
   const tabGroupId = useId()
 
   return (
-    <article className="overflow-visible rounded-lg border border-gray-100 bg-white py-2 shadow-md">
+    <article className="overflow-visible rounded-lg border border-gray-100 bg-white px-4 py-5 shadow-md md:px-6">
       <section>
-        <div className="mx-auto mb-2 w-11/12">
-          <div className="flex justify-center -mt-16 lg:justify-end">
-            <Link href={roasterHref}>
-              <img
-                src={roasterImageUrl ?? "/images/default-roaster.png"}
-                alt={`${roasterName}の画像`}
-                className="h-24 w-24 rounded-full border-4 border-white object-cover shadow-md"
-              />
-            </Link>
-          </div>
-
-          <div className="my-1 flex items-start justify-end">
-            <div className="ml-auto w-2/3 md:w-1/3">
+        <div className="mx-auto mb-2 w-full">
+          <div className="mb-4 flex justify-end">
+            <div className="flex max-w-40 flex-col items-center gap-2 text-center md:items-end md:text-right">
+              <Link href={roasterHref}>
+                <img
+                  src={roasterImageUrl ?? "/images/default-roaster.png"}
+                  alt={`${roasterName}の画像`}
+                  className="h-24 w-24 rounded-full border-4 border-white object-cover shadow-md"
+                />
+              </Link>
               <Link
                 href={roasterHref}
                 className="legacy-text-link text-sm"
@@ -160,7 +157,7 @@ export function HomeOfferCard({
       </section>
 
       <section>
-        <div className="mx-auto mt-4 flex w-11/12 flex-wrap">
+        <div className="mx-auto mt-4 flex w-full flex-wrap">
           <div className="mb-4 w-full lg:mb-0 lg:w-1/2 lg:pr-4">
             <div
               role="tablist"
@@ -327,7 +324,7 @@ function HomeOfferStatusTag({ status }: { status: HomeOfferStatus }) {
 
 function HomeDetailItem({ label, value }: { label: string; value: string }) {
   return (
-    <div className="mx-auto flex w-11/12 border-t border-gray-200 py-2">
+    <div className="mx-auto flex w-full border-t border-gray-200 py-2">
       <span className="text-gray-500">{label}</span>
       <span className="ml-auto text-right text-gray-800">{value}</span>
     </div>

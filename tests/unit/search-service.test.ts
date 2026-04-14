@@ -31,7 +31,7 @@ describe("search/service", () => {
     vi.clearAllMocks()
   })
 
-  it("ロースター検索は名称と都道府県コードで絞り込み、ページング情報を返す", async () => {
+  it("ロースター検索は名称と複数都道府県で絞り込み、ページング情報を返す", async () => {
     mockPrisma.roaster.count.mockResolvedValue(12)
     mockPrisma.roaster.findMany.mockResolvedValue([
       {
@@ -49,7 +49,7 @@ describe("search/service", () => {
     const result = await listRoastersBySearch({
       name: "Tokyo",
       page: "2",
-      prefectureCode: "13",
+      prefectureCodes: ["13", "14"],
     })
 
     expect(mockPrisma.roaster.count).toHaveBeenCalledWith({
@@ -58,7 +58,9 @@ describe("search/service", () => {
           contains: "Tokyo",
           mode: "insensitive",
         },
-        prefectureCode: "13",
+        prefectureCode: {
+          in: ["13", "14"],
+        },
       },
     })
     expect(mockPrisma.roaster.findMany).toHaveBeenCalledWith(
@@ -71,7 +73,9 @@ describe("search/service", () => {
             contains: "Tokyo",
             mode: "insensitive",
           },
-          prefectureCode: "13",
+          prefectureCode: {
+            in: ["13", "14"],
+          },
         },
       }),
     )
@@ -141,7 +145,7 @@ describe("search/service", () => {
       {
         countryId: "44",
         page: "1",
-        prefectureCode: "13",
+        prefectureCodes: ["13", "14"],
         roastLevelId: "2",
         tasteTagId: "4",
       },
@@ -155,7 +159,9 @@ describe("search/service", () => {
           countryId: 44n,
           roastLevelId: 2n,
           roaster: {
-            prefectureCode: "13",
+            prefectureCode: {
+              in: ["13", "14"],
+            },
           },
           beanTasteTags: {
             some: {
