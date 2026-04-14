@@ -161,6 +161,24 @@ img {
   font-size: 0.875rem;
 }
 
+.status-banner-default {
+  background: #eef2ff;
+  border-color: #c7d2fe;
+  color: #4338ca;
+}
+
+.status-banner-success {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #166534;
+}
+
+.status-banner-error {
+  background: #fff1f2;
+  border-color: #fecdd3;
+  color: #be123c;
+}
+
 .toast-viewport {
   position: fixed;
   right: 1rem;
@@ -188,6 +206,10 @@ img {
 .toast-shell-leaving {
   opacity: 0;
   transform: translateY(0.75rem);
+}
+
+.toast-content {
+  display: block;
 }
 
 .empty-state {

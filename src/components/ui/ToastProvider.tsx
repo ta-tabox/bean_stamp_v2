@@ -11,19 +11,18 @@ import {
 } from "react"
 
 import { StatusBanner } from "@/components/ui/StatusBanner"
-
-type ToastTone = "error" | "success"
+import { getToastStatusMeta, type ToastStatus } from "@/components/ui/toast"
 
 type ToastState = {
   id: number
   message: string
-  tone: ToastTone
+  status: ToastStatus
 }
 
 type ToastPhase = "entering" | "visible" | "leaving"
 
 type ToastContextValue = {
-  showToast: (message: string, tone: ToastTone) => void
+  showToast: (message: string, status: ToastStatus) => void
 }
 
 const ToastContext = createContext<ToastContextValue | null>(null)
@@ -82,12 +81,14 @@ export function ToastProvider({ children }: ToastProviderProps) {
   const contextValue = useMemo<ToastContextValue>(
     () => ({
       showToast(message, tone) {
+        const status = tone
+
         toastIdRef.current += 1
         setToastPhase("entering")
         setToast({
           id: toastIdRef.current,
           message,
-          tone,
+          status,
         })
       },
     }),
@@ -98,19 +99,10 @@ export function ToastProvider({ children }: ToastProviderProps) {
     <ToastContext.Provider value={contextValue}>
       {children}
       {toast ? (
-        <div className="toast-viewport">
-          <div
-            role={toast.tone === "error" ? "alert" : "status"}
-            aria-live={toast.tone === "error" ? "assertive" : "polite"}
-            className={`toast-shell toast-shell-${toastPhase}`}
-          >
-            <StatusBanner>
-              <span className={toast.tone === "error" ? "text-rose-700" : undefined}>
-                {toast.message}
-              </span>
-            </StatusBanner>
-          </div>
-        </div>
+        <ToastMessage
+          toast={toast}
+          toastPhase={toastPhase}
+        />
       ) : null}
     </ToastContext.Provider>
   )
@@ -124,4 +116,27 @@ export function useToast() {
   }
 
   return context
+}
+
+type ToastMessageProps = {
+  toast: ToastState
+  toastPhase: ToastPhase
+}
+
+function ToastMessage({ toast, toastPhase }: ToastMessageProps) {
+  const meta = getToastStatusMeta(toast.status)
+
+  return (
+    <div className="toast-viewport">
+      <div
+        role={meta.role}
+        aria-live={meta.ariaLive}
+        className={`toast-shell toast-shell-${toastPhase}`}
+      >
+        <StatusBanner tone={toast.status}>
+          <div className="toast-content">{toast.message}</div>
+        </StatusBanner>
+      </div>
+    </div>
+  )
 }
